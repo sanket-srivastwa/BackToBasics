@@ -145,6 +145,15 @@ The application uses four main entities:
 - Enhanced CSS animations including gradient shifts, scale effects, and smooth transitions
 - Better mobile responsiveness and accessibility features
 
+### Search Functionality (New Features)
+- Global search bar on home page hero section for searching questions and topics
+- Search redirects to practice page with filtered results
+- Comprehensive search functionality for questions with query parameter handling
+- Enhanced AI Learning Assistant prominently featured at top of learning page
+- AI search with conversation history for interactive Q&A in learning materials
+- Quick question buttons for common management and technical topics
+- Smart error handling for OpenAI API quota limitations with user-friendly messages
+
 ## Changelog
 
 ```
@@ -152,6 +161,7 @@ Changelog:
 - July 04, 2025. Initial setup with database integration and AI-powered feedback
 - July 04, 2025. Added comprehensive learning materials and voice-based answering functionality
 - July 04, 2025. Major UX improvements: redesigned home page, enhanced learning platform with Engineering Management, improved visual design and animations
+- July 04, 2025. Implemented comprehensive search functionality: global search bar on home page, enhanced AI learning assistant, and question search with filtering
 ```
 
 ## User Preferences

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,13 +12,35 @@ import { ArrowLeft, Users, Clock, Target, TrendingUp, Bookmark, Star, Flame } fr
 export default function Practice() {
   const [, setLocation] = useLocation();
   const [selectedTopic, setSelectedTopic] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
+  // Get search query from URL parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const search = urlParams.get('search');
+    if (search) {
+      setSearchQuery(search);
+    }
+  }, []);
+
+  // Default questions query
   const { data: questions, isLoading } = useQuery({
     queryKey: ["/api/questions/popular"],
     queryFn: async () => {
       const response = await fetch("/api/questions/popular");
       return response.json();
     },
+    enabled: !searchQuery, // Only fetch when not searching
+  });
+
+  // Search questions query
+  const { data: searchResults, isLoading: searchLoading } = useQuery({
+    queryKey: ["/api/questions/search", searchQuery],
+    queryFn: async () => {
+      const response = await fetch(`/api/questions/search?q=${encodeURIComponent(searchQuery)}`);
+      return response.json();
+    },
+    enabled: !!searchQuery,
   });
 
   const topics = [
@@ -66,10 +88,13 @@ export default function Practice() {
             Back to Home
           </Button>
           <h1 className="text-3xl font-bold text-neutral-800 mb-2">
-            Practice Questions
+            {searchQuery ? `Search Results for "${searchQuery}"` : "Practice Questions"}
           </h1>
           <p className="text-neutral-600">
-            Browse and practice with curated questions from top tech companies
+            {searchQuery 
+              ? `Found ${searchResults?.length || 0} questions matching your search`
+              : "Browse and practice with curated questions from top tech companies"
+            }
           </p>
         </div>
 
@@ -91,7 +116,7 @@ export default function Practice() {
 
         {/* Questions List */}
         <div className="space-y-6">
-          {isLoading ? (
+          {(isLoading || searchLoading) ? (
             <div className="grid gap-6">
               {[1, 2, 3].map((i) => (
                 <Card key={i} className="animate-pulse">
@@ -106,9 +131,9 @@ export default function Practice() {
                 </Card>
               ))}
             </div>
-          ) : questions && questions.length > 0 ? (
+          ) : (searchQuery ? searchResults : questions) && (searchQuery ? searchResults : questions)?.length > 0 ? (
             <div className="grid gap-6">
-              {questions.map((question: any, index: number) => (
+              {(searchQuery ? searchResults : questions).map((question: any, index: number) => (
                 <QuestionCard
                   key={question.id}
                   question={question}
@@ -121,15 +146,29 @@ export default function Practice() {
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle>No Questions Available</CardTitle>
+                <CardTitle>
+                  {searchQuery ? "No Search Results" : "No Questions Available"}
+                </CardTitle>
                 <CardDescription>
-                  There are no questions available at the moment. Try creating a custom case study instead.
+                  {searchQuery 
+                    ? `No questions found matching "${searchQuery}". Try different keywords or browse all questions.`
+                    : "There are no questions available at the moment. Try creating a custom case study instead."
+                  }
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button onClick={() => setLocation("/custom-case-study")}>
-                  Create Custom Case Study
-                </Button>
+                {searchQuery ? (
+                  <Button onClick={() => {
+                    setSearchQuery("");
+                    window.history.replaceState({}, '', '/practice');
+                  }}>
+                    Browse All Questions
+                  </Button>
+                ) : (
+                  <Button onClick={() => setLocation("/custom-case-study")}>
+                    Create Custom Case Study
+                  </Button>
+                )}
               </CardContent>
             </Card>
           )}

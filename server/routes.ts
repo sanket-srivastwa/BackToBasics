@@ -16,6 +16,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Search questions
+  app.get("/api/questions/search", async (req, res) => {
+    try {
+      const { q: query } = req.query;
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ error: "Search query is required" });
+      }
+      
+      const questions = await storage.searchQuestions(query);
+      res.json(questions);
+    } catch (error) {
+      console.error("Error searching questions:", error);
+      res.status(500).json({ error: "Failed to search questions" });
+    }
+  });
+
   // Get questions by topic and category
   app.get("/api/questions", async (req, res) => {
     try {

@@ -855,6 +855,24 @@ export default function Learning() {
           </p>
         </div>
 
+        {/* AI Learning Assistant Search */}
+        <div className="mb-16">
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl flex items-center justify-center gap-2">
+                <Search className="w-6 h-6 text-blue-600" />
+                AI Learning Assistant
+              </CardTitle>
+              <CardDescription className="text-lg">
+                Ask any question about management, leadership, technical concepts, or career development
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="max-w-4xl mx-auto">
+              <AISearchComponent />
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Learning Tracks Overview */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           {Object.entries(learningTracks).map(([key, track]) => {
