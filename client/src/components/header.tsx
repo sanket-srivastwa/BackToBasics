@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 
 export default function Header() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -20,27 +20,33 @@ export default function Header() {
             <nav className="hidden md:ml-8 md:flex md:space-x-8">
               <button 
                 onClick={() => setLocation("/")}
-                className="text-neutral-800 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  location === "/" 
+                    ? "text-primary bg-primary/10" 
+                    : "text-neutral-600 hover:text-primary"
+                }`}
               >
                 Home
               </button>
               <button 
                 onClick={() => setLocation("/practice")}
-                className="text-neutral-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  location === "/practice" 
+                    ? "text-primary bg-primary/10" 
+                    : "text-neutral-600 hover:text-primary"
+                }`}
               >
                 Practice
               </button>
               <button 
                 onClick={() => setLocation("/custom-case-study")}
-                className="text-neutral-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  location === "/custom-case-study" 
+                    ? "text-primary bg-primary/10" 
+                    : "text-neutral-600 hover:text-primary"
+                }`}
               >
                 AI Case Study
-              </button>
-              <button className="text-neutral-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                Resources
-              </button>
-              <button className="text-neutral-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                About
               </button>
             </nav>
           </div>

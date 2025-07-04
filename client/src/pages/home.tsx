@@ -121,19 +121,19 @@ export default function Home() {
               <Button 
                 size="lg" 
                 className="bg-white text-primary hover:bg-gray-100 text-lg px-8 py-4"
-                onClick={() => handleTopicSelect("tpm", "mock-interview")}
+                onClick={() => setLocation("/custom-case-study")}
               >
-                <Play className="mr-2 h-5 w-5" />
-                Start Mock Interview
+                <Briefcase className="mr-2 h-5 w-5" />
+                Create Custom Case Study
               </Button>
               <Button 
                 size="lg" 
                 variant="outline" 
                 className="border-2 border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-4"
-                onClick={() => setLocation("/custom-case-study")}
+                onClick={() => setLocation("/practice")}
               >
-                <Briefcase className="mr-2 h-5 w-5" />
-                Create Custom Case Study
+                <Play className="mr-2 h-5 w-5" />
+                Browse Questions
               </Button>
             </div>
           </div>
@@ -151,54 +151,17 @@ export default function Home() {
           </div>
           
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Mock Interviews Card */}
-            <Card className="border-2 hover:border-primary transition-all hover:shadow-xl cursor-pointer group">
-              <CardHeader>
-                <div className="flex items-center mb-4">
-                  <div className="bg-primary/10 p-3 rounded-lg mr-4">
-                    <Mic className="h-8 w-8 text-primary" />
-                  </div>
-                  <CardTitle className="text-2xl">Mock Interviews</CardTitle>
-                </div>
-                <CardDescription className="text-base">
-                  Practice real-time interviews with AI feedback. Perfect for behavioral and technical questions from top tech companies.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 mb-6">
-                  <li className="flex items-center text-neutral-600">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-                    Real-time feedback
-                  </li>
-                  <li className="flex items-center text-neutral-600">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-                    MAANG company questions
-                  </li>
-                  <li className="flex items-center text-neutral-600">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-                    Timed practice sessions
-                  </li>
-                </ul>
-                <Button 
-                  className="w-full group-hover:bg-primary/90" 
-                  onClick={() => handleTopicSelect("tpm", "mock-interview")}
-                >
-                  Start Mock Interview
-                </Button>
-              </CardContent>
-            </Card>
-
             {/* Case Studies Card */}
             <Card className="border-2 hover:border-primary transition-all hover:shadow-xl cursor-pointer group">
               <CardHeader>
                 <div className="flex items-center mb-4">
-                  <div className="bg-accent/10 p-3 rounded-lg mr-4">
-                    <ChartLine className="h-8 w-8 text-accent" />
+                  <div className="bg-primary/10 p-3 rounded-lg mr-4">
+                    <ChartLine className="h-8 w-8 text-primary" />
                   </div>
-                  <CardTitle className="text-2xl">Case Studies</CardTitle>
+                  <CardTitle className="text-2xl">AI Case Studies</CardTitle>
                 </div>
                 <CardDescription className="text-base">
-                  Create custom interview questions and get AI-powered feedback. Perfect for personalized practice and skill development.
+                  Create custom interview questions or use AI-generated questions with personalized feedback. Perfect for targeted practice.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -217,10 +180,47 @@ export default function Home() {
                   </li>
                 </ul>
                 <Button 
-                  className="w-full bg-accent hover:bg-accent/90" 
+                  className="w-full group-hover:bg-primary/90" 
                   onClick={() => setLocation("/custom-case-study")}
                 >
                   Create Custom Case Study
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Practice Questions Card */}
+            <Card className="border-2 hover:border-primary transition-all hover:shadow-xl cursor-pointer group">
+              <CardHeader>
+                <div className="flex items-center mb-4">
+                  <div className="bg-accent/10 p-3 rounded-lg mr-4">
+                    <Briefcase className="h-8 w-8 text-accent" />
+                  </div>
+                  <CardTitle className="text-2xl">Practice Questions</CardTitle>
+                </div>
+                <CardDescription className="text-base">
+                  Browse and practice with curated questions from top tech companies. Perfect for structured interview preparation.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-center text-neutral-600">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                    MAANG company questions
+                  </li>
+                  <li className="flex items-center text-neutral-600">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                    Timed practice sessions
+                  </li>
+                  <li className="flex items-center text-neutral-600">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                    Difficulty-based filtering
+                  </li>
+                </ul>
+                <Button 
+                  className="w-full bg-accent hover:bg-accent/90" 
+                  onClick={() => setLocation("/practice")}
+                >
+                  Browse Questions
                 </Button>
               </CardContent>
             </Card>
@@ -246,7 +246,7 @@ export default function Home() {
                 <Card 
                   key={topic.id}
                   className="hover:shadow-md transition-shadow cursor-pointer border hover:border-primary"
-                  onClick={() => handleTopicSelect(topic.id, "mock-interview")}
+                  onClick={() => setLocation("/practice")}
                 >
                   <CardHeader>
                     <div className="flex items-center mb-4">
