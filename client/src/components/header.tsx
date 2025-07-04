@@ -106,29 +106,7 @@ export default function Header() {
                 Get Started
               </Button>
               
-              {/* Search Bar */}
-              <form onSubmit={handleSearch} className="hidden lg:flex items-center">
-                <div className="relative flex items-center bg-white rounded-md overflow-hidden shadow-sm border border-gray-200">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    type="text"
-                    placeholder="Search questions, topics, companies..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-28 w-80 border-0 rounded-none focus:ring-0 bg-white text-gray-900 placeholder-gray-500"
-                  />
-                  <Select value={searchType} onValueChange={setSearchType}>
-                    <SelectTrigger className="w-24 border-0 border-l border-gray-200 rounded-none bg-gray-50 text-gray-700 text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="practice">Practice</SelectItem>
-                      <SelectItem value="learning">Learning</SelectItem>
-                      <SelectItem value="companies">Companies</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </form>
+
             </div>
           </div>
         </div>
