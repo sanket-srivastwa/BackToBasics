@@ -37,8 +37,11 @@ The answer should be 300-500 words and demonstrate expertise level appropriate f
     });
 
     return response.choices[0].message.content || "Unable to generate optimal answer.";
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error generating optimal answer:", error);
+    if (error.status === 429) {
+      throw new Error("OpenAI API quota exceeded. Please check your API plan and billing details.");
+    }
     throw new Error("Failed to generate optimal answer");
   }
 }
@@ -96,8 +99,11 @@ Focus on:
       suggestions: analysis.suggestions || ["Use the STAR method for structure"],
       detailedFeedback: analysis.detailedFeedback || "Please provide more detail in your response."
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error analyzing answer:", error);
+    if (error.status === 429) {
+      throw new Error("OpenAI API quota exceeded. Please check your API plan and billing details.");
+    }
     throw new Error("Failed to analyze answer");
   }
 }
@@ -130,8 +136,11 @@ Respond with JSON:
       isValid: result.isValid !== false,
       feedback: result.feedback
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error validating question:", error);
+    if (error.status === 429) {
+      console.warn("OpenAI API quota exceeded for validation - defaulting to valid");
+    }
     return { isValid: true }; // Default to allowing questions if validation fails
   }
 }

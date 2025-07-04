@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { type Question } from "@/lib/api";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import VoiceInput from "@/components/voice-input";
@@ -22,7 +23,7 @@ export default function Question() {
   // Get question ID from URL
   const questionId = parseInt(window.location.pathname.split("/").pop() || "0");
 
-  const { data: question, isLoading } = useQuery({
+  const { data: question, isLoading } = useQuery<Question>({
     queryKey: [`/api/questions/${questionId}`],
     enabled: !!questionId,
   });
@@ -62,7 +63,7 @@ export default function Question() {
 
   // Timer logic
   useEffect(() => {
-    if (question && !isTimerActive) {
+    if (question && question.timeLimit && !isTimerActive) {
       setTimeLeft(question.timeLimit * 60); // Convert minutes to seconds
       setIsTimerActive(true);
     }
@@ -205,11 +206,11 @@ export default function Question() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold mb-2">
-                  {question.topic.toUpperCase()} - Question
+                  {question?.topic?.toUpperCase()} - Question
                 </h3>
                 <p className="text-blue-100">
-                  {question.category === "mock-interview" ? "Behavioral" : "Case Study"} • 
-                  Expected time: {question.timeLimit} minutes
+                  {question?.category === "mock-interview" ? "Behavioral" : "Case Study"} • 
+                  Expected time: {question?.timeLimit || 0} minutes
                 </p>
               </div>
               <div className="text-right">
@@ -225,14 +226,14 @@ export default function Question() {
           <CardContent className="p-8">
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-neutral-800 mb-4">
-                {question.title}
+                {question?.title || "Loading question..."}
               </h2>
               
               <p className="text-lg text-neutral-700 mb-6">
-                {question.description}
+                {question?.description || "Loading question details..."}
               </p>
 
-              {question.tips && question.tips.length > 0 && (
+              {question?.tips && question.tips.length > 0 && (
                 <div className="bg-blue-50 border-l-4 border-primary p-4 mb-6">
                   <div className="flex items-center mb-2">
                     <Lightbulb className="h-5 w-5 text-primary mr-2" />
