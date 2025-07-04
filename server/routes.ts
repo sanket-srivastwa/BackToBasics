@@ -206,6 +206,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI Learning Search endpoint
+  app.post("/api/ai/learning-search", async (req, res) => {
+    try {
+      const { query } = req.body;
+      
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ error: "Query is required" });
+      }
+
+      const response = await generateLearningResponse(query.trim());
+      res.json({ response });
+    } catch (error: any) {
+      console.error("AI learning search error:", error);
+      if (error?.message?.includes('quota') || error?.message?.includes('rate limit')) {
+        return res.status(429).json({ 
+          error: "Our AI assistant is currently at capacity. Please try again in a few minutes, or explore our comprehensive learning materials below." 
+        });
+      }
+      res.status(500).json({ error: "Failed to process learning query" });
+    }
+  });
+
   // Submit and analyze custom question answer
   app.post("/api/answers/analyze", async (req, res) => {
     try {
