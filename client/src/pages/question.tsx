@@ -5,10 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import { ArrowLeft, Save, Send, Clock, Lightbulb } from "lucide-react";
+import VoiceInput from "@/components/voice-input";
+import { ArrowLeft, Save, Send, Clock, Lightbulb, Mic, Keyboard } from "lucide-react";
 
 export default function Question() {
   const [, setLocation] = useLocation();
@@ -250,20 +252,63 @@ export default function Question() {
               <label className="block text-lg font-semibold text-neutral-800 mb-3">
                 Your Answer
               </label>
-              <Textarea
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Start typing your answer here... Remember to structure your response using the STAR method."
-                className="min-h-64 resize-none"
-              />
-              <div className="flex justify-between items-center mt-2">
-                <span className="text-sm text-neutral-500">
-                  Word count: {wordCount}
-                </span>
-                <span className="text-sm text-neutral-500">
-                  Aim for 200-400 words
-                </span>
-              </div>
+              
+              <Tabs defaultValue="typing" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="typing" className="flex items-center gap-2">
+                    <Keyboard className="h-4 w-4" />
+                    Type Answer
+                  </TabsTrigger>
+                  <TabsTrigger value="voice" className="flex items-center gap-2">
+                    <Mic className="h-4 w-4" />
+                    Speak Answer
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="typing" className="mt-4">
+                  <Textarea
+                    value={answer}
+                    onChange={(e) => setAnswer(e.target.value)}
+                    placeholder="Start typing your answer here... Remember to structure your response using the STAR method."
+                    className="min-h-64 resize-none"
+                  />
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-sm text-neutral-500">
+                      Word count: {wordCount}
+                    </span>
+                    <span className="text-sm text-neutral-500">
+                      Aim for 200-400 words
+                    </span>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="voice" className="mt-4">
+                  <VoiceInput
+                    onTranscription={(text) => setAnswer(prev => prev + " " + text)}
+                    disabled={submitAnswerMutation.isPending}
+                  />
+                  {answer && (
+                    <div className="mt-4">
+                      <div className="text-sm text-neutral-600 mb-2">Your transcribed answer:</div>
+                      <div className="bg-gray-50 p-4 rounded-lg border text-sm">
+                        {answer}
+                      </div>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-sm text-neutral-500">
+                          Word count: {wordCount}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setAnswer("")}
+                        >
+                          Clear Answer
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
             </div>
 
             {/* Action Buttons */}

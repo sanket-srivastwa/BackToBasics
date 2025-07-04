@@ -22,7 +22,8 @@ import {
   Star,
   Clock,
   TrendingUp,
-  Bookmark
+  Bookmark,
+  Target
 } from "lucide-react";
 
 export default function Home() {
@@ -286,6 +287,70 @@ export default function Home() {
                 <p className="text-sm text-neutral-500 mt-2 text-center">
                   We'll create personalized questions based on your specific topic
                 </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Learning Materials */}
+      <section className="py-20 bg-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-neutral-800 mb-4">Learning Materials</h2>
+            <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
+              Comprehensive guides and resources to master management roles
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <Card className="group hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setLocation("/learning")}>
+              <CardHeader className="text-center">
+                <div className="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Target className="w-8 h-8 text-blue-600" />
+                </div>
+                <CardTitle className="text-2xl text-blue-800">Technical Program Management</CardTitle>
+                <CardDescription className="text-gray-600">
+                  Learn to lead complex technical programs across engineering teams
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li>• Program Planning & Execution</li>
+                  <li>• Systems Design for TPMs</li>
+                  <li>• Cross-functional Leadership</li>
+                  <li>• Risk Management</li>
+                </ul>
+                <div className="mt-6">
+                  <Button className="w-full group-hover:bg-blue-700">
+                    Start Learning
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="group hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setLocation("/learning")}>
+              <CardHeader className="text-center">
+                <div className="mx-auto mb-4 w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <Lightbulb className="w-8 h-8 text-green-600" />
+                </div>
+                <CardTitle className="text-2xl text-green-800">Product Management</CardTitle>
+                <CardDescription className="text-gray-600">
+                  Build products that customers love and drive business growth
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li>• Product Strategy & Vision</li>
+                  <li>• User Research & Analytics</li>
+                  <li>• Feature Prioritization</li>
+                  <li>• A/B Testing & Metrics</li>
+                </ul>
+                <div className="mt-6">
+                  <Button className="w-full group-hover:bg-green-700">
+                    Start Learning
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>

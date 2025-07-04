@@ -114,11 +114,33 @@ The application uses four main entities:
 - Environment-based database URL configuration
 - Connection pooling through Neon serverless architecture
 
+## Recent Features
+
+### Learning Materials System
+- Comprehensive learning materials for Technical Program Management and Product Management
+- Structured modules covering foundations, systems design, execution, strategy, and analytics
+- Interactive content with expandable sections, skill assessments, and practical frameworks
+- Accessible via header navigation and home page cards
+
+### Voice-Based Answering
+- Web Speech API integration for voice-to-text transcription
+- Available in both practice questions and custom case studies
+- Tab-based interface allowing users to choose between typing and speaking
+- Real-time transcription display with clear answer functionality
+- Browser compatibility checks and permission handling
+
+### Navigation Improvements
+- Fixed all header navigation buttons (Sign In, Get Started, Browse Questions)
+- Practice page redesigned to work without URL parameters
+- Topic filtering functionality for question browsing
+- Seamless integration between learning materials, practice, and case studies
+
 ## Changelog
 
 ```
 Changelog:
-- July 04, 2025. Initial setup
+- July 04, 2025. Initial setup with database integration and AI-powered feedback
+- July 04, 2025. Added comprehensive learning materials and voice-based answering functionality
 ```
 
 ## User Preferences

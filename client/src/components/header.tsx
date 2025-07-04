@@ -39,6 +39,16 @@ export default function Header() {
                 Practice
               </button>
               <button 
+                onClick={() => setLocation("/learning")}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  location === "/learning" 
+                    ? "text-primary bg-primary/10" 
+                    : "text-neutral-600 hover:text-primary"
+                }`}
+              >
+                Learning
+              </button>
+              <button 
                 onClick={() => setLocation("/custom-case-study")}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   location === "/custom-case-study" 

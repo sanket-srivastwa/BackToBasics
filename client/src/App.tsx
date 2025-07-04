@@ -8,6 +8,7 @@ import Practice from "@/pages/practice";
 import Question from "@/pages/question";
 import Feedback from "@/pages/feedback";
 import CustomCaseStudy from "@/pages/custom-case-study";
+import Learning from "@/pages/learning";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/question/:id" component={Question} />
       <Route path="/feedback/:answerId" component={Feedback} />
       <Route path="/custom-case-study" component={CustomCaseStudy} />
+      <Route path="/learning" component={Learning} />
       <Route component={NotFound} />
     </Switch>
   );

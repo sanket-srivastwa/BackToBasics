@@ -7,9 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import VoiceInput from "@/components/voice-input";
 import { 
   ArrowLeft, 
   Send, 
@@ -24,7 +26,9 @@ import {
   Bot,
   RefreshCw,
   ChevronRight,
-  Clock
+  Clock,
+  Mic,
+  Keyboard
 } from "lucide-react";
 
 interface AnalysisResult {
@@ -545,24 +549,67 @@ export default function CustomCaseStudy() {
                     <label className="block text-sm font-medium text-neutral-700 mb-2">
                       Write Your Response
                     </label>
-                    <Textarea
-                      value={userAnswer}
-                      onChange={(e) => setUserAnswer(e.target.value)}
-                      placeholder="Structure your answer using STAR method:
+                    
+                    <Tabs defaultValue="typing" className="w-full">
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="typing" className="flex items-center gap-2">
+                          <Keyboard className="h-4 w-4" />
+                          Type Answer
+                        </TabsTrigger>
+                        <TabsTrigger value="voice" className="flex items-center gap-2">
+                          <Mic className="h-4 w-4" />
+                          Speak Answer
+                        </TabsTrigger>
+                      </TabsList>
+                      
+                      <TabsContent value="typing" className="mt-4">
+                        <Textarea
+                          value={userAnswer}
+                          onChange={(e) => setUserAnswer(e.target.value)}
+                          placeholder="Structure your answer using STAR method:
 Situation: Set the context...
 Task: Describe your responsibility...
 Action: Explain what you did...
 Result: Share the outcome and impact..."
-                      className="min-h-64"
-                    />
-                    <div className="flex justify-between items-center mt-2">
-                      <span className="text-sm text-neutral-500">
-                        Word count: {wordCount} (aim for 200-400 words)
-                      </span>
-                      <span className="text-sm text-neutral-500">
-                        Minimum 50 characters
-                      </span>
-                    </div>
+                          className="min-h-64"
+                        />
+                        <div className="flex justify-between items-center mt-2">
+                          <span className="text-sm text-neutral-500">
+                            Word count: {wordCount} (aim for 200-400 words)
+                          </span>
+                          <span className="text-sm text-neutral-500">
+                            Minimum 50 characters
+                          </span>
+                        </div>
+                      </TabsContent>
+                      
+                      <TabsContent value="voice" className="mt-4">
+                        <VoiceInput
+                          onTranscription={(text) => setUserAnswer(prev => prev + " " + text)}
+                          disabled={analyzeMutation.isPending}
+                        />
+                        {userAnswer && (
+                          <div className="mt-4">
+                            <div className="text-sm text-neutral-600 mb-2">Your transcribed answer:</div>
+                            <div className="bg-gray-50 p-4 rounded-lg border text-sm max-h-40 overflow-y-auto">
+                              {userAnswer}
+                            </div>
+                            <div className="flex justify-between items-center mt-2">
+                              <span className="text-sm text-neutral-500">
+                                Word count: {wordCount} (aim for 200-400 words)
+                              </span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setUserAnswer("")}
+                              >
+                                Clear Answer
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </TabsContent>
+                    </Tabs>
                   </div>
 
                   <div className="bg-green-50 border-l-4 border-green-500 p-4">
