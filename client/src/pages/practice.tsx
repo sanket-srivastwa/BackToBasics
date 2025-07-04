@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import QuestionCard from "@/components/question-card";
-import { ArrowLeft, Users, Clock, Target, TrendingUp, Bookmark, Star, Flame, Search, Filter } from "lucide-react";
+import { ArrowLeft, Users, Clock, Target, TrendingUp, Bookmark, Star, Flame, Search, Filter, ChevronDown, ChevronUp } from "lucide-react";
 
 export default function Practice() {
   const [, setLocation] = useLocation();
@@ -18,6 +18,7 @@ export default function Practice() {
   const [selectedCompany, setSelectedCompany] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
   const [localSearchQuery, setLocalSearchQuery] = useState("");
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
 
   // Get search query and company filter from URL parameters
   useEffect(() => {
@@ -115,7 +116,7 @@ export default function Practice() {
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
+        {/* Header with Search */}
         <div className="mb-8">
           <Button 
             variant="ghost" 
@@ -125,116 +126,123 @@ export default function Practice() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Home
           </Button>
-          <h1 className="text-3xl font-bold text-neutral-800 mb-2">
-            {(searchQuery || localSearchQuery)
-              ? `Search Results for "${searchQuery || localSearchQuery}"` 
-              : selectedCompany !== "all" 
-                ? `${selectedCompany.charAt(0).toUpperCase() + selectedCompany.slice(1)} Questions`
-                : "Practice Questions"
-            }
-          </h1>
-          <p className="text-neutral-600">
-            {(searchQuery || localSearchQuery)
-              ? `Found ${questions?.length || 0} questions matching your search`
-              : selectedCompany !== "all"
-                ? `Practice questions specifically from ${selectedCompany.charAt(0).toUpperCase() + selectedCompany.slice(1)}`
-                : "Browse and practice with curated questions from top tech companies"
-            }
-          </p>
-        </div>
-
-        {/* Search and Filters */}
-        <div className="mb-8 space-y-6">
-          {/* Search Bar */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Search className="w-5 h-5 mr-2" />
-                Search Questions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleLocalSearch} className="flex gap-4">
+          
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-neutral-800 mb-2">
+                {(searchQuery || localSearchQuery)
+                  ? `Search Results for "${searchQuery || localSearchQuery}"` 
+                  : selectedCompany !== "all" 
+                    ? `${selectedCompany.charAt(0).toUpperCase() + selectedCompany.slice(1)} Questions`
+                    : "Practice Questions"
+                }
+              </h1>
+              <p className="text-neutral-600">
+                {(searchQuery || localSearchQuery)
+                  ? `Found ${questions?.length || 0} questions matching your search`
+                  : selectedCompany !== "all"
+                    ? `Practice questions specifically from ${selectedCompany.charAt(0).toUpperCase() + selectedCompany.slice(1)}`
+                    : "Browse and practice with curated questions from top tech companies"
+                }
+              </p>
+            </div>
+            
+            {/* Search Section */}
+            <div className="lg:min-w-96">
+              <form onSubmit={handleLocalSearch} className="flex gap-2">
                 <div className="flex-1">
                   <Input
                     type="text"
-                    placeholder="Search for questions, topics, or companies..."
+                    placeholder="Search questions..."
                     value={localSearchQuery}
                     onChange={(e) => setLocalSearchQuery(e.target.value)}
                     className="w-full"
                   />
                 </div>
-                <Button type="submit">
-                  <Search className="w-4 h-4 mr-2" />
-                  Search
+                <Button type="submit" size="sm">
+                  <Search className="w-4 h-4" />
                 </Button>
               </form>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+        </div>
 
-          {/* Filters */}
+        {/* Collapsible Filters */}
+        <div className="mb-8">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Filter className="w-5 h-5 mr-2" />
-                Filter Questions
+            <CardHeader 
+              className="cursor-pointer hover:bg-gray-50 transition-colors" 
+              onClick={() => setFiltersExpanded(!filtersExpanded)}
+            >
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Filter className="w-5 h-5 mr-2" />
+                  Filter Questions
+                </div>
+                {filtersExpanded ? (
+                  <ChevronUp className="w-5 h-5" />
+                ) : (
+                  <ChevronDown className="w-5 h-5" />
+                )}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Difficulty Filter */}
-              <div>
-                <h4 className="text-sm font-medium mb-3">Difficulty Level</h4>
-                <div className="flex flex-wrap gap-2">
-                  {difficulties.map((difficulty) => (
-                    <Button
-                      key={difficulty.id}
-                      variant={selectedDifficulty === difficulty.id ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setSelectedDifficulty(difficulty.id)}
-                      className="transition-colors"
-                    >
-                      {difficulty.name}
-                    </Button>
-                  ))}
+            {filtersExpanded && (
+              <CardContent className="space-y-6 pt-0">
+                {/* Difficulty Filter */}
+                <div>
+                  <h4 className="text-sm font-medium mb-3">Difficulty Level</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {difficulties.map((difficulty) => (
+                      <Button
+                        key={difficulty.id}
+                        variant={selectedDifficulty === difficulty.id ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedDifficulty(difficulty.id)}
+                        className="transition-colors"
+                      >
+                        {difficulty.name}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Topic Filter */}
-              <div>
-                <h4 className="text-sm font-medium mb-3">Management Area</h4>
-                <div className="flex flex-wrap gap-2">
-                  {topics.map((topic) => (
-                    <Button
-                      key={topic.id}
-                      variant={selectedTopic === topic.id ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setSelectedTopic(topic.id)}
-                      className="transition-colors"
-                    >
-                      {topic.name}
-                    </Button>
-                  ))}
+                {/* Topic Filter */}
+                <div>
+                  <h4 className="text-sm font-medium mb-3">Management Area</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {topics.map((topic) => (
+                      <Button
+                        key={topic.id}
+                        variant={selectedTopic === topic.id ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedTopic(topic.id)}
+                        className="transition-colors"
+                      >
+                        {topic.name}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Company Filter */}
-              <div>
-                <h4 className="text-sm font-medium mb-3">Company</h4>
-                <div className="flex flex-wrap gap-2">
-                  {companies.map((company) => (
-                    <Button
-                      key={company.id}
-                      variant={selectedCompany === company.id ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setSelectedCompany(company.id)}
-                      className="transition-colors"
-                    >
-                      {company.name}
-                    </Button>
-                  ))}
+                {/* Company Filter */}
+                <div>
+                  <h4 className="text-sm font-medium mb-3">Company</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {companies.map((company) => (
+                      <Button
+                        key={company.id}
+                        variant={selectedCompany === company.id ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedCompany(company.id)}
+                        className="transition-colors"
+                      >
+                        {company.name}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </CardContent>
+              </CardContent>
+            )}
           </Card>
         </div>
 
