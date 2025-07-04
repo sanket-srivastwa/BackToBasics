@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/header";
@@ -23,15 +23,13 @@ import {
   Clock,
   TrendingUp,
   Bookmark,
-  Target,
-  Search
+  Target
 } from "lucide-react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const [customTopic, setCustomTopic] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: popularQuestions, isLoading } = useQuery({
     queryKey: ["/api/questions/popular", selectedCompany !== "all" ? selectedCompany : undefined],
@@ -44,16 +42,7 @@ export default function Home() {
     },
   });
 
-  // Search questions query
-  const { data: searchResults, isLoading: searchLoading } = useQuery({
-    queryKey: ["/api/questions/search", searchQuery],
-    queryFn: async () => {
-      if (!searchQuery.trim()) return [];
-      const response = await fetch(`/api/questions/search?q=${encodeURIComponent(searchQuery)}`);
-      return response.json();
-    },
-    enabled: searchQuery.trim().length > 0,
-  });
+
 
   const companies = [
     { id: "all", name: "All Companies" },
@@ -97,12 +86,7 @@ export default function Home() {
     }
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      setLocation(`/practice?search=${encodeURIComponent(searchQuery)}`);
-    }
-  };
+
 
   const getCompanyBadgeColor = (company: string) => {
     const colors = {
@@ -134,28 +118,6 @@ export default function Home() {
             <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
               Practice with real MAANG company questions, get AI-powered feedback, and ace your technical program management interviews
             </p>
-            
-            {/* Global Search Bar */}
-            <div className="max-w-2xl mx-auto mb-12">
-              <form onSubmit={handleSearch} className="relative">
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <Input
-                    type="text"
-                    placeholder="Search questions, topics, or companies..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 text-lg bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder-white/70 rounded-xl focus:bg-white/20 focus:border-white/30 transition-all"
-                  />
-                  <Button 
-                    type="submit" 
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white border-0 px-6"
-                  >
-                    Search
-                  </Button>
-                </div>
-              </form>
-            </div>
             
             {/* Practice and Learn Options */}
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mt-12">
