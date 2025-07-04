@@ -1,0 +1,199 @@
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import { insertAnswerSchema, insertSessionSchema } from "@shared/schema";
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Get popular questions
+  app.get("/api/questions/popular", async (req, res) => {
+    try {
+      const company = req.query.company as string;
+      const questions = await storage.getPopularQuestions(company);
+      res.json(questions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch popular questions" });
+    }
+  });
+
+  // Get questions by topic and category
+  app.get("/api/questions", async (req, res) => {
+    try {
+      const { topic, category } = req.query;
+      
+      if (!topic || !category) {
+        return res.status(400).json({ error: "Topic and category are required" });
+      }
+
+      const questions = await storage.getQuestionsByTopic(
+        topic as string, 
+        category as string
+      );
+      res.json(questions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch questions" });
+    }
+  });
+
+  // Get specific question
+  app.get("/api/questions/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const question = await storage.getQuestion(id);
+      
+      if (!question) {
+        return res.status(404).json({ error: "Question not found" });
+      }
+
+      res.json(question);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch question" });
+    }
+  });
+
+  // Search questions
+  app.get("/api/questions/search", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      
+      if (!query) {
+        return res.status(400).json({ error: "Search query is required" });
+      }
+
+      const questions = await storage.searchQuestions(query);
+      res.json(questions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to search questions" });
+    }
+  });
+
+  // Create session
+  app.post("/api/sessions", async (req, res) => {
+    try {
+      const validatedData = insertSessionSchema.parse(req.body);
+      const session = await storage.createSession(validatedData);
+      res.json(session);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid session data" });
+    }
+  });
+
+  // Get session
+  app.get("/api/sessions/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const session = await storage.getSession(id);
+      
+      if (!session) {
+        return res.status(404).json({ error: "Session not found" });
+      }
+
+      res.json(session);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch session" });
+    }
+  });
+
+  // Submit answer
+  app.post("/api/answers", async (req, res) => {
+    try {
+      const validatedData = insertAnswerSchema.parse(req.body);
+      const answer = await storage.createAnswer(validatedData);
+      
+      // Generate feedback
+      const question = await storage.getQuestion(validatedData.questionId);
+      if (question) {
+        const feedback = await generateFeedback(validatedData.userAnswer, question.optimalAnswer);
+        const updatedAnswer = await storage.updateAnswerFeedback(answer.id, feedback);
+        res.json(updatedAnswer);
+      } else {
+        res.json(answer);
+      }
+    } catch (error) {
+      res.status(400).json({ error: "Invalid answer data" });
+    }
+  });
+
+  // Get answer with feedback
+  app.get("/api/answers/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const answer = await storage.getAnswer(id);
+      
+      if (!answer) {
+        return res.status(404).json({ error: "Answer not found" });
+      }
+
+      res.json(answer);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch answer" });
+    }
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}
+
+// AI-powered feedback generation
+async function generateFeedback(userAnswer: string, optimalAnswer: string) {
+  // This is a simplified feedback generation algorithm
+  // In production, this would use AI/ML models for more sophisticated analysis
+  
+  const userWords = userAnswer.toLowerCase().split(/\s+/);
+  const optimalWords = optimalAnswer.toLowerCase().split(/\s+/);
+  
+  // Calculate basic similarity score
+  const commonWords = userWords.filter(word => 
+    optimalWords.some(optimal => optimal.includes(word) || word.includes(optimal))
+  );
+  
+  const score = Math.min(10, Math.max(1, Math.round((commonWords.length / optimalWords.length) * 10)));
+  
+  // Generate basic feedback
+  const strengths = [];
+  const improvements = [];
+  const suggestions = [];
+  
+  if (userAnswer.length > 100) {
+    strengths.push("Good detail and comprehensive response");
+  }
+  
+  if (userAnswer.toLowerCase().includes("situation") || 
+      userAnswer.toLowerCase().includes("task") || 
+      userAnswer.toLowerCase().includes("action") || 
+      userAnswer.toLowerCase().includes("result")) {
+    strengths.push("Used structured approach (STAR method)");
+  }
+  
+  if (score < 6) {
+    improvements.push("Provide more specific examples and details");
+    improvements.push("Focus on quantifiable outcomes and results");
+  }
+  
+  if (userAnswer.length < 150) {
+    improvements.push("Expand your answer with more detail");
+  }
+  
+  if (!userAnswer.toLowerCase().includes("result") && !userAnswer.toLowerCase().includes("outcome")) {
+    suggestions.push("Always include the results and impact of your actions");
+  }
+  
+  suggestions.push("Consider using the STAR method for behavioral questions");
+  suggestions.push("Include specific metrics and timelines when possible");
+  
+  return {
+    score,
+    feedback: {
+      overall: score >= 7 ? "Strong response with good structure" : 
+               score >= 5 ? "Good foundation, could use more detail" : 
+               "Needs significant improvement in detail and structure",
+      detailedAnalysis: `Your response scored ${score}/10. ${
+        score >= 7 ? "You demonstrated good understanding and provided relevant examples." :
+        score >= 5 ? "You have the right idea but could benefit from more specific details." :
+        "Consider restructuring your response with more concrete examples."
+      }`
+    },
+    strengths: strengths.length > 0 ? strengths : ["Clear communication"],
+    improvements: improvements.length > 0 ? improvements : ["Consider adding more specific examples"],
+    suggestions: suggestions
+  };
+}
