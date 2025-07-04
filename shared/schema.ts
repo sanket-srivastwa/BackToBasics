@@ -5,7 +5,15 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  fullName: text("full_name"),
+  currentRole: text("current_role"),
+  targetRole: text("target_role"),
+  experienceLevel: text("experience_level"), // "junior", "mid", "senior", "principal"
+  preferredTopics: text("preferred_topics").array(),
+  profileCompleted: boolean("profile_completed").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const questions = pgTable("questions", {
@@ -37,6 +45,7 @@ export const answers = pgTable("answers", {
 
 export const sessions = pgTable("sessions", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id"),
   topic: text("topic").notNull(),
   category: text("category").notNull(),
   questionsCount: integer("questions_count").notNull(),
@@ -45,9 +54,57 @@ export const sessions = pgTable("sessions", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const promptedQuestions = pgTable("prompted_questions", {
+  id: serial("id").primaryKey(),
+  topic: text("topic").notNull(),
+  experienceLevel: text("experience_level").notNull(),
+  questionPrompt: text("question_prompt").notNull(),
+  context: text("context"),
+  suggestedStructure: text("suggested_structure"),
+  keyPoints: text("key_points").array(),
+  difficultyLevel: text("difficulty_level").notNull(), // "easy", "medium", "hard"
+  estimatedTime: integer("estimated_time").notNull(), // in minutes
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userProfiles = pgTable("user_profiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  bio: text("bio"),
+  skills: text("skills").array(),
+  achievements: text("achievements").array(),
+  goals: text("goals"),
+  practiceHistory: jsonb("practice_history"),
+  strengths: text("strengths").array(),
+  improvementAreas: text("improvement_areas").array(),
+  totalPracticeTime: integer("total_practice_time").default(0), // in minutes
+  questionsCompleted: integer("questions_completed").default(0),
+  averageScore: integer("average_score").default(0),
+  lastActiveAt: timestamp("last_active_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
+  email: true,
   password: true,
+  fullName: true,
+  currentRole: true,
+  targetRole: true,
+  experienceLevel: true,
+  preferredTopics: true,
+});
+
+export const insertPromptedQuestionSchema = createInsertSchema(promptedQuestions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserProfileSchema = createInsertSchema(userProfiles).omit({
+  id: true,
+  createdAt: true,
+  lastActiveAt: true,
 });
 
 export const insertQuestionSchema = createInsertSchema(questions).omit({
@@ -80,3 +137,7 @@ export type InsertAnswer = z.infer<typeof insertAnswerSchema>;
 export type Answer = typeof answers.$inferSelect;
 export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type Session = typeof sessions.$inferSelect;
+export type InsertPromptedQuestion = z.infer<typeof insertPromptedQuestionSchema>;
+export type PromptedQuestion = typeof promptedQuestions.$inferSelect;
+export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;
+export type UserProfile = typeof userProfiles.$inferSelect;

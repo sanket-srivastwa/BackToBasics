@@ -19,7 +19,12 @@ import {
   Target,
   Sparkles,
   MessageSquare,
-  TrendingUp
+  TrendingUp,
+  PenTool,
+  Bot,
+  RefreshCw,
+  ChevronRight,
+  Clock
 } from "lucide-react";
 
 interface AnalysisResult {
@@ -38,7 +43,11 @@ export default function CustomCaseStudy() {
   const [userAnswer, setUserAnswer] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("Technical Program Management");
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
-  const [step, setStep] = useState<"question" | "answer" | "feedback">("question");
+  const [step, setStep] = useState<"mode" | "question" | "answer" | "feedback">("mode");
+  const [mode, setMode] = useState<"custom" | "prompted">("custom");
+  const [promptedQuestions, setPromptedQuestions] = useState<any[]>([]);
+  const [selectedPrompted, setSelectedPrompted] = useState<any>(null);
+  const [experienceLevel, setExperienceLevel] = useState("mid");
 
   const topics = [
     "Technical Program Management",
@@ -47,6 +56,25 @@ export default function CustomCaseStudy() {
     "Engineering Management",
     "Data Science Leadership"
   ];
+
+  const experienceLevels = [
+    { id: "junior", name: "Junior (0-2 years)", description: "Entry-level questions focusing on fundamentals" },
+    { id: "mid", name: "Mid-level (2-5 years)", description: "Intermediate scenarios requiring strategic thinking" },
+    { id: "senior", name: "Senior (5+ years)", description: "Complex leadership and technical challenges" }
+  ];
+
+  // Load prompted questions when topic or experience level changes
+  const loadPromptedQuestions = async () => {
+    try {
+      const response = await fetch(`/api/prompted-questions?topic=${encodeURIComponent(selectedTopic)}&experienceLevel=${experienceLevel}`);
+      if (response.ok) {
+        const questions = await response.json();
+        setPromptedQuestions(questions);
+      }
+    } catch (error) {
+      console.error("Failed to load prompted questions:", error);
+    }
+  };
 
   const validateQuestionMutation = useMutation({
     mutationFn: async (questionText: string) => {
@@ -156,7 +184,22 @@ export default function CustomCaseStudy() {
     setQuestion("");
     setUserAnswer("");
     setAnalysis(null);
+    setSelectedPrompted(null);
+    setStep("mode");
+  };
+
+  const handleModeSelect = (selectedMode: "custom" | "prompted") => {
+    setMode(selectedMode);
+    if (selectedMode === "prompted") {
+      loadPromptedQuestions();
+    }
     setStep("question");
+  };
+
+  const handlePromptedQuestionSelect = (promptedQuestion: any) => {
+    setSelectedPrompted(promptedQuestion);
+    setQuestion(promptedQuestion.questionPrompt);
+    setStep("answer");
   };
 
   const getScoreColor = (score: number) => {
@@ -197,31 +240,81 @@ export default function CustomCaseStudy() {
         {/* Progress Steps */}
         <div className="flex justify-center mb-12">
           <div className="flex items-center space-x-4">
-            <div className={`flex items-center ${step === "question" ? "text-primary" : step === "answer" || step === "feedback" ? "text-green-600" : "text-gray-400"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "question" ? "bg-primary text-white" : step === "answer" || step === "feedback" ? "bg-green-600 text-white" : "bg-gray-200"}`}>
+            <div className={`flex items-center ${step === "mode" ? "text-primary" : (step === "question" || step === "answer" || step === "feedback") ? "text-green-600" : "text-gray-400"}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "mode" ? "bg-primary text-white" : (step === "question" || step === "answer" || step === "feedback") ? "bg-green-600 text-white" : "bg-gray-200"}`}>
                 1
               </div>
-              <span className="ml-2 font-medium">Write Question</span>
+              <span className="ml-2 font-medium">Choose Mode</span>
+            </div>
+            <div className="w-8 h-0.5 bg-gray-300"></div>
+            <div className={`flex items-center ${step === "question" ? "text-primary" : (step === "answer" || step === "feedback") ? "text-green-600" : "text-gray-400"}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "question" ? "bg-primary text-white" : (step === "answer" || step === "feedback") ? "bg-green-600 text-white" : "bg-gray-200"}`}>
+                2
+              </div>
+              <span className="ml-2 font-medium">Select Question</span>
             </div>
             <div className="w-8 h-0.5 bg-gray-300"></div>
             <div className={`flex items-center ${step === "answer" ? "text-primary" : step === "feedback" ? "text-green-600" : "text-gray-400"}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "answer" ? "bg-primary text-white" : step === "feedback" ? "bg-green-600 text-white" : "bg-gray-200"}`}>
-                2
+                3
               </div>
               <span className="ml-2 font-medium">Answer Question</span>
             </div>
             <div className="w-8 h-0.5 bg-gray-300"></div>
             <div className={`flex items-center ${step === "feedback" ? "text-green-600" : "text-gray-400"}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "feedback" ? "bg-green-600 text-white" : "bg-gray-200"}`}>
-                3
+                4
               </div>
               <span className="ml-2 font-medium">Get Feedback</span>
             </div>
           </div>
         </div>
 
-        {/* Step 1: Question Input */}
-        {step === "question" && (
+        {/* Step 1: Mode Selection */}
+        {step === "mode" && (
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-lg shadow-md p-8">
+              <h2 className="text-2xl font-bold mb-6 text-center">Choose Your Case Study Mode</h2>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                <div 
+                  className="border-2 border-gray-200 rounded-lg p-6 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
+                  onClick={() => handleModeSelect("custom")}
+                >
+                  <div className="flex items-center mb-4">
+                    <PenTool className="w-8 h-8 text-primary mr-3" />
+                    <h3 className="text-xl font-semibold">Custom Question</h3>
+                  </div>
+                  <p className="text-gray-600 mb-4">Write your own case study question and get AI-powered feedback on your answer.</p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li>• Create personalized scenarios</li>
+                    <li>• Focus on specific challenges</li>
+                    <li>• Tailored to your needs</li>
+                  </ul>
+                </div>
+
+                <div 
+                  className="border-2 border-gray-200 rounded-lg p-6 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
+                  onClick={() => handleModeSelect("prompted")}
+                >
+                  <div className="flex items-center mb-4">
+                    <Bot className="w-8 h-8 text-primary mr-3" />
+                    <h3 className="text-xl font-semibold">AI-Generated Question</h3>
+                  </div>
+                  <p className="text-gray-600 mb-4">Choose from AI-generated questions based on your experience level and topic.</p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li>• Experience-level appropriate</li>
+                    <li>• Topic-specific scenarios</li>
+                    <li>• Industry-standard questions</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Custom Question Input */}
+        {step === "question" && mode === "custom" && (
           <Card className="shadow-lg border max-w-4xl mx-auto">
             <CardHeader>
               <div className="flex items-center mb-4">
@@ -306,7 +399,111 @@ export default function CustomCaseStudy() {
           </Card>
         )}
 
-        {/* Step 2: Answer Input */}
+        {/* Step 2: Prompted Questions Selection */}
+        {step === "question" && mode === "prompted" && (
+          <div className="max-w-4xl mx-auto">
+            <Card className="shadow-lg border">
+              <CardHeader>
+                <div className="flex items-center mb-4">
+                  <div className="bg-primary/10 p-3 rounded-lg mr-4">
+                    <Bot className="h-8 w-8 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl">Choose AI-Generated Question</CardTitle>
+                    <CardDescription className="text-base mt-2">
+                      Select from questions tailored to your experience level and topic
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Select Topic
+                      </label>
+                      <select
+                        value={selectedTopic}
+                        onChange={(e) => setSelectedTopic(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      >
+                        {topics.map(topic => (
+                          <option key={topic} value={topic}>{topic}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Experience Level
+                      </label>
+                      <select
+                        value={experienceLevel}
+                        onChange={(e) => setExperienceLevel(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      >
+                        {experienceLevels.map(level => (
+                          <option key={level.id} value={level.id}>{level.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={loadPromptedQuestions}
+                    className="w-full"
+                    size="lg"
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Load Questions
+                  </Button>
+
+                  {promptedQuestions.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Available Questions:</h3>
+                      <div className="grid gap-4">
+                        {promptedQuestions.map((promptedQuestion, index) => (
+                          <div
+                            key={promptedQuestion.id}
+                            className="border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
+                            onClick={() => handlePromptedQuestionSelect(promptedQuestion)}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h4 className="font-semibold text-lg mb-2">Question {index + 1}</h4>
+                                <p className="text-gray-700 mb-3">{promptedQuestion.questionPrompt}</p>
+                                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                  <span className="flex items-center">
+                                    <Clock className="w-4 h-4 mr-1" />
+                                    {promptedQuestion.timeLimit} mins
+                                  </span>
+                                  <span className="flex items-center">
+                                    <Target className="w-4 h-4 mr-1" />
+                                    {promptedQuestion.difficulty}
+                                  </span>
+                                </div>
+                              </div>
+                              <ChevronRight className="w-5 h-5 text-gray-400" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {promptedQuestions.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      <Bot className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                      <p>No questions available for this combination. Try a different topic or experience level.</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Step 3: Answer Input */}
         {step === "answer" && (
           <div className="space-y-6 max-w-4xl mx-auto">
             <Card className="shadow-sm border">

@@ -195,6 +195,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get prompted questions by topic and experience level
+  app.get("/api/prompted-questions", async (req, res) => {
+    try {
+      const { topic, experienceLevel } = req.query;
+      
+      if (!topic || !experienceLevel) {
+        return res.status(400).json({ error: "Topic and experience level are required" });
+      }
+
+      const questions = await storage.getPromptedQuestions(
+        topic as string, 
+        experienceLevel as string
+      );
+      res.json(questions);
+    } catch (error) {
+      console.error("Failed to fetch prompted questions:", error);
+      res.status(500).json({ error: "Failed to fetch prompted questions" });
+    }
+  });
+
+  // Get specific prompted question
+  app.get("/api/prompted-questions/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const question = await storage.getPromptedQuestion(id);
+      
+      if (!question) {
+        return res.status(404).json({ error: "Question not found" });
+      }
+
+      res.json(question);
+    } catch (error) {
+      console.error("Failed to fetch prompted question:", error);
+      res.status(500).json({ error: "Failed to fetch prompted question" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
