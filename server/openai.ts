@@ -156,6 +156,32 @@ Respond in JSON format with this structure:
   }
 }
 
+export async function generateLearningResponse(query: string): Promise<string> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert learning assistant for management and technical roles. Provide comprehensive, practical answers to questions about technical program management, product management, engineering management, system design, leadership, and career development. Use examples, frameworks, and actionable advice. Keep responses well-structured and easy to understand."
+        },
+        {
+          role: "user",
+          content: query
+        }
+      ],
+    });
+
+    return response.choices[0].message.content || "I apologize, but I couldn't generate a response to your question. Please try rephrasing it or ask something more specific.";
+  } catch (error: any) {
+    console.error("Error generating learning response:", error);
+    if (error.status === 429) {
+      throw new Error("OpenAI API quota exceeded. Please check your API plan and billing details.");
+    }
+    throw new Error("Failed to generate learning response");
+  }
+}
+
 export async function validateQuestion(question: string): Promise<{ isValid: boolean; feedback?: string }> {
   try {
     const response = await openai.chat.completions.create({

@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/header";
@@ -28,7 +30,11 @@ import {
   Shield,
   Layers,
   Globe,
-  Database
+  Database,
+  Search,
+  Send,
+  ChevronDown,
+  ChevronRight
 } from "lucide-react";
 
 interface LearningContent {
@@ -169,9 +175,469 @@ function AILearningModule({ track, module }: { track: string; module: string }) 
   );
 }
 
+function AISearchComponent() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [conversation, setConversation] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    setIsLoading(true);
+    const userMessage = { role: 'user' as const, content: searchQuery };
+    setConversation(prev => [...prev, userMessage]);
+    
+    try {
+      const response = await fetch('/api/learning/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: searchQuery })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setConversation(prev => [...prev, { role: 'assistant', content: data.response }]);
+      } else {
+        setConversation(prev => [...prev, { 
+          role: 'assistant', 
+          content: 'I apologize, but I cannot generate responses right now due to API limitations. Please try again later.' 
+        }]);
+      }
+    } catch (error) {
+      setConversation(prev => [...prev, { 
+        role: 'assistant', 
+        content: 'I encountered an error while processing your question. Please try again.' 
+      }]);
+    }
+    
+    setSearchQuery("");
+    setIsLoading(false);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Search className="w-5 h-5 mr-2" />
+          AI Learning Assistant
+        </CardTitle>
+        <CardDescription>
+          Ask any questions about management, leadership, or technical concepts. I'll provide detailed explanations and examples.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Conversation History */}
+        {conversation.length > 0 && (
+          <div className="max-h-96 overflow-y-auto space-y-4 border rounded-lg p-4 bg-gray-50">
+            {conversation.map((message, idx) => (
+              <div key={idx} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[80%] p-3 rounded-lg ${
+                  message.role === 'user' 
+                    ? 'bg-primary text-white' 
+                    : 'bg-white border shadow-sm'
+                }`}>
+                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                </div>
+              </div>
+            ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-white border shadow-sm p-3 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-pulse flex space-x-1">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                    </div>
+                    <span className="text-sm text-gray-500">AI is thinking...</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* Search Input */}
+        <div className="flex space-x-2">
+          <Input
+            placeholder="Ask a question about management, leadership, or technical concepts..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSearch()}
+            disabled={isLoading}
+          />
+          <Button 
+            onClick={handleSearch} 
+            disabled={isLoading || !searchQuery.trim()}
+            size="icon"
+          >
+            <Send className="w-4 h-4" />
+          </Button>
+        </div>
+        
+        {/* Quick Questions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          {[
+            "How do I prioritize features as a PM?",
+            "What is technical debt in engineering?",
+            "How to conduct effective 1:1 meetings?",
+            "Explain the STAR method for interviews"
+          ].map((question, idx) => (
+            <Button 
+              key={idx}
+              variant="outline" 
+              size="sm" 
+              className="text-left justify-start h-auto py-2 px-3"
+              onClick={() => setSearchQuery(question)}
+              disabled={isLoading}
+            >
+              <MessageSquare className="w-3 h-3 mr-2 flex-shrink-0" />
+              <span className="text-xs">{question}</span>
+            </Button>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function StaticLearningContent({ track, module }: { track: string; module: string }) {
+  const [expandedLessons, setExpandedLessons] = useState<Set<number>>(new Set());
+
+  const toggleLesson = (lessonIndex: number) => {
+    const newExpanded = new Set(expandedLessons);
+    if (newExpanded.has(lessonIndex)) {
+      newExpanded.delete(lessonIndex);
+    } else {
+      newExpanded.add(lessonIndex);
+    }
+    setExpandedLessons(newExpanded);
+  };
+
+  const courseContent: any = {
+    tpm: {
+      "TPM Foundations": {
+        title: "Technical Program Management Foundations",
+        description: "Master the core principles and responsibilities of Technical Program Management",
+        lessons: [
+          {
+            title: "Understanding the TPM Role",
+            duration: "15 min",
+            content: `Technical Program Managers (TPMs) bridge the gap between technical teams and business objectives. Unlike Project Managers who focus on deliverables and timelines, TPMs dive deep into technical complexity and architectural decisions.
+
+Key Responsibilities:
+• Drive cross-functional technical programs from conception to launch
+• Identify and mitigate technical risks before they impact delivery
+• Facilitate communication between engineering, product, and leadership teams
+• Make data-driven decisions on technical trade-offs and priorities
+
+The TPM operates at the intersection of technical depth and program management excellence, requiring both engineering background and strong leadership skills.`,
+            keyTakeaways: [
+              "TPMs focus on technical complexity, not just project coordination",
+              "Technical depth is essential for effective decision-making",
+              "Cross-functional leadership is a core competency"
+            ]
+          },
+          {
+            title: "Technical Risk Management",
+            duration: "20 min", 
+            content: `Technical risks are the silent killers of complex programs. Effective TPMs develop systematic approaches to identify, assess, and mitigate these risks before they become critical issues.
+
+Risk Identification Framework:
+1. Architecture Reviews: Regularly assess system design decisions
+2. Dependency Mapping: Identify critical path dependencies across teams
+3. Capacity Planning: Ensure technical infrastructure can handle projected load
+4. Security Assessments: Proactively address potential vulnerabilities
+
+Risk Mitigation Strategies:
+• Build in contingency time for complex technical work
+• Establish fallback plans for critical system components
+• Create technical debt budgets for sustainable development
+• Implement monitoring and alerting for early risk detection`,
+            keyTakeaways: [
+              "Proactive risk identification prevents costly delays",
+              "Technical debt must be managed as a program risk",
+              "Dependencies are often the highest risk factors"
+            ]
+          },
+          {
+            title: "Stakeholder Management",
+            duration: "18 min",
+            content: `Technical programs involve diverse stakeholders with competing priorities. TPMs must master the art of influence without authority, building consensus across engineering, product, design, and executive teams.
+
+Stakeholder Mapping:
+• Engineering Teams: Focus on technical feasibility and implementation details
+• Product Managers: Emphasize user impact and business value
+• Executive Leadership: Communicate in terms of business outcomes and risks
+• Design Teams: Collaborate on user experience and technical constraints
+
+Communication Strategies:
+1. Tailor your message to your audience's priorities and language
+2. Use data and metrics to support technical recommendations
+3. Create visual dashboards showing program health and progress
+4. Establish regular communication cadences with key stakeholders`,
+            keyTakeaways: [
+              "Different stakeholders need different communication approaches",
+              "Data-driven communication builds credibility",
+              "Regular updates prevent surprises and build trust"
+            ]
+          }
+        ]
+      },
+      "System Design for TPMs": {
+        title: "System Design for Technical Program Managers",
+        description: "Understand large-scale system architecture and design principles",
+        lessons: [
+          {
+            title: "Scalability Fundamentals",
+            duration: "25 min",
+            content: `Understanding scalability is crucial for TPMs managing large-scale systems. Scalability isn't just about handling more traffic—it's about designing systems that grow efficiently with business needs.
+
+Horizontal vs Vertical Scaling:
+• Horizontal Scaling: Adding more servers to handle increased load
+  - Pros: Better fault tolerance, linear cost scaling
+  - Cons: Increased complexity, data consistency challenges
+• Vertical Scaling: Upgrading existing server capacity
+  - Pros: Simpler architecture, no distributed system complexity
+  - Cons: Single point of failure, limited by hardware constraints
+
+Design Patterns for Scale:
+1. Load Balancing: Distribute traffic across multiple servers
+2. Caching Strategies: Reduce database load with intelligent caching
+3. Database Sharding: Distribute data across multiple database instances
+4. Microservices Architecture: Break monoliths into independent services`,
+            keyTakeaways: [
+              "Plan for scale early in the design process",
+              "Horizontal scaling provides better long-term flexibility",
+              "Every scaling decision involves trade-offs"
+            ]
+          },
+          {
+            title: "Distributed Systems Challenges",
+            duration: "30 min",
+            content: `Distributed systems introduce complexity that TPMs must understand to make informed technical decisions. The CAP theorem and its implications shape many architectural choices.
+
+CAP Theorem:
+You can only guarantee two of three properties:
+• Consistency: All nodes see the same data simultaneously
+• Availability: System remains operational even with node failures
+• Partition Tolerance: System continues despite network failures
+
+Common Distributed System Patterns:
+1. Event-Driven Architecture: Components communicate through events
+2. CQRS (Command Query Responsibility Segregation): Separate read and write models
+3. Saga Pattern: Manage distributed transactions across services
+4. Circuit Breaker: Prevent cascade failures in service dependencies
+
+Monitoring and Observability:
+• Distributed Tracing: Track requests across multiple services
+• Centralized Logging: Aggregate logs for system-wide visibility
+• Metrics and Alerting: Proactive monitoring of system health`,
+            keyTakeaways: [
+              "Distributed systems require careful trade-off decisions",
+              "Observability is critical for managing complexity",
+              "Failure is inevitable; design for resilience"
+            ]
+          }
+        ]
+      }
+    },
+    pm: {
+      "Product Strategy & Vision": {
+        title: "Product Strategy and Vision Development", 
+        description: "Learn to define winning product strategies and create compelling visions",
+        lessons: [
+          {
+            title: "Market Analysis and Competitive Intelligence",
+            duration: "22 min",
+            content: `Successful product strategy starts with deep market understanding. Product managers must systematically analyze market dynamics, customer needs, and competitive landscape to identify opportunities.
+
+Market Analysis Framework:
+1. Total Addressable Market (TAM): Overall revenue opportunity
+2. Serviceable Addressable Market (SAM): Market segment you can target
+3. Serviceable Obtainable Market (SOM): Realistic market share achievable
+
+Competitive Analysis:
+• Direct Competitors: Products solving the same problem
+• Indirect Competitors: Alternative solutions to customer problems
+• Substitute Products: Different approaches to the same end goal
+
+Customer Research Methods:
+• Jobs-to-be-Done Interviews: Understand underlying customer motivations
+• User Journey Mapping: Identify pain points and opportunities
+• Competitive Feature Analysis: Compare capabilities and positioning`,
+            keyTakeaways: [
+              "Market sizing guides strategic investment decisions",
+              "Indirect competition often poses the biggest threat",
+              "Customer problems are more important than existing solutions"
+            ]
+          },
+          {
+            title: "Vision and Strategy Frameworks",
+            duration: "25 min",
+            content: `A compelling product vision aligns teams and drives decision-making. Product managers need frameworks to translate market insights into actionable strategy.
+
+Vision Development Process:
+1. Problem Definition: Clearly articulate the customer problem
+2. Solution Hypothesis: Propose how your product uniquely solves it
+3. Value Proposition: Define the specific value delivered to customers
+4. Success Metrics: Establish measurable outcomes
+
+Strategic Frameworks:
+• North Star Framework: Single metric that captures product value
+• OKRs (Objectives and Key Results): Align teams on measurable goals
+• ICE Scoring: Prioritize initiatives by Impact, Confidence, Ease
+• Kano Model: Categorize features by customer satisfaction impact
+
+Communication Strategies:
+• Executive Summaries: Concise strategy communication for leadership
+• Team Playbooks: Detailed execution guides for development teams
+• Customer-Facing Messaging: External communication of product value`,
+            keyTakeaways: [
+              "Great visions are customer-centric, not feature-centric",
+              "Strategy frameworks provide structure for complex decisions",
+              "Different audiences need different levels of detail"
+            ]
+          }
+        ]
+      }
+    },
+    em: {
+      "People Management": {
+        title: "Engineering People Management",
+        description: "Build and lead high-performing engineering teams",
+        lessons: [
+          {
+            title: "Building High-Performing Teams",
+            duration: "20 min",
+            content: `Engineering teams are the foundation of technical excellence. Engineering managers must create environments where engineers can do their best work while delivering business value.
+
+Team Formation Principles:
+1. Diversity of Skills: Combine senior and junior engineers for knowledge transfer
+2. Clear Roles: Define responsibilities to avoid overlap and gaps
+3. Psychological Safety: Create environment where people feel safe to take risks
+4. Shared Purpose: Align team on mission and success metrics
+
+Hiring Excellence:
+• Technical Interviews: Assess coding skills and system design thinking
+• Behavioral Interviews: Evaluate collaboration and communication
+• Culture Fit: Ensure alignment with team values and working style
+• Growth Potential: Look for continuous learning mindset
+
+Team Dynamics:
+• Code Review Culture: Establish constructive feedback processes
+• Knowledge Sharing: Regular tech talks and documentation practices
+• Mentorship Programs: Pair experienced engineers with growing talent`,
+            keyTakeaways: [
+              "Diverse teams outperform homogeneous ones",
+              "Psychological safety is essential for innovation",
+              "Culture is built through daily practices, not policies"
+            ]
+          },
+          {
+            title: "Performance Management and Growth",
+            duration: "25 min",
+            content: `Engineering managers must balance individual growth with team performance. This requires systematic approaches to feedback, goal setting, and career development.
+
+Performance Framework:
+1. Goal Setting: Use SMART goals aligned with business objectives
+2. Regular Check-ins: Weekly 1:1s for continuous feedback and support
+3. 360 Reviews: Gather feedback from peers, direct reports, and stakeholders
+4. Growth Planning: Create personalized development plans for each engineer
+
+Career Laddering:
+• Individual Contributor Path: Senior Engineer → Staff → Principal
+• Management Path: Team Lead → Engineering Manager → Director
+• Technical Leadership: Architect → Distinguished Engineer
+• Cross-functional Growth: Product-focused or Infrastructure specialist roles
+
+Difficult Conversations:
+• Performance Issues: Address problems early with specific examples
+• Career Transitions: Support engineers exploring new directions
+• Team Conflicts: Mediate disputes while maintaining relationships
+• Compensation Discussions: Advocate for team members fairly`,
+            keyTakeaways: [
+              "Regular feedback prevents performance surprises",
+              "Career growth requires intentional planning and investment",
+              "Difficult conversations get easier with practice and preparation"
+            ]
+          }
+        ]
+      }
+    }
+  };
+
+  const content = courseContent[track]?.[module];
+  if (!content) return null;
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">{content.title}</CardTitle>
+          <CardDescription>{content.description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {content.lessons.map((lesson: any, idx: number) => (
+              <Card key={idx} className="border">
+                <CardHeader 
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => toggleLesson(idx)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-lg flex items-center">
+                        {expandedLessons.has(idx) ? 
+                          <ChevronDown className="w-4 h-4 mr-2" /> : 
+                          <ChevronRight className="w-4 h-4 mr-2" />
+                        }
+                        {lesson.title}
+                      </CardTitle>
+                      <div className="flex items-center mt-1">
+                        <Clock className="w-3 h-3 mr-1 text-gray-500" />
+                        <span className="text-sm text-gray-500">{lesson.duration}</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                {expandedLessons.has(idx) && (
+                  <CardContent>
+                    <div className="prose max-w-none">
+                      <div className="text-gray-700 whitespace-pre-line mb-4">
+                        {lesson.content}
+                      </div>
+                      {lesson.keyTakeaways && (
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                          <h4 className="font-semibold text-blue-800 mb-2">Key Takeaways:</h4>
+                          <ul className="space-y-1">
+                            {lesson.keyTakeaways.map((takeaway: string, takewayIdx: number) => (
+                              <li key={takewayIdx} className="flex items-start text-blue-700 text-sm">
+                                <CheckCircle className="w-3 h-3 mr-2 mt-1 flex-shrink-0" />
+                                {takeaway}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                )}
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function Learning() {
   const [, setLocation] = useLocation();
   const [selectedModule, setSelectedModule] = useState<{ track: string; module: string } | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showAISearch, setShowAISearch] = useState(false);
 
   const learningTracks = {
     tpm: {
@@ -554,22 +1020,58 @@ export default function Learning() {
                 </CardContent>
               </Card>
 
-              {/* AI-Generated Learning Content */}
+              {/* Learning Content Display */}
               {selectedModule && selectedModule.track === key && (
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-2xl font-bold">AI-Generated Learning Content</h3>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setSelectedModule(null)}
-                    >
-                      Close
-                    </Button>
+                    <h3 className="text-2xl font-bold">Course Content</h3>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setShowAISearch(!showAISearch)}
+                      >
+                        <Search className="w-4 h-4 mr-2" />
+                        AI Assistant
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setSelectedModule(null)}
+                      >
+                        Close
+                      </Button>
+                    </div>
                   </div>
-                  <AILearningModule 
+                  
+                  {/* AI Search Component */}
+                  {showAISearch && (
+                    <div className="mb-6">
+                      <AISearchComponent />
+                    </div>
+                  )}
+                  
+                  {/* Static Learning Content */}
+                  <StaticLearningContent 
                     track={selectedModule.track} 
                     module={selectedModule.module} 
                   />
+                  
+                  {/* AI Generated Content Option */}
+                  <div className="mt-6">
+                    <Card className="border-dashed border-2 border-gray-300">
+                      <CardContent className="p-6 text-center">
+                        <Zap className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                        <h4 className="font-semibold mb-2">Enhanced AI Content</h4>
+                        <p className="text-gray-600 mb-4">
+                          Get personalized, AI-generated learning content tailored to your experience level and learning goals.
+                        </p>
+                        <AILearningModule 
+                          track={selectedModule.track} 
+                          module={selectedModule.module} 
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
               )}
 

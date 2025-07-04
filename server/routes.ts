@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertAnswerSchema, insertSessionSchema } from "@shared/schema";
-import { generateOptimalAnswer, analyzeAnswerComparison, validateQuestion, generateLearningContent } from "./openai";
+import { generateOptimalAnswer, analyzeAnswerComparison, validateQuestion, generateLearningContent, generateLearningResponse } from "./openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get popular questions
@@ -249,6 +249,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(429).json({ error: "AI service temporarily unavailable. Please try again later." });
       } else {
         res.status(500).json({ error: "Failed to generate learning content" });
+      }
+    }
+  });
+
+  // AI Learning Search Assistant
+  app.post("/api/learning/search", async (req, res) => {
+    try {
+      const { query } = req.body;
+      
+      if (!query) {
+        return res.status(400).json({ error: "Query is required" });
+      }
+
+      const response = await generateLearningResponse(query);
+      res.json({ response });
+    } catch (error: any) {
+      console.error("Failed to generate learning response:", error);
+      if (error.message.includes("quota exceeded")) {
+        res.status(429).json({ error: "AI assistant temporarily unavailable due to API limitations. Please try again later." });
+      } else {
+        res.status(500).json({ error: "Failed to generate response" });
       }
     }
   });
