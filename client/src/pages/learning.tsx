@@ -32,6 +32,8 @@ import {
 
 export default function Learning() {
   const [, setLocation] = useLocation();
+  
+  console.log("Learning component rendered");
 
   const learningTracks = {
     tpm: {

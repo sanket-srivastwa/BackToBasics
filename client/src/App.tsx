@@ -10,6 +10,7 @@ import Question from "@/pages/question";
 import Feedback from "@/pages/feedback";
 import CustomCaseStudy from "@/pages/custom-case-study";
 import Learning from "@/pages/learning";
+import LearningTest from "@/pages/learning-test";
 import NotFound from "@/pages/not-found";
 
 function ScrollToTop() {
@@ -33,6 +34,7 @@ function Router() {
         <Route path="/feedback/:answerId" component={Feedback} />
         <Route path="/custom-case-study" component={CustomCaseStudy} />
         <Route path="/learning" component={Learning} />
+        <Route path="/learning-test" component={LearningTest} />
         <Route component={NotFound} />
       </Switch>
     </>
