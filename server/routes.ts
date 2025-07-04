@@ -6,19 +6,23 @@ import { generateOptimalAnswer, analyzeAnswerComparison, validateQuestion, gener
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
+  // Temporarily disable auth until environment is configured
+  // await setupAuth(app);
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
+  // Auth routes (mock for now)
+  app.get('/api/auth/user', async (req: any, res) => {
+    // Return 401 for unauthenticated users (simulation)
+    res.status(401).json({ message: "Unauthorized" });
+  });
+
+  // Mock login route - redirects to home with a message
+  app.get('/api/login', async (req: any, res) => {
+    res.redirect('/?message=auth-required');
+  });
+
+  // Mock logout route
+  app.get('/api/logout', async (req: any, res) => {
+    res.redirect('/?message=logged-out');
   });
 
   // Check user's question access status (freemium model)
