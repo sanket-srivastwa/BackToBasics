@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertAnswerSchema, insertSessionSchema } from "@shared/schema";
+import { generateOptimalAnswer, analyzeAnswerComparison, validateQuestion } from "./openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get popular questions
@@ -126,6 +127,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(answer);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch answer" });
+    }
+  });
+
+  // Validate custom question
+  app.post("/api/questions/validate", async (req, res) => {
+    try {
+      const { question } = req.body;
+      
+      if (!question || typeof question !== 'string' || question.trim().length < 10) {
+        return res.status(400).json({ error: "Question must be at least 10 characters long" });
+      }
+
+      const validation = await validateQuestion(question.trim());
+      res.json(validation);
+    } catch (error) {
+      console.error("Question validation error:", error);
+      res.status(500).json({ error: "Failed to validate question" });
+    }
+  });
+
+  // Generate optimal answer for custom question
+  app.post("/api/questions/generate-answer", async (req, res) => {
+    try {
+      const { question, topic = "Technical Program Management" } = req.body;
+      
+      if (!question || typeof question !== 'string') {
+        return res.status(400).json({ error: "Question is required" });
+      }
+
+      const optimalAnswer = await generateOptimalAnswer(question.trim(), topic);
+      res.json({ optimalAnswer });
+    } catch (error) {
+      console.error("Answer generation error:", error);
+      res.status(500).json({ error: "Failed to generate optimal answer" });
+    }
+  });
+
+  // Submit and analyze custom question answer
+  app.post("/api/answers/analyze", async (req, res) => {
+    try {
+      const { question, userAnswer, topic = "Technical Program Management" } = req.body;
+      
+      if (!question || !userAnswer) {
+        return res.status(400).json({ error: "Question and answer are required" });
+      }
+
+      if (userAnswer.trim().length < 50) {
+        return res.status(400).json({ error: "Answer must be at least 50 characters long" });
+      }
+
+      // Generate optimal answer
+      const optimalAnswer = await generateOptimalAnswer(question.trim(), topic);
+      
+      // Analyze user's answer
+      const analysis = await analyzeAnswerComparison(
+        question.trim(), 
+        userAnswer.trim(), 
+        optimalAnswer, 
+        topic
+      );
+
+      res.json(analysis);
+    } catch (error) {
+      console.error("Answer analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze answer" });
     }
   });
 

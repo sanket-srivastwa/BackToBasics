@@ -30,6 +30,12 @@ export default function Header() {
               >
                 Practice
               </button>
+              <button 
+                onClick={() => setLocation("/custom-case-study")}
+                className="text-neutral-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                AI Case Study
+              </button>
               <button className="text-neutral-600 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">
                 Resources
               </button>

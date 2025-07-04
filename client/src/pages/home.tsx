@@ -130,10 +130,10 @@ export default function Home() {
                 size="lg" 
                 variant="outline" 
                 className="border-2 border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-4"
-                onClick={() => handleTopicSelect("pm", "case-study")}
+                onClick={() => setLocation("/custom-case-study")}
               >
                 <Briefcase className="mr-2 h-5 w-5" />
-                Explore Case Studies
+                Create Custom Case Study
               </Button>
             </div>
           </div>
@@ -198,29 +198,29 @@ export default function Home() {
                   <CardTitle className="text-2xl">Case Studies</CardTitle>
                 </div>
                 <CardDescription className="text-base">
-                  Solve complex business problems with structured frameworks. Ideal for consulting and product management roles.
+                  Create custom interview questions and get AI-powered feedback. Perfect for personalized practice and skill development.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 mb-6">
                   <li className="flex items-center text-neutral-600">
                     <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-                    Structured frameworks
+                    Custom question creation
                   </li>
                   <li className="flex items-center text-neutral-600">
                     <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-                    Step-by-step guidance
+                    AI-powered optimal answers
                   </li>
                   <li className="flex items-center text-neutral-600">
                     <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-                    Industry scenarios
+                    Detailed feedback analysis
                   </li>
                 </ul>
                 <Button 
                   className="w-full bg-accent hover:bg-accent/90" 
-                  onClick={() => handleTopicSelect("pm", "case-study")}
+                  onClick={() => setLocation("/custom-case-study")}
                 >
-                  Explore Case Studies
+                  Create Custom Case Study
                 </Button>
               </CardContent>
             </Card>
