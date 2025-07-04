@@ -1,19 +1,37 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, varchar, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Session storage table for Replit Auth
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// User storage table for Replit Auth
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  email: text("email").notNull().unique(),
-  password: text("password").notNull(),
+  id: varchar("id").primaryKey().notNull(), // Replit user ID as string
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  // Extended user profile fields
   fullName: text("full_name"),
   currentRole: text("current_role"),
   targetRole: text("target_role"),
   experienceLevel: text("experience_level"), // "junior", "mid", "senior", "principal"
   preferredTopics: text("preferred_topics").array(),
   profileCompleted: boolean("profile_completed").default(false),
+  // Usage tracking for freemium model
+  questionsViewed: integer("questions_viewed").default(0),
+  lastViewedReset: timestamp("last_viewed_reset").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const questions = pgTable("questions", {
@@ -43,9 +61,9 @@ export const answers = pgTable("answers", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const sessions = pgTable("sessions", {
+export const practiceSession = pgTable("practice_sessions", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id"),
+  userId: varchar("user_id"),
   topic: text("topic").notNull(),
   category: text("category").notNull(),
   questionsCount: integer("questions_count").notNull(),
@@ -85,10 +103,17 @@ export const userProfiles = pgTable("user_profiles", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
+// Replit Auth user upsert schema
+export const upsertUserSchema = createInsertSchema(users).pick({
+  id: true,
   email: true,
-  password: true,
+  firstName: true,
+  lastName: true,
+  profileImageUrl: true,
+});
+
+// Extended user profile schema  
+export const insertUserProfileExtendedSchema = createInsertSchema(users).pick({
   fullName: true,
   currentRole: true,
   targetRole: true,
@@ -122,21 +147,22 @@ export const insertAnswerSchema = createInsertSchema(answers).omit({
   createdAt: true,
 });
 
-export const insertSessionSchema = createInsertSchema(sessions).omit({
+export const insertPracticeSessionSchema = createInsertSchema(practiceSession).omit({
   id: true,
   completedCount: true,
   currentQuestionId: true,
   createdAt: true,
 });
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
+// Type definitions
+export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertQuestion = z.infer<typeof insertQuestionSchema>;
 export type Question = typeof questions.$inferSelect;
 export type InsertAnswer = z.infer<typeof insertAnswerSchema>;
 export type Answer = typeof answers.$inferSelect;
-export type InsertSession = z.infer<typeof insertSessionSchema>;
-export type Session = typeof sessions.$inferSelect;
+export type InsertPracticeSession = z.infer<typeof insertPracticeSessionSchema>;
+export type PracticeSession = typeof practiceSession.$inferSelect;
 export type InsertPromptedQuestion = z.infer<typeof insertPromptedQuestionSchema>;
 export type PromptedQuestion = typeof promptedQuestions.$inferSelect;
 export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;

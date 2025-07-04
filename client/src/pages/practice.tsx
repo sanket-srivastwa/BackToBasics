@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import QuestionCard from "@/components/question-card";
+import AuthPromptModal from "@/components/auth-prompt-modal";
+import { useAccessControl } from "@/hooks/useAccessControl";
 import { ArrowLeft, Users, Clock, Target, TrendingUp, Bookmark, Star, Flame, Search, Filter, ChevronDown, ChevronUp } from "lucide-react";
 
 export default function Practice() {
@@ -19,6 +21,9 @@ export default function Practice() {
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const [filtersExpanded, setFiltersExpanded] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  
+  const { canViewQuestions, shouldShowAuthPrompt, questionsRemaining, questionsViewed } = useAccessControl();
 
   // Get search query and company filter from URL parameters
   useEffect(() => {
@@ -324,6 +329,14 @@ export default function Practice() {
       </div>
       
       <Footer />
+      
+      {/* Authentication Modal */}
+      <AuthPromptModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        questionsViewed={questionsViewed}
+        questionsRemaining={questionsRemaining}
+      />
     </div>
   );
 }

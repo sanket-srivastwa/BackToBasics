@@ -1,10 +1,73 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertAnswerSchema, insertSessionSchema } from "@shared/schema";
+import { insertAnswerSchema, insertPracticeSessionSchema } from "@shared/schema";
 import { generateOptimalAnswer, analyzeAnswerComparison, validateQuestion, generateLearningContent, generateLearningResponse } from "./openai";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth middleware
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Check user's question access status (freemium model)
+  app.get('/api/auth/access-status', async (req: any, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.json({ 
+          isAuthenticated: false, 
+          questionsViewed: 0, 
+          questionsRemaining: 5,
+          requiresAuth: false 
+        });
+      }
+
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const questionsViewed = user.questionsViewed || 0;
+      const questionsRemaining = Math.max(0, 5 - questionsViewed);
+      
+      res.json({
+        isAuthenticated: true,
+        questionsViewed,
+        questionsRemaining,
+        requiresAuth: questionsRemaining <= 0 && questionsViewed >= 5
+      });
+    } catch (error) {
+      console.error("Error checking access status:", error);
+      res.status(500).json({ message: "Failed to check access status" });
+    }
+  });
+
+  // Middleware to track question views for unauthenticated users
+  const trackQuestionAccess = async (req: any, res: any, next: any) => {
+    try {
+      if (req.isAuthenticated()) {
+        const userId = req.user.claims.sub;
+        await storage.incrementUserQuestionsViewed(userId);
+      }
+      next();
+    } catch (error) {
+      console.error("Error tracking question access:", error);
+      next(); // Continue even if tracking fails
+    }
+  };
   // Get popular questions
   app.get("/api/questions/popular", async (req, res) => {
     try {
@@ -109,22 +172,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create session
-  app.post("/api/sessions", async (req, res) => {
+  // Create practice session
+  app.post("/api/practice-sessions", async (req, res) => {
     try {
-      const validatedData = insertSessionSchema.parse(req.body);
-      const session = await storage.createSession(validatedData);
+      const validatedData = insertPracticeSessionSchema.parse(req.body);
+      const session = await storage.createPracticeSession(validatedData);
       res.json(session);
     } catch (error) {
       res.status(400).json({ error: "Invalid session data" });
     }
   });
 
-  // Get session
-  app.get("/api/sessions/:id", async (req, res) => {
+  // Get practice session
+  app.get("/api/practice-sessions/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const session = await storage.getSession(id);
+      const session = await storage.getPracticeSession(id);
       
       if (!session) {
         return res.status(404).json({ error: "Session not found" });
