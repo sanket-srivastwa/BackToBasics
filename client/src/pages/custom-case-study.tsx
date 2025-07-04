@@ -55,11 +55,19 @@ export default function CustomCaseStudy() {
 
   const topics = [
     "Technical Program Management",
-    "Product Management",
+    "Product Management", 
     "Project Management",
     "Engineering Management",
     "Data Science Leadership"
   ];
+
+  const topicMapping: { [key: string]: string } = {
+    "Technical Program Management": "Technical Program Management",
+    "Product Management": "Product Management",
+    "Project Management": "Project Management", 
+    "Engineering Management": "Engineering Management",
+    "Data Science Leadership": "Data Science Leadership"
+  };
 
   const experienceLevels = [
     { id: "junior", name: "Junior (0-2 years)", description: "Entry-level questions focusing on fundamentals" },
@@ -70,13 +78,42 @@ export default function CustomCaseStudy() {
   // Load prompted questions when topic or experience level changes
   const loadPromptedQuestions = async () => {
     try {
+      console.log(`Loading questions for topic: ${selectedTopic}, experience: ${experienceLevel}`);
       const response = await fetch(`/api/prompted-questions?topic=${encodeURIComponent(selectedTopic)}&experienceLevel=${experienceLevel}`);
+      
       if (response.ok) {
         const questions = await response.json();
+        console.log('Loaded questions:', questions);
         setPromptedQuestions(questions);
+        
+        if (questions.length === 0) {
+          toast({
+            title: "No questions found",
+            description: "Try a different topic or experience level combination.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Questions loaded",
+            description: `Found ${questions.length} questions for your selection.`,
+          });
+        }
+      } else {
+        const errorData = await response.json();
+        console.error('Error loading questions:', errorData);
+        toast({
+          title: "Failed to load questions",
+          description: errorData.error || "Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Failed to load prompted questions:", error);
+      toast({
+        title: "Connection error",
+        description: "Failed to connect to the server. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 

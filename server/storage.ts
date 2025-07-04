@@ -235,6 +235,27 @@ export class DatabaseStorage implements IStorage {
   // Seed sample data for prompted questions
   async seedPromptedQuestions(): Promise<void> {
     const samplePromptedQuestions: InsertPromptedQuestion[] = [
+      // TPM Questions
+      {
+        topic: "Technical Program Management",
+        experienceLevel: "junior",
+        questionPrompt: "Describe how you would coordinate a simple feature rollout across frontend and backend teams with a 2-week timeline.",
+        context: "Tests basic coordination and communication skills for entry-level TPM roles.",
+        suggestedStructure: "Use STAR method focusing on planning, coordination, and execution",
+        keyPoints: ["Team coordination", "Timeline management", "Communication", "Risk planning"],
+        difficultyLevel: "easy",
+        estimatedTime: 8
+      },
+      {
+        topic: "Technical Program Management",
+        experienceLevel: "mid",
+        questionPrompt: "You're leading a database migration project that affects 8 microservices. How do you minimize downtime and ensure data integrity?",
+        context: "Tests mid-level technical planning and risk management skills.",
+        suggestedStructure: "Focus on risk assessment, phased approach, and contingency planning",
+        keyPoints: ["Risk management", "Data integrity", "Phased migration", "Rollback plans", "Service coordination"],
+        difficultyLevel: "medium",
+        estimatedTime: 12
+      },
       {
         topic: "Technical Program Management",
         experienceLevel: "senior",
@@ -243,7 +264,19 @@ export class DatabaseStorage implements IStorage {
         suggestedStructure: "Use STAR method: Situation (API dependency and timeline), Task (migration execution), Action (planning steps and risk mitigation), Result (successful migration metrics)",
         keyPoints: ["Cross-team coordination", "Risk assessment", "Timeline management", "Quality assurance", "Stakeholder communication"],
         difficultyLevel: "hard",
-        estimatedTime: 12
+        estimatedTime: 15
+      },
+      
+      // PM Questions
+      {
+        topic: "Product Management",
+        experienceLevel: "junior",
+        questionPrompt: "How would you gather user feedback for a new feature you're considering adding to your mobile app?",
+        context: "Tests basic user research and feedback collection skills for entry-level PM roles.",
+        suggestedStructure: "Cover research methods, user segments, and feedback analysis approaches",
+        keyPoints: ["User research", "Feedback methods", "Data collection", "Analysis planning"],
+        difficultyLevel: "easy",
+        estimatedTime: 8
       },
       {
         topic: "Product Management",
@@ -256,6 +289,50 @@ export class DatabaseStorage implements IStorage {
         estimatedTime: 10
       },
       {
+        topic: "Product Management", 
+        experienceLevel: "senior",
+        questionPrompt: "You're launching a new product line that could cannibalize 20% of your existing revenue but opens a $500M market opportunity. Walk through your strategic approach.",
+        context: "Tests strategic thinking, business analysis, and senior-level decision making.",
+        suggestedStructure: "Focus on market analysis, risk assessment, strategic planning, and stakeholder alignment",
+        keyPoints: ["Strategic planning", "Market analysis", "Risk assessment", "Revenue impact", "Stakeholder management"],
+        difficultyLevel: "hard",
+        estimatedTime: 15
+      },
+
+      // Engineering Management Questions
+      {
+        topic: "Engineering Management",
+        experienceLevel: "junior", 
+        questionPrompt: "One of your team members is consistently missing deadlines. How do you address this performance issue?",
+        context: "Tests basic people management and performance issue handling.",
+        suggestedStructure: "Focus on investigation, communication, and support planning",
+        keyPoints: ["Performance management", "Communication", "Support planning", "Documentation"],
+        difficultyLevel: "easy",
+        estimatedTime: 6
+      },
+      {
+        topic: "Engineering Management",
+        experienceLevel: "mid",
+        questionPrompt: "Your team is experiencing high technical debt and velocity is decreasing. How do you balance feature delivery with technical improvements?",
+        context: "Tests technical decision making and team productivity management.",
+        suggestedStructure: "Cover assessment, prioritization framework, and stakeholder communication",
+        keyPoints: ["Technical debt assessment", "Velocity optimization", "Stakeholder communication", "Balance planning"],
+        difficultyLevel: "medium", 
+        estimatedTime: 10
+      },
+      {
+        topic: "Engineering Management",
+        experienceLevel: "senior",
+        questionPrompt: "You need to scale your engineering organization from 20 to 50 engineers in 6 months while maintaining code quality and team culture. How do you approach this?",
+        context: "Tests organizational scaling, culture management, and strategic planning.",
+        suggestedStructure: "Focus on hiring strategy, organizational design, culture preservation, and process scaling",
+        keyPoints: ["Hiring strategy", "Organizational design", "Culture scaling", "Process optimization", "Leadership development"],
+        difficultyLevel: "hard",
+        estimatedTime: 15
+      },
+
+      // Project Management Questions
+      {
         topic: "Project Management",
         experienceLevel: "junior",
         questionPrompt: "You're managing a project with a tight deadline when a key developer gets sick for 2 weeks. The client expects the delivery on time. Walk me through how you would handle this situation.",
@@ -264,6 +341,16 @@ export class DatabaseStorage implements IStorage {
         keyPoints: ["Risk assessment", "Team communication", "Resource management", "Client communication", "Timeline adjustment"],
         difficultyLevel: "easy",
         estimatedTime: 8
+      },
+      {
+        topic: "Project Management",
+        experienceLevel: "mid",
+        questionPrompt: "You're managing a cross-functional project involving marketing, engineering, and design teams. Each team has different priorities and timelines. How do you align everyone?",
+        context: "Tests stakeholder management and cross-functional coordination skills.",
+        suggestedStructure: "Cover stakeholder analysis, alignment strategies, and coordination frameworks",
+        keyPoints: ["Stakeholder management", "Cross-functional coordination", "Priority alignment", "Communication planning"],
+        difficultyLevel: "medium",
+        estimatedTime: 10
       }
     ];
 

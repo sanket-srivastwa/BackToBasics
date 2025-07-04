@@ -47,44 +47,106 @@ interface LearningContent {
   assessment: Array<{ question: string; answer: string }>;
 }
 
-function AILearningModule({ track, module }: { track: string; module: string }) {
-  const { data: content, isLoading, error } = useQuery<LearningContent>({
-    queryKey: [`/api/learning/${track}/${module}`],
-    retry: 1,
-  });
+function StaticLearningModule({ track, module }: { track: string; module: string }) {
+  // Static content instead of AI-generated
+  const getStaticContent = (track: string, module: string): LearningContent | null => {
+    const contentMap: { [key: string]: { [key: string]: LearningContent } } = {
+      "tpm": {
+        "TPM Foundations": {
+          title: "Technical Program Management Foundations",
+          objectives: [
+            "Understand the role of a Technical Program Manager",
+            "Learn cross-functional team coordination",
+            "Master stakeholder communication strategies",
+            "Apply project planning and execution frameworks"
+          ],
+          concepts: [
+            { 
+              title: "Role Definition", 
+              explanation: "TPMs bridge technical and business teams, driving complex technical initiatives across multiple teams and stakeholders."
+            },
+            { 
+              title: "Cross-functional Leadership", 
+              explanation: "Lead without authority by building relationships, facilitating decisions, and aligning teams toward common goals."
+            },
+            { 
+              title: "Technical Depth", 
+              explanation: "Maintain sufficient technical knowledge to understand trade-offs, risks, and dependencies in complex systems."
+            }
+          ],
+          examples: [
+            {
+              scenario: "Managing a microservices migration across 8 teams",
+              solution: "Create detailed dependency mapping, establish migration phases, coordinate team schedules, and track progress with clear metrics."
+            }
+          ],
+          exercises: [
+            "Design a project plan for API versioning across 15 services",
+            "Create a stakeholder communication matrix for a major infrastructure upgrade"
+          ],
+          resources: [
+            { title: "TPM Career Guide", type: "Article", description: "Comprehensive guide to TPM roles and responsibilities" }
+          ],
+          assessment: [
+            { question: "What are the key responsibilities of a TPM?", answer: "Cross-team coordination, technical planning, risk management, and stakeholder communication" }
+          ]
+        }
+      },
+      "pm": {
+        "Product Strategy": {
+          title: "Product Strategy Fundamentals",
+          objectives: [
+            "Develop product vision and strategy",
+            "Learn market analysis techniques", 
+            "Master product roadmapping",
+            "Understand competitive positioning"
+          ],
+          concepts: [
+            { 
+              title: "Product Vision", 
+              explanation: "A clear, inspiring picture of what the product will achieve for users and the business in the future."
+            },
+            { 
+              title: "Market Analysis", 
+              explanation: "Understanding market size, customer segments, competitive landscape, and growth opportunities."
+            }
+          ],
+          examples: [
+            {
+              scenario: "Defining strategy for a new social media feature",
+              solution: "Conduct user research, analyze competitor features, define success metrics, and create a phased rollout plan."
+            }
+          ],
+          exercises: [
+            "Create a product strategy for entering a new market segment"
+          ],
+          resources: [
+            { title: "Product Strategy Templates", type: "Template", description: "Ready-to-use frameworks for strategy development" }
+          ],
+          assessment: [
+            { question: "What components make up a strong product strategy?", answer: "Vision, market analysis, competitive positioning, and clear success metrics" }
+          ]
+        }
+      }
+    };
 
-  if (isLoading) {
-    return (
-      <Card className="animate-pulse">
-        <CardHeader>
-          <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="h-4 bg-gray-200 rounded w-full"></div>
-            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-            <div className="h-4 bg-gray-200 rounded w-4/5"></div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+    return contentMap[track]?.[module] || null;
+  };
 
-  if (error) {
+  const content = getStaticContent(track, module);
+
+  if (!content) {
     return (
-      <Card className="border-red-200 bg-red-50">
+      <Card className="border-gray-200 bg-gray-50">
         <CardContent className="p-6">
-          <div className="text-red-600 text-center">
-            <h3 className="font-semibold mb-2">AI Content Temporarily Unavailable</h3>
-            <p className="text-sm">Due to API limitations, dynamic content cannot be generated at this time.</p>
-            <p className="text-sm mt-2">Please check back later or contact support if this persists.</p>
+          <div className="text-gray-600 text-center">
+            <h3 className="font-semibold mb-2">Content Coming Soon</h3>
+            <p className="text-sm">This module content is being developed and will be available soon.</p>
           </div>
         </CardContent>
       </Card>
     );
   }
-
-  if (!content) return null;
 
   return (
     <div className="space-y-6">
@@ -172,172 +234,6 @@ function AILearningModule({ track, module }: { track: string; module: string }) 
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-function AISearchComponent({ initialQuery = "" }: { initialQuery?: string }) {
-  const [searchQuery, setSearchQuery] = useState(initialQuery);
-  const [conversation, setConversation] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Auto-search if initial query is provided
-  useEffect(() => {
-    if (initialQuery && initialQuery.trim()) {
-      const performInitialSearch = async () => {
-        setIsLoading(true);
-        const userMessage = { role: 'user' as const, content: initialQuery };
-        setConversation([userMessage]);
-        
-        try {
-          const response = await fetch('/api/learning/search', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: initialQuery })
-          });
-          
-          const data = await response.json();
-          
-          if (response.ok) {
-            setConversation(prev => [...prev, { role: 'assistant', content: data.response }]);
-          } else {
-            setConversation(prev => [...prev, { 
-              role: 'assistant', 
-              content: 'I apologize, but I cannot generate responses right now due to API limitations. Please try again later.' 
-            }]);
-          }
-        } catch (error) {
-          setConversation(prev => [...prev, { 
-            role: 'assistant', 
-            content: 'I encountered an error while processing your question. Please try again.' 
-          }]);
-        }
-        
-        setIsLoading(false);
-      };
-      
-      performInitialSearch();
-    }
-  }, [initialQuery]);
-
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
-    
-    setIsLoading(true);
-    const userMessage = { role: 'user' as const, content: searchQuery };
-    setConversation(prev => [...prev, userMessage]);
-    
-    try {
-      const response = await fetch('/api/learning/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: searchQuery })
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok) {
-        setConversation(prev => [...prev, { role: 'assistant', content: data.response }]);
-      } else {
-        setConversation(prev => [...prev, { 
-          role: 'assistant', 
-          content: 'I apologize, but I cannot generate responses right now due to API limitations. Please try again later.' 
-        }]);
-      }
-    } catch (error) {
-      setConversation(prev => [...prev, { 
-        role: 'assistant', 
-        content: 'I encountered an error while processing your question. Please try again.' 
-      }]);
-    }
-    
-    setSearchQuery("");
-    setIsLoading(false);
-  };
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <Search className="w-5 h-5 mr-2" />
-          AI Learning Assistant
-        </CardTitle>
-        <CardDescription>
-          Ask any questions about management, leadership, or technical concepts. I'll provide detailed explanations and examples.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Conversation History */}
-        {conversation.length > 0 && (
-          <div className="max-h-96 overflow-y-auto space-y-4 border rounded-lg p-4 bg-gray-50">
-            {conversation.map((message, idx) => (
-              <div key={idx} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] p-3 rounded-lg ${
-                  message.role === 'user' 
-                    ? 'bg-primary text-white' 
-                    : 'bg-white border shadow-sm'
-                }`}>
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                </div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-white border shadow-sm p-3 rounded-lg">
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-pulse flex space-x-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                    </div>
-                    <span className="text-sm text-gray-500">AI is thinking...</span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        
-        {/* Search Input */}
-        <div className="flex space-x-2">
-          <Input
-            placeholder="Ask a question about management, leadership, or technical concepts..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && !isLoading && handleSearch()}
-            disabled={isLoading}
-          />
-          <Button 
-            onClick={handleSearch} 
-            disabled={isLoading || !searchQuery.trim()}
-            size="icon"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
-        </div>
-        
-        {/* Quick Questions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          {[
-            "How do I prioritize features as a PM?",
-            "What is technical debt in engineering?",
-            "How to conduct effective 1:1 meetings?",
-            "Explain the STAR method for interviews"
-          ].map((question, idx) => (
-            <Button 
-              key={idx}
-              variant="outline" 
-              size="sm" 
-              className="text-left justify-start h-auto py-2 px-3"
-              onClick={() => setSearchQuery(question)}
-              disabled={isLoading}
-            >
-              <MessageSquare className="w-3 h-3 mr-2 flex-shrink-0" />
-              <span className="text-xs">{question}</span>
-            </Button>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
   );
 }
 
@@ -687,8 +583,7 @@ export default function Learning() {
       window.history.replaceState({}, '', '/learning');
     }
   }, []);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showAISearch, setShowAISearch] = useState(false);
+  // AI search functionality removed
 
   const learningTracks = {
     tpm: {
@@ -906,23 +801,7 @@ export default function Learning() {
           </p>
         </div>
 
-        {/* AI Learning Assistant Search */}
-        <div className="mb-16">
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl flex items-center justify-center gap-2">
-                <Search className="w-6 h-6 text-blue-600" />
-                AI Learning Assistant
-              </CardTitle>
-              <CardDescription className="text-lg">
-                Ask any question about management, leadership, technical concepts, or career development
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="max-w-4xl mx-auto">
-              <AISearchComponent initialQuery={headerSearchQuery} />
-            </CardContent>
-          </Card>
-        </div>
+
 
         {/* Learning Tracks Overview */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
@@ -1095,14 +974,7 @@ export default function Learning() {
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-2xl font-bold">Course Content</h3>
                     <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setShowAISearch(!showAISearch)}
-                      >
-                        <Search className="w-4 h-4 mr-2" />
-                        AI Assistant
-                      </Button>
+                      {/* AI Assistant removed for better performance */}
                       <Button 
                         variant="outline" 
                         onClick={() => setSelectedModule(null)}
@@ -1112,12 +984,7 @@ export default function Learning() {
                     </div>
                   </div>
                   
-                  {/* AI Search Component */}
-                  {showAISearch && (
-                    <div className="mb-6">
-                      <AISearchComponent />
-                    </div>
-                  )}
+                  {/* AI content has been removed for better performance */}
                   
                   {/* Static Learning Content */}
                   <StaticLearningContent 
@@ -1130,11 +997,11 @@ export default function Learning() {
                     <Card className="border-dashed border-2 border-gray-300">
                       <CardContent className="p-6 text-center">
                         <Zap className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                        <h4 className="font-semibold mb-2">Enhanced AI Content</h4>
+                        <h4 className="font-semibold mb-2">Comprehensive Learning Content</h4>
                         <p className="text-gray-600 mb-4">
-                          Get personalized, AI-generated learning content tailored to your experience level and learning goals.
+                          Access structured learning materials with practical examples, exercises, and assessments.
                         </p>
-                        <AILearningModule 
+                        <StaticLearningModule 
                           track={selectedModule.track} 
                           module={selectedModule.module} 
                         />
