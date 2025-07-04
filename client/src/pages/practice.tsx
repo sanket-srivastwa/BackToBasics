@@ -4,16 +4,20 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import QuestionCard from "@/components/question-card";
-import { ArrowLeft, Users, Clock, Target, TrendingUp, Bookmark, Star, Flame } from "lucide-react";
+import { ArrowLeft, Users, Clock, Target, TrendingUp, Bookmark, Star, Flame, Search, Filter } from "lucide-react";
 
 export default function Practice() {
   const [, setLocation] = useLocation();
   const [selectedTopic, setSelectedTopic] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("all");
+  const [selectedDifficulty, setSelectedDifficulty] = useState("all");
+  const [localSearchQuery, setLocalSearchQuery] = useState("");
 
   // Get search query and company filter from URL parameters
   useEffect(() => {
@@ -28,34 +32,60 @@ export default function Practice() {
     }
   }, []);
 
-  // Default questions query (with company filter)
+  // Comprehensive questions query with all filters
   const { data: questions, isLoading } = useQuery({
-    queryKey: ["/api/questions/popular", selectedCompany !== "all" ? selectedCompany : undefined],
+    queryKey: ["/api/questions/filtered", selectedTopic, selectedCompany, selectedDifficulty, searchQuery || localSearchQuery],
     queryFn: async () => {
-      const url = selectedCompany !== "all" 
-        ? `/api/questions/popular?company=${selectedCompany}`
-        : "/api/questions/popular";
+      const params = new URLSearchParams();
+      
+      if (searchQuery || localSearchQuery) {
+        params.append('q', searchQuery || localSearchQuery);
+        const response = await fetch(`/api/questions/search?${params.toString()}`);
+        return response.json();
+      }
+      
+      // For non-search queries, use popular questions with filters
+      if (selectedCompany !== "all") params.append('company', selectedCompany);
+      if (selectedTopic !== "all") params.append('topic', selectedTopic);
+      if (selectedDifficulty !== "all") params.append('difficulty', selectedDifficulty);
+      
+      const url = params.toString() ? `/api/questions/popular?${params.toString()}` : "/api/questions/popular";
       const response = await fetch(url);
       return response.json();
     },
-    enabled: !searchQuery, // Only fetch when not searching
   });
 
-  // Search questions query
-  const { data: searchResults, isLoading: searchLoading } = useQuery({
-    queryKey: ["/api/questions/search", searchQuery],
-    queryFn: async () => {
-      const response = await fetch(`/api/questions/search?q=${encodeURIComponent(searchQuery)}`);
-      return response.json();
-    },
-    enabled: !!searchQuery,
-  });
+  // Handle local search
+  const handleLocalSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (localSearchQuery.trim()) {
+      setSearchQuery(""); // Clear URL search
+      // The query will automatically refetch due to localSearchQuery change
+    }
+  };
 
   const topics = [
     { id: "all", name: "All Topics" },
     { id: "tpm", name: "Technical Program Management" },
     { id: "pm", name: "Product Management" },
-    { id: "project-management", name: "Project Management" }
+    { id: "project-management", name: "Project Management" },
+    { id: "em", name: "Engineering Management" }
+  ];
+
+  const difficulties = [
+    { id: "all", name: "All Difficulties" },
+    { id: "easy", name: "Easy" },
+    { id: "medium", name: "Medium" },
+    { id: "hard", name: "Hard" }
+  ];
+
+  const companies = [
+    { id: "all", name: "All Companies" },
+    { id: "meta", name: "Meta" },
+    { id: "amazon", name: "Amazon" },
+    { id: "apple", name: "Apple" },
+    { id: "netflix", name: "Netflix" },
+    { id: "google", name: "Google" }
   ];
 
   const handleQuestionClick = (questionId: number) => {
@@ -96,16 +126,16 @@ export default function Practice() {
             Back to Home
           </Button>
           <h1 className="text-3xl font-bold text-neutral-800 mb-2">
-            {searchQuery 
-              ? `Search Results for "${searchQuery}"` 
+            {(searchQuery || localSearchQuery)
+              ? `Search Results for "${searchQuery || localSearchQuery}"` 
               : selectedCompany !== "all" 
                 ? `${selectedCompany.charAt(0).toUpperCase() + selectedCompany.slice(1)} Questions`
                 : "Practice Questions"
             }
           </h1>
           <p className="text-neutral-600">
-            {searchQuery 
-              ? `Found ${searchResults?.length || 0} questions matching your search`
+            {(searchQuery || localSearchQuery)
+              ? `Found ${questions?.length || 0} questions matching your search`
               : selectedCompany !== "all"
                 ? `Practice questions specifically from ${selectedCompany.charAt(0).toUpperCase() + selectedCompany.slice(1)}`
                 : "Browse and practice with curated questions from top tech companies"
@@ -113,8 +143,103 @@ export default function Practice() {
           </p>
         </div>
 
-        {/* Topic Filter */}
-        <div className="mb-8">
+        {/* Search and Filters */}
+        <div className="mb-8 space-y-6">
+          {/* Search Bar */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Search className="w-5 h-5 mr-2" />
+                Search Questions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleLocalSearch} className="flex gap-4">
+                <div className="flex-1">
+                  <Input
+                    type="text"
+                    placeholder="Search for questions, topics, or companies..."
+                    value={localSearchQuery}
+                    onChange={(e) => setLocalSearchQuery(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                <Button type="submit">
+                  <Search className="w-4 h-4 mr-2" />
+                  Search
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Filters */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Filter className="w-5 h-5 mr-2" />
+                Filter Questions
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Difficulty Filter */}
+              <div>
+                <h4 className="text-sm font-medium mb-3">Difficulty Level</h4>
+                <div className="flex flex-wrap gap-2">
+                  {difficulties.map((difficulty) => (
+                    <Button
+                      key={difficulty.id}
+                      variant={selectedDifficulty === difficulty.id ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedDifficulty(difficulty.id)}
+                      className="transition-colors"
+                    >
+                      {difficulty.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Topic Filter */}
+              <div>
+                <h4 className="text-sm font-medium mb-3">Management Area</h4>
+                <div className="flex flex-wrap gap-2">
+                  {topics.map((topic) => (
+                    <Button
+                      key={topic.id}
+                      variant={selectedTopic === topic.id ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedTopic(topic.id)}
+                      className="transition-colors"
+                    >
+                      {topic.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Company Filter */}
+              <div>
+                <h4 className="text-sm font-medium mb-3">Company</h4>
+                <div className="flex flex-wrap gap-2">
+                  {companies.map((company) => (
+                    <Button
+                      key={company.id}
+                      variant={selectedCompany === company.id ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedCompany(company.id)}
+                      className="transition-colors"
+                    >
+                      {company.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Legacy Topic Filter (keeping for compatibility) */}
+        <div className="mb-8" style={{ display: 'none' }}>
           <h3 className="text-lg font-semibold mb-4">Filter by Topic</h3>
           <div className="flex flex-wrap gap-2">
             {topics.map((topic) => (
@@ -131,7 +256,7 @@ export default function Practice() {
 
         {/* Questions List */}
         <div className="space-y-6">
-          {(isLoading || searchLoading) ? (
+          {isLoading ? (
             <div className="grid gap-6">
               {[1, 2, 3].map((i) => (
                 <Card key={i} className="animate-pulse">
@@ -146,9 +271,9 @@ export default function Practice() {
                 </Card>
               ))}
             </div>
-          ) : (searchQuery ? searchResults : questions) && (searchQuery ? searchResults : questions)?.length > 0 ? (
+          ) : questions && questions.length > 0 ? (
             <div className="grid gap-6">
-              {(searchQuery ? searchResults : questions).map((question: any, index: number) => (
+              {questions.map((question: any, index: number) => (
                 <QuestionCard
                   key={question.id}
                   question={question}
