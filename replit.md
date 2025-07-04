@@ -135,12 +135,23 @@ The application uses four main entities:
 - Topic filtering functionality for question browsing
 - Seamless integration between learning materials, practice, and case studies
 
+### Enhanced User Experience (Latest Updates)
+- Redesigned home page with Practice and Learn focus areas in hero section
+- Removed "Select your Focus Area" and "Enter Custom Topic" sections for cleaner UX
+- Added Engineering Management to learning materials (now covers TPM, PM, EM)
+- Enhanced learning platform inspired by tryexponent.com structure
+- Comprehensive course modules with practical frameworks and skill assessments
+- Improved visual design with glass morphism effects, floating animations, and card hover states
+- Enhanced CSS animations including gradient shifts, scale effects, and smooth transitions
+- Better mobile responsiveness and accessibility features
+
 ## Changelog
 
 ```
 Changelog:
 - July 04, 2025. Initial setup with database integration and AI-powered feedback
 - July 04, 2025. Added comprehensive learning materials and voice-based answering functionality
+- July 04, 2025. Major UX improvements: redesigned home page, enhanced learning platform with Engineering Management, improved visual design and animations
 ```
 
 ## User Preferences

@@ -586,7 +586,7 @@ Result: Share the outcome and impact..."
                       <TabsContent value="voice" className="mt-4">
                         <VoiceInput
                           onTranscription={(text) => setUserAnswer(prev => prev + " " + text)}
-                          disabled={analyzeMutation.isPending}
+                          disabled={analyzeAnswerMutation.isPending}
                         />
                         {userAnswer && (
                           <div className="mt-4">

@@ -114,24 +114,66 @@ export default function Home() {
             <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
               Practice with real MAANG company questions, get AI-powered feedback, and ace your technical program management interviews
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="bg-white text-primary hover:bg-gray-100 text-lg px-8 py-4"
-                onClick={() => setLocation("/custom-case-study")}
-              >
-                <Briefcase className="mr-2 h-5 w-5" />
-                Create Custom Case Study
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="border-2 border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-4"
+            
+            {/* Practice and Learn Options */}
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mt-12">
+              <div 
+                className="glass-card rounded-xl p-8 hover:bg-white/20 transition-all duration-300 cursor-pointer group scale-on-hover"
                 onClick={() => setLocation("/practice")}
               >
-                <Play className="mr-2 h-5 w-5" />
-                Browse Questions
-              </Button>
+                <div className="text-center">
+                  <div className="bg-white/20 rounded-full p-6 w-20 h-20 mx-auto mb-6 group-hover:bg-white/30 transition-all">
+                    <Play className="w-8 h-8 text-white mx-auto" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4">Practice</h3>
+                  <p className="text-blue-100 mb-6">
+                    Test yourself with real interview questions from top companies. Get AI-powered feedback and improve your answers.
+                  </p>
+                  <div className="flex flex-col gap-2 text-sm text-blue-100">
+                    <div className="flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Real MAANG company questions
+                    </div>
+                    <div className="flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      AI-powered feedback
+                    </div>
+                    <div className="flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Voice and text answers
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div 
+                className="glass-card rounded-xl p-8 hover:bg-white/20 transition-all duration-300 cursor-pointer group scale-on-hover"
+                onClick={() => setLocation("/learning")}
+              >
+                <div className="text-center">
+                  <div className="bg-white/20 rounded-full p-6 w-20 h-20 mx-auto mb-6 group-hover:bg-white/30 transition-all">
+                    <Lightbulb className="w-8 h-8 text-white mx-auto" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4">Learn</h3>
+                  <p className="text-blue-100 mb-6">
+                    Master the fundamentals with comprehensive learning materials covering PM, TPM, and Engineering Management.
+                  </p>
+                  <div className="flex flex-col gap-2 text-sm text-blue-100">
+                    <div className="flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Comprehensive frameworks
+                    </div>
+                    <div className="flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Interactive modules
+                    </div>
+                    <div className="flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Real-world examples
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -149,7 +191,7 @@ export default function Home() {
           
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Case Studies Card */}
-            <Card className="border-2 hover:border-primary transition-all hover:shadow-xl cursor-pointer group">
+            <Card className="card-hover border-2 cursor-pointer group scale-on-hover">
               <CardHeader>
                 <div className="flex items-center mb-4">
                   <div className="bg-primary/10 p-3 rounded-lg mr-4">
@@ -186,7 +228,7 @@ export default function Home() {
             </Card>
 
             {/* Practice Questions Card */}
-            <Card className="border-2 hover:border-primary transition-all hover:shadow-xl cursor-pointer group">
+            <Card className="card-hover border-2 cursor-pointer group scale-on-hover">
               <CardHeader>
                 <div className="flex items-center mb-4">
                   <div className="bg-accent/10 p-3 rounded-lg mr-4">
@@ -225,73 +267,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Topic Selection */}
-      <section className="py-20 bg-neutral-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-neutral-800 mb-4">Select Your Focus Area</h2>
-            <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
-              Choose from popular domains or enter your custom topic
-            </p>
-          </div>
-          
-          {/* Popular Topics */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            {topics.map((topic) => {
-              const IconComponent = topic.icon;
-              return (
-                <Card 
-                  key={topic.id}
-                  className="hover:shadow-md transition-shadow cursor-pointer border hover:border-primary"
-                  onClick={() => setLocation("/practice")}
-                >
-                  <CardHeader>
-                    <div className="flex items-center mb-4">
-                      <div className={`p-3 rounded-lg mr-4 ${topic.color}`}>
-                        <IconComponent className="h-6 w-6" />
-                      </div>
-                      <CardTitle className="text-lg">{topic.name}</CardTitle>
-                    </div>
-                    <CardDescription className="mb-4">
-                      {topic.description}
-                    </CardDescription>
-                    <div className="flex items-center text-sm text-neutral-500">
-                      <Users className="w-4 h-4 mr-2" />
-                      <span>{topic.questionCount} questions available</span>
-                    </div>
-                  </CardHeader>
-                </Card>
-              );
-            })}
-          </div>
 
-          {/* Custom Topic Input */}
-          <div className="max-w-2xl mx-auto">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl text-center">Or Enter Custom Topic</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-4">
-                  <Input 
-                    placeholder="e.g., Data Engineering, UX Research, Sales Strategy..."
-                    value={customTopic}
-                    onChange={(e) => setCustomTopic(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleCustomTopicSubmit()}
-                    className="flex-1"
-                  />
-                  <Button onClick={handleCustomTopicSubmit}>
-                    Generate Questions
-                  </Button>
-                </div>
-                <p className="text-sm text-neutral-500 mt-2 text-center">
-                  We'll create personalized questions based on your specific topic
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
 
       {/* Learning Materials */}
       <section className="py-20 bg-blue-50">
@@ -299,19 +275,19 @@ export default function Home() {
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-neutral-800 mb-4">Learning Materials</h2>
             <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
-              Comprehensive guides and resources to master management roles
+              Comprehensive courses and frameworks for management roles at top tech companies
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <Card className="group hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setLocation("/learning")}>
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <Card className="card-hover cursor-pointer group scale-on-hover" onClick={() => setLocation("/learning")}>
               <CardHeader className="text-center">
-                <div className="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                <div className="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center float-animation">
                   <Target className="w-8 h-8 text-blue-600" />
                 </div>
-                <CardTitle className="text-2xl text-blue-800">Technical Program Management</CardTitle>
+                <CardTitle className="text-xl text-blue-800">Technical Program Management</CardTitle>
                 <CardDescription className="text-gray-600">
-                  Learn to lead complex technical programs across engineering teams
+                  Lead complex technical programs across engineering teams
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -329,12 +305,12 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setLocation("/learning")}>
+            <Card className="card-hover cursor-pointer group scale-on-hover" onClick={() => setLocation("/learning")}>
               <CardHeader className="text-center">
-                <div className="mx-auto mb-4 w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <div className="mx-auto mb-4 w-16 h-16 bg-green-100 rounded-full flex items-center justify-center float-animation">
                   <Lightbulb className="w-8 h-8 text-green-600" />
                 </div>
-                <CardTitle className="text-2xl text-green-800">Product Management</CardTitle>
+                <CardTitle className="text-xl text-green-800">Product Management</CardTitle>
                 <CardDescription className="text-gray-600">
                   Build products that customers love and drive business growth
                 </CardDescription>
@@ -348,6 +324,31 @@ export default function Home() {
                 </ul>
                 <div className="mt-6">
                   <Button className="w-full group-hover:bg-green-700">
+                    Start Learning
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="card-hover cursor-pointer group scale-on-hover" onClick={() => setLocation("/learning")}>
+              <CardHeader className="text-center">
+                <div className="mx-auto mb-4 w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center float-animation">
+                  <Users className="w-8 h-8 text-purple-600" />
+                </div>
+                <CardTitle className="text-xl text-purple-800">Engineering Management</CardTitle>
+                <CardDescription className="text-gray-600">
+                  Lead engineering teams and drive technical excellence
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li>• People Management</li>
+                  <li>• Technical Leadership</li>
+                  <li>• Engineering Culture</li>
+                  <li>• Performance Coaching</li>
+                </ul>
+                <div className="mt-6">
+                  <Button className="w-full group-hover:bg-purple-700">
                     Start Learning
                   </Button>
                 </div>
