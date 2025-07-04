@@ -77,13 +77,9 @@ export default function Home() {
     }
   ];
 
-  const handleTopicSelect = (topicId: string, category: string) => {
-    setLocation(`/practice?topic=${topicId}&category=${category}`);
-  };
-
   const handleCustomTopicSubmit = () => {
     if (customTopic.trim()) {
-      setLocation(`/practice?topic=${encodeURIComponent(customTopic)}&category=custom`);
+      setLocation("/custom-case-study");
     }
   };
 

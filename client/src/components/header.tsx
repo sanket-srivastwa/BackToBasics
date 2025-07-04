@@ -51,10 +51,17 @@ export default function Header() {
             </nav>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" className="font-medium">
+            <Button 
+              variant="ghost" 
+              className="font-medium"
+              onClick={() => setLocation("/custom-case-study")}
+            >
               Sign In
             </Button>
-            <Button className="font-medium">
+            <Button 
+              className="font-medium"
+              onClick={() => setLocation("/practice")}
+            >
               Get Started
             </Button>
           </div>

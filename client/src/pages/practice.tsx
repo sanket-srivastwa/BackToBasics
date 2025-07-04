@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,59 +7,48 @@ import { Badge } from "@/components/ui/badge";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import QuestionCard from "@/components/question-card";
-import { ArrowLeft, Users } from "lucide-react";
+import { ArrowLeft, Users, Clock, Target, TrendingUp, Bookmark, Star, Flame } from "lucide-react";
 
 export default function Practice() {
   const [, setLocation] = useLocation();
-  const [searchParams] = useState(new URLSearchParams(window.location.search));
-  const topic = searchParams.get("topic") || "";
-  const category = searchParams.get("category") || "mock-interview";
+  const [selectedTopic, setSelectedTopic] = useState("all");
 
   const { data: questions, isLoading } = useQuery({
-    queryKey: ["/api/questions", topic, category],
-    enabled: !!topic,
+    queryKey: ["/api/questions/popular"],
+    queryFn: async () => {
+      const response = await fetch("/api/questions/popular");
+      return response.json();
+    },
   });
+
+  const topics = [
+    { id: "all", name: "All Topics" },
+    { id: "tpm", name: "Technical Program Management" },
+    { id: "pm", name: "Product Management" },
+    { id: "project-management", name: "Project Management" }
+  ];
 
   const handleQuestionClick = (questionId: number) => {
     setLocation(`/question/${questionId}`);
   };
 
-  const getTopicDisplay = (topic: string) => {
-    const topicMap = {
-      "tpm": "Technical Program Management",
-      "pm": "Product Management", 
-      "project-management": "Project Management"
+  const getCompanyBadgeColor = (company: string) => {
+    const colors = {
+      meta: "bg-blue-100 text-blue-800",
+      amazon: "bg-orange-100 text-orange-800", 
+      apple: "bg-purple-100 text-purple-800",
+      netflix: "bg-red-100 text-red-800",
+      google: "bg-green-100 text-green-800",
     };
-    return topicMap[topic as keyof typeof topicMap] || topic;
+    return colors[company as keyof typeof colors] || "bg-gray-100 text-gray-800";
   };
 
-  const getCategoryDisplay = (category: string) => {
-    return category === "mock-interview" ? "Mock Interviews" : 
-           category === "case-study" ? "Case Studies" : "Custom Questions";
+  const getStatusIcon = (company: string, index: number) => {
+    const icons = [Flame, Star, Clock, TrendingUp, Bookmark];
+    const IconComponent = icons[index % icons.length];
+    const colors = ["text-orange-500", "text-yellow-500", "text-gray-500", "text-green-500", "text-blue-500"];
+    return <IconComponent className={`w-4 h-4 ${colors[index % colors.length]}`} />;
   };
-
-  if (!topic) {
-    return (
-      <div className="min-h-screen bg-neutral-50">
-        <Header />
-        <div className="max-w-4xl mx-auto px-4 py-20">
-          <Card>
-            <CardHeader>
-              <CardTitle>No topic selected</CardTitle>
-              <CardDescription>Please go back and select a topic to practice</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => setLocation("/")}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Home
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -76,58 +65,77 @@ export default function Practice() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Home
           </Button>
-          
-          <div className="flex items-center gap-4 mb-4">
-            <h1 className="text-3xl font-bold text-neutral-800">
-              {getTopicDisplay(topic)}
-            </h1>
-            <Badge variant="secondary" className="text-sm">
-              {getCategoryDisplay(category)}
-            </Badge>
-          </div>
-          
+          <h1 className="text-3xl font-bold text-neutral-800 mb-2">
+            Practice Questions
+          </h1>
           <p className="text-neutral-600">
-            Practice questions tailored for your selected topic and interview style
+            Browse and practice with curated questions from top tech companies
           </p>
         </div>
 
-        {/* Questions */}
-        {isLoading ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <p className="mt-4 text-neutral-600">Loading questions...</p>
-          </div>
-        ) : questions && questions.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {questions.map((question: any, index: number) => (
-              <QuestionCard
-                key={question.id}
-                question={question}
-                companyBadgeColor={question.company ? `bg-${question.company}-100 text-${question.company}-800` : "bg-gray-100 text-gray-800"}
-                statusIcon={<Users className="w-4 h-4 text-gray-500" />}
-                onClick={() => handleQuestionClick(question.id)}
-                showPractitioners={false}
-              />
+        {/* Topic Filter */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold mb-4">Filter by Topic</h3>
+          <div className="flex flex-wrap gap-2">
+            {topics.map((topic) => (
+              <Button
+                key={topic.id}
+                variant={selectedTopic === topic.id ? "default" : "outline"}
+                onClick={() => setSelectedTopic(topic.id)}
+              >
+                {topic.name}
+              </Button>
             ))}
           </div>
-        ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>No questions found</CardTitle>
-              <CardDescription>
-                We don't have questions for this topic yet. Try a different topic or check back later.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => setLocation("/")}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Try Different Topic
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+        </div>
 
+        {/* Questions List */}
+        <div className="space-y-6">
+          {isLoading ? (
+            <div className="grid gap-6">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardHeader>
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : questions && questions.length > 0 ? (
+            <div className="grid gap-6">
+              {questions.map((question: any, index: number) => (
+                <QuestionCard
+                  key={question.id}
+                  question={question}
+                  companyBadgeColor={getCompanyBadgeColor(question.company)}
+                  statusIcon={getStatusIcon(question.company, index)}
+                  onClick={() => handleQuestionClick(question.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>No Questions Available</CardTitle>
+                <CardDescription>
+                  There are no questions available at the moment. Try creating a custom case study instead.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={() => setLocation("/custom-case-study")}>
+                  Create Custom Case Study
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+      
       <Footer />
     </div>
   );
