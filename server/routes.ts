@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertAnswerSchema, insertSessionSchema } from "@shared/schema";
-import { generateOptimalAnswer, analyzeAnswerComparison, validateQuestion } from "./openai";
+import { generateOptimalAnswer, analyzeAnswerComparison, validateQuestion, generateLearningContent } from "./openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get popular questions
@@ -229,6 +229,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to fetch prompted question:", error);
       res.status(500).json({ error: "Failed to fetch prompted question" });
+    }
+  });
+
+  // Generate learning content using AI
+  app.get("/api/learning/:track/:module", async (req, res) => {
+    try {
+      const { track, module } = req.params;
+      
+      if (!track || !module) {
+        return res.status(400).json({ error: "Track and module are required" });
+      }
+
+      const content = await generateLearningContent(track, module);
+      res.json(content);
+    } catch (error: any) {
+      console.error("Failed to generate learning content:", error);
+      if (error.message.includes("quota exceeded")) {
+        res.status(429).json({ error: "AI service temporarily unavailable. Please try again later." });
+      } else {
+        res.status(500).json({ error: "Failed to generate learning content" });
+      }
     }
   });
 

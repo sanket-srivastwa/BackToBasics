@@ -108,6 +108,54 @@ Focus on:
   }
 }
 
+export async function generateLearningContent(track: string, module: string): Promise<any> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert learning content creator for technical management roles. Generate comprehensive, practical learning content."
+        },
+        {
+          role: "user",
+          content: `Generate detailed learning content for ${track} - ${module}.
+
+Include:
+- Learning objectives (3-5 bullet points)
+- Key concepts with explanations
+- Practical examples and case studies
+- Action items and exercises
+- Recommended readings and resources
+- Assessment questions
+
+Make it comprehensive, practical, and suitable for professionals at top tech companies.
+
+Respond in JSON format with this structure:
+{
+  "title": "Module Title",
+  "objectives": ["objective1", "objective2"],
+  "concepts": [{"title": "Concept", "explanation": "Detailed explanation"}],
+  "examples": [{"scenario": "Scenario", "solution": "Solution approach"}],
+  "exercises": ["exercise1", "exercise2"],
+  "resources": [{"title": "Resource", "type": "book/article/course", "description": "Description"}],
+  "assessment": [{"question": "Question", "answer": "Answer"}]
+}`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    return JSON.parse(response.choices[0].message.content || "{}");
+  } catch (error: any) {
+    console.error("Error generating learning content:", error);
+    if (error.status === 429) {
+      throw new Error("OpenAI API quota exceeded. Please check your API plan and billing details.");
+    }
+    throw new Error("Failed to generate learning content");
+  }
+}
+
 export async function validateQuestion(question: string): Promise<{ isValid: boolean; feedback?: string }> {
   try {
     const response = await openai.chat.completions.create({

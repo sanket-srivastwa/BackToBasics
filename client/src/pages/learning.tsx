@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,10 +31,147 @@ import {
   Database
 } from "lucide-react";
 
+interface LearningContent {
+  title: string;
+  objectives: string[];
+  concepts: Array<{ title: string; explanation: string }>;
+  examples: Array<{ scenario: string; solution: string }>;
+  exercises: string[];
+  resources: Array<{ title: string; type: string; description: string }>;
+  assessment: Array<{ question: string; answer: string }>;
+}
+
+function AILearningModule({ track, module }: { track: string; module: string }) {
+  const { data: content, isLoading, error } = useQuery<LearningContent>({
+    queryKey: [`/api/learning/${track}/${module}`],
+    retry: 1,
+  });
+
+  if (isLoading) {
+    return (
+      <Card className="animate-pulse">
+        <CardHeader>
+          <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="h-4 bg-gray-200 rounded w-full"></div>
+            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+            <div className="h-4 bg-gray-200 rounded w-4/5"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="border-red-200 bg-red-50">
+        <CardContent className="p-6">
+          <div className="text-red-600 text-center">
+            <h3 className="font-semibold mb-2">AI Content Temporarily Unavailable</h3>
+            <p className="text-sm">Due to API limitations, dynamic content cannot be generated at this time.</p>
+            <p className="text-sm mt-2">Please check back later or contact support if this persists.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!content) return null;
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">{content.title}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Learning Objectives */}
+          <div>
+            <h4 className="font-semibold text-lg mb-3">Learning Objectives</h4>
+            <ul className="space-y-2">
+              {content.objectives?.map((objective, idx) => (
+                <li key={idx} className="flex items-start">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-1 mr-2 flex-shrink-0" />
+                  <span>{objective}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Key Concepts */}
+          <div>
+            <h4 className="font-semibold text-lg mb-3">Key Concepts</h4>
+            <Accordion type="single" collapsible className="w-full">
+              {content.concepts?.map((concept, idx) => (
+                <AccordionItem key={idx} value={`concept-${idx}`}>
+                  <AccordionTrigger>{concept.title}</AccordionTrigger>
+                  <AccordionContent>
+                    <p className="text-gray-700">{concept.explanation}</p>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+
+          {/* Practical Examples */}
+          <div>
+            <h4 className="font-semibold text-lg mb-3">Practical Examples</h4>
+            <div className="space-y-4">
+              {content.examples?.map((example, idx) => (
+                <Card key={idx} className="bg-blue-50 border-blue-200">
+                  <CardContent className="p-4">
+                    <h5 className="font-medium text-blue-800 mb-2">Scenario:</h5>
+                    <p className="text-sm text-blue-700 mb-3">{example.scenario}</p>
+                    <h5 className="font-medium text-blue-800 mb-2">Solution Approach:</h5>
+                    <p className="text-sm text-blue-700">{example.solution}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Exercises */}
+          <div>
+            <h4 className="font-semibold text-lg mb-3">Practice Exercises</h4>
+            <div className="space-y-2">
+              {content.exercises?.map((exercise, idx) => (
+                <div key={idx} className="bg-gray-50 p-3 rounded border-l-4 border-primary">
+                  <p className="text-sm">{exercise}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h4 className="font-semibold text-lg mb-3">Recommended Resources</h4>
+            <div className="grid gap-3">
+              {content.resources?.map((resource, idx) => (
+                <Card key={idx} className="border border-gray-200">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h5 className="font-medium">{resource.title}</h5>
+                        <p className="text-sm text-gray-600 mt-1">{resource.description}</p>
+                      </div>
+                      <Badge variant="outline">{resource.type}</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function Learning() {
   const [, setLocation] = useLocation();
-  
-  console.log("Learning component rendered");
+  const [selectedModule, setSelectedModule] = useState<{ track: string; module: string } | null>(null);
 
   const learningTracks = {
     tpm: {
@@ -334,11 +472,21 @@ export default function Learning() {
                 <h3 className="text-2xl font-bold mb-6">Course Modules</h3>
                 <div className="grid gap-6">
                   {track.courses.map((course, idx) => (
-                    <Card key={idx} className="border hover:shadow-md transition-shadow">
+                    <Card 
+                      key={idx} 
+                      className="border hover:shadow-md transition-shadow cursor-pointer hover:border-primary"
+                      onClick={() => setSelectedModule({ track: key, module: course.title })}
+                    >
                       <CardHeader>
                         <div className="flex justify-between items-start">
                           <div>
-                            <CardTitle className="text-xl">{course.title}</CardTitle>
+                            <CardTitle className="text-xl flex items-center">
+                              {course.title}
+                              <Button variant="ghost" size="sm" className="ml-2 text-primary">
+                                <Zap className="w-4 h-4 mr-1" />
+                                AI Content
+                              </Button>
+                            </CardTitle>
                             <CardDescription className="mt-2">{course.description}</CardDescription>
                           </div>
                           <div className="text-right text-sm text-gray-500">
@@ -405,6 +553,25 @@ export default function Learning() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* AI-Generated Learning Content */}
+              {selectedModule && selectedModule.track === key && (
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-2xl font-bold">AI-Generated Learning Content</h3>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setSelectedModule(null)}
+                    >
+                      Close
+                    </Button>
+                  </div>
+                  <AILearningModule 
+                    track={selectedModule.track} 
+                    module={selectedModule.module} 
+                  />
+                </div>
+              )}
 
               {/* Call to Action */}
               <div className="text-center">
