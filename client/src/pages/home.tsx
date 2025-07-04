@@ -444,7 +444,7 @@ export default function Home() {
             <div className="text-center">Loading questions...</div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {popularQuestions?.map((question: any, index: number) => (
+              {popularQuestions?.slice(0, 20).map((question: any, index: number) => (
                 <QuestionCard 
                   key={question.id}
                   question={question}
@@ -457,9 +457,19 @@ export default function Home() {
           )}
 
           <div className="text-center mt-12">
-            <Button size="lg" onClick={() => setLocation("/practice")}>
+            <Button 
+              size="lg" 
+              onClick={() => setLocation("/practice")}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3"
+            >
               View All Questions
+              <Target className="ml-2 w-5 h-5" />
             </Button>
+            {popularQuestions && popularQuestions.length > 20 && (
+              <p className="text-sm text-gray-600 mt-3">
+                Showing 20 of {popularQuestions.length} questions
+              </p>
+            )}
           </div>
         </div>
       </section>

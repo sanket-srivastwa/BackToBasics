@@ -9,13 +9,15 @@ import { Search, User, LogOut, Settings } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import AuthPromptModal from "@/components/auth-prompt-modal";
 
 export default function Header() {
   const [location, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("practice");
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const { user, isAuthenticated, isLoading } = useAuth();
-  const { questionsRemaining } = useAccessControl();
+  const { questionsRemaining, questionsViewed } = useAccessControl();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,7 +159,7 @@ export default function Header() {
                       <Button 
                         variant="ghost" 
                         className="font-medium"
-                        onClick={() => window.location.href = "/api/login"}
+                        onClick={() => setShowAuthModal(true)}
                       >
                         Sign In
                       </Button>
@@ -175,6 +177,14 @@ export default function Header() {
           </div>
         </div>
       </header>
+
+      {/* Authentication Modal */}
+      <AuthPromptModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        questionsViewed={questionsViewed || 0}
+        questionsRemaining={questionsRemaining || 5}
+      />
     </div>
   );
 }

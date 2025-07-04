@@ -28,30 +28,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Check user's question access status (freemium model)
   app.get('/api/auth/access-status', async (req: any, res) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.json({ 
-          isAuthenticated: false, 
-          questionsViewed: 0, 
-          questionsRemaining: 5,
-          requiresAuth: false 
-        });
-      }
-
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      const questionsViewed = user.questionsViewed || 0;
-      const questionsRemaining = Math.max(0, 5 - questionsViewed);
-      
-      res.json({
-        isAuthenticated: true,
-        questionsViewed,
-        questionsRemaining,
-        requiresAuth: questionsRemaining <= 0 && questionsViewed >= 5
+      // For now, always return unauthenticated state with 5 free questions
+      res.json({ 
+        isAuthenticated: false, 
+        questionsViewed: 0, 
+        questionsRemaining: 5,
+        requiresAuth: false 
       });
     } catch (error) {
       console.error("Error checking access status:", error);

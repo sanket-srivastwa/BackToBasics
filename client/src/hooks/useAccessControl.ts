@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "./useAuth";
+import { useState, useEffect } from "react";
 
 interface AccessStatus {
   isAuthenticated: boolean;
@@ -9,23 +9,34 @@ interface AccessStatus {
 }
 
 export function useAccessControl() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const [questionsViewed, setQuestionsViewed] = useState(0);
   
-  const { data: accessStatus, isLoading } = useQuery<AccessStatus>({
-    queryKey: ["/api/auth/access-status"],
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-  });
+  // For demo purposes, use local storage to track question views
+  useEffect(() => {
+    const viewedCount = parseInt(localStorage.getItem('questionsViewed') || '0');
+    setQuestionsViewed(viewedCount);
+  }, []);
 
-  const canViewQuestions = !accessStatus?.requiresAuth;
-  const shouldShowAuthPrompt = accessStatus?.requiresAuth && !isAuthenticated;
+  const questionsRemaining = Math.max(0, 5 - questionsViewed);
+  const requiresAuth = questionsViewed >= 5 && !isAuthenticated;
+  const canViewQuestions = !requiresAuth;
+  const shouldShowAuthPrompt = requiresAuth;
+
+  const incrementQuestionView = () => {
+    if (!isAuthenticated) {
+      const newCount = questionsViewed + 1;
+      setQuestionsViewed(newCount);
+      localStorage.setItem('questionsViewed', newCount.toString());
+    }
+  };
 
   return {
-    accessStatus,
-    isLoading,
+    isLoading: false,
     canViewQuestions,
     shouldShowAuthPrompt,
-    questionsRemaining: accessStatus?.questionsRemaining || 5,
-    questionsViewed: accessStatus?.questionsViewed || 0,
+    questionsRemaining: isAuthenticated ? Infinity : questionsRemaining,
+    questionsViewed,
+    incrementQuestionView,
   };
 }

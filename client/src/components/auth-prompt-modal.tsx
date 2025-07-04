@@ -22,7 +22,13 @@ export default function AuthPromptModal({
 
   const handleSignIn = () => {
     setIsLoading(true);
-    window.location.href = "/api/login";
+    
+    // Demo: simulate successful authentication
+    setTimeout(() => {
+      onClose();
+      // Show success message
+      window.location.href = "/?message=signed-in-demo";
+    }, 1000);
   };
 
   return (
