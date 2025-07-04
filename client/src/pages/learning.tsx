@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -175,10 +175,49 @@ function AILearningModule({ track, module }: { track: string; module: string }) 
   );
 }
 
-function AISearchComponent() {
-  const [searchQuery, setSearchQuery] = useState("");
+function AISearchComponent({ initialQuery = "" }: { initialQuery?: string }) {
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [conversation, setConversation] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Auto-search if initial query is provided
+  useEffect(() => {
+    if (initialQuery && initialQuery.trim()) {
+      const performInitialSearch = async () => {
+        setIsLoading(true);
+        const userMessage = { role: 'user' as const, content: initialQuery };
+        setConversation([userMessage]);
+        
+        try {
+          const response = await fetch('/api/learning/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: initialQuery })
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            setConversation(prev => [...prev, { role: 'assistant', content: data.response }]);
+          } else {
+            setConversation(prev => [...prev, { 
+              role: 'assistant', 
+              content: 'I apologize, but I cannot generate responses right now due to API limitations. Please try again later.' 
+            }]);
+          }
+        } catch (error) {
+          setConversation(prev => [...prev, { 
+            role: 'assistant', 
+            content: 'I encountered an error while processing your question. Please try again.' 
+          }]);
+        }
+        
+        setIsLoading(false);
+      };
+      
+      performInitialSearch();
+    }
+  }, [initialQuery]);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -636,6 +675,18 @@ Difficult Conversations:
 export default function Learning() {
   const [, setLocation] = useLocation();
   const [selectedModule, setSelectedModule] = useState<{ track: string; module: string } | null>(null);
+  const [headerSearchQuery, setHeaderSearchQuery] = useState("");
+
+  // Handle search parameter from header
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const search = urlParams.get('search');
+    if (search) {
+      setHeaderSearchQuery(search);
+      // Clear URL parameters after extracting the search query
+      window.history.replaceState({}, '', '/learning');
+    }
+  }, []);
   const [searchQuery, setSearchQuery] = useState("");
   const [showAISearch, setShowAISearch] = useState(false);
 
@@ -868,7 +919,7 @@ export default function Learning() {
               </CardDescription>
             </CardHeader>
             <CardContent className="max-w-4xl mx-auto">
-              <AISearchComponent />
+              <AISearchComponent initialQuery={headerSearchQuery} />
             </CardContent>
           </Card>
         </div>

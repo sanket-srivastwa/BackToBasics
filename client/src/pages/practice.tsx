@@ -13,21 +13,29 @@ export default function Practice() {
   const [, setLocation] = useLocation();
   const [selectedTopic, setSelectedTopic] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCompany, setSelectedCompany] = useState("all");
 
-  // Get search query from URL parameters
+  // Get search query and company filter from URL parameters
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const search = urlParams.get('search');
+    const company = urlParams.get('company');
     if (search) {
       setSearchQuery(search);
     }
+    if (company) {
+      setSelectedCompany(company);
+    }
   }, []);
 
-  // Default questions query
+  // Default questions query (with company filter)
   const { data: questions, isLoading } = useQuery({
-    queryKey: ["/api/questions/popular"],
+    queryKey: ["/api/questions/popular", selectedCompany !== "all" ? selectedCompany : undefined],
     queryFn: async () => {
-      const response = await fetch("/api/questions/popular");
+      const url = selectedCompany !== "all" 
+        ? `/api/questions/popular?company=${selectedCompany}`
+        : "/api/questions/popular";
+      const response = await fetch(url);
       return response.json();
     },
     enabled: !searchQuery, // Only fetch when not searching
@@ -88,12 +96,19 @@ export default function Practice() {
             Back to Home
           </Button>
           <h1 className="text-3xl font-bold text-neutral-800 mb-2">
-            {searchQuery ? `Search Results for "${searchQuery}"` : "Practice Questions"}
+            {searchQuery 
+              ? `Search Results for "${searchQuery}"` 
+              : selectedCompany !== "all" 
+                ? `${selectedCompany.charAt(0).toUpperCase() + selectedCompany.slice(1)} Questions`
+                : "Practice Questions"
+            }
           </h1>
           <p className="text-neutral-600">
             {searchQuery 
               ? `Found ${searchResults?.length || 0} questions matching your search`
-              : "Browse and practice with curated questions from top tech companies"
+              : selectedCompany !== "all"
+                ? `Practice questions specifically from ${selectedCompany.charAt(0).toUpperCase() + selectedCompany.slice(1)}`
+                : "Browse and practice with curated questions from top tech companies"
             }
           </p>
         </div>

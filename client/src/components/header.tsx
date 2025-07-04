@@ -7,6 +7,28 @@ import { useState } from "react";
 
 export default function Header() {
   const [location, setLocation] = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchType, setSearchType] = useState("practice");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    switch (searchType) {
+      case "practice":
+        setLocation(`/practice?search=${encodeURIComponent(searchQuery)}`);
+        break;
+      case "learning":
+        setLocation(`/learning?search=${encodeURIComponent(searchQuery)}`);
+        break;
+      case "companies":
+        setLocation(`/practice?company=${encodeURIComponent(searchQuery)}`);
+        break;
+      default:
+        setLocation(`/practice?search=${encodeURIComponent(searchQuery)}`);
+    }
+    setSearchQuery("");
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -64,6 +86,36 @@ export default function Header() {
               </button>
             </nav>
           </div>
+          
+          {/* Search Bar */}
+          <div className="hidden lg:flex items-center space-x-2">
+            <form onSubmit={handleSearch} className="flex items-center space-x-2">
+              <Select value={searchType} onValueChange={setSearchType}>
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Search in" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="practice">Practice</SelectItem>
+                  <SelectItem value="learning">Learning</SelectItem>
+                  <SelectItem value="companies">Companies</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 w-64"
+                />
+              </div>
+              <Button type="submit" size="sm">
+                Search
+              </Button>
+            </form>
+          </div>
+          
           <div className="flex items-center space-x-4">
             <Button 
               variant="ghost" 
