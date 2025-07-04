@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/header";
@@ -23,13 +24,16 @@ import {
   Clock,
   TrendingUp,
   Bookmark,
-  Target
+  Target,
+  Search
 } from "lucide-react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const [customTopic, setCustomTopic] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchType, setSearchType] = useState("practice");
 
   const { data: popularQuestions, isLoading } = useQuery({
     queryKey: ["/api/questions/popular", selectedCompany !== "all" ? selectedCompany : undefined],
@@ -86,6 +90,26 @@ export default function Home() {
     }
   };
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    switch (searchType) {
+      case "practice":
+        setLocation(`/practice?search=${encodeURIComponent(searchQuery)}`);
+        break;
+      case "learning":
+        setLocation(`/learning?search=${encodeURIComponent(searchQuery)}`);
+        break;
+      case "companies":
+        setLocation(`/practice?company=${encodeURIComponent(searchQuery)}`);
+        break;
+      default:
+        setLocation(`/practice?search=${encodeURIComponent(searchQuery)}`);
+    }
+    setSearchQuery("");
+  };
+
 
 
   const getCompanyBadgeColor = (company: string) => {
@@ -113,6 +137,32 @@ export default function Home() {
       {/* Hero Section */}
       <section className="gradient-hero text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Search Bar - Top Right */}
+          <div className="flex justify-end mb-8">
+            <form onSubmit={handleSearch} className="hidden lg:flex items-center">
+              <div className="relative flex items-center bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white w-4 h-4" />
+                <Input
+                  type="text"
+                  placeholder="Search questions, topics, companies..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 pr-28 w-80 border-0 rounded-none focus:ring-0 bg-transparent text-white placeholder-white/70"
+                />
+                <Select value={searchType} onValueChange={setSearchType}>
+                  <SelectTrigger className="w-24 border-0 border-l border-white/20 rounded-none bg-white/10 text-white text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="practice">Practice</SelectItem>
+                    <SelectItem value="learning">Learning</SelectItem>
+                    <SelectItem value="companies">Companies</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </form>
+          </div>
+          
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">Master Your Next Interview</h1>
             <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
