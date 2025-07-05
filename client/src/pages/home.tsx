@@ -181,14 +181,15 @@ export default function Home() {
                   }
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 pr-20 w-96 h-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 placeholder-gray-500 text-base font-medium"
+                  className="pl-12 pr-16 w-96 h-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 placeholder-gray-500 text-base font-medium"
                 />
-                {/* Search Button Inside Input */}
+                {/* Elegant Search Button Inside Input */}
                 <Button 
                   type="submit" 
-                  className="absolute right-2 h-8 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-sm transition-all"
+                  size="sm"
+                  className="absolute right-1.5 h-9 w-9 p-0 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-md shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center"
                 >
-                  Search
+                  <Search className="w-4 h-4" />
                 </Button>
               </div>
             </form>
