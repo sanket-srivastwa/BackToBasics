@@ -114,11 +114,17 @@ export default function Home() {
 
   const getCompanyBadgeColor = (company: string) => {
     const colors = {
-      meta: "bg-blue-100 text-blue-800",
-      amazon: "bg-orange-100 text-orange-800", 
-      apple: "bg-purple-100 text-purple-800",
-      netflix: "bg-red-100 text-red-800",
+      microsoft: "bg-blue-100 text-blue-800",
       google: "bg-green-100 text-green-800",
+      amazon: "bg-orange-100 text-orange-800", 
+      meta: "bg-blue-100 text-blue-800",
+      apple: "bg-purple-100 text-purple-800",
+      oracle: "bg-red-100 text-red-800",
+      cisco: "bg-cyan-100 text-cyan-800",
+      salesforce: "bg-indigo-100 text-indigo-800",
+      adobe: "bg-red-100 text-red-800",
+      nvidia: "bg-green-100 text-green-800",
+      netflix: "bg-red-100 text-red-800"
     };
     return colors[company as keyof typeof colors] || "bg-gray-100 text-gray-800";
   };
@@ -140,17 +146,17 @@ export default function Home() {
           {/* Search Bar - Top Right */}
           <div className="flex justify-end mb-8">
             <form onSubmit={handleSearch} className="hidden lg:flex items-center">
-              <div className="relative flex items-center bg-white/10 backdrop-blur-sm rounded-lg overflow-hidden border border-white/20">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white w-4 h-4" />
+              <div className="relative flex items-center bg-white/20 backdrop-blur-md rounded-xl overflow-hidden border border-white/30 shadow-lg">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white w-5 h-5" />
                 <Input
                   type="text"
                   placeholder="Search questions, topics, companies..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-28 w-80 border-0 rounded-none focus:ring-0 bg-transparent text-white placeholder-white/70"
+                  className="pl-12 pr-32 w-96 h-12 border-0 rounded-none focus:ring-2 focus:ring-white/40 bg-transparent text-white placeholder-white/80 text-base font-medium"
                 />
                 <Select value={searchType} onValueChange={setSearchType}>
-                  <SelectTrigger className="w-24 border-0 border-l border-white/20 rounded-none bg-white/10 text-white text-sm">
+                  <SelectTrigger className="w-28 h-12 border-0 border-l border-white/30 rounded-none bg-white/10 text-white font-medium hover:bg-white/20 transition-colors">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -166,7 +172,7 @@ export default function Home() {
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">Master Your Next Interview</h1>
             <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
-              Practice with real MAANG company questions, get AI-powered feedback, and ace your technical program management interviews
+              Practice with real questions from top tech companies like Microsoft, Google, Amazon, and more. Get AI-powered feedback for product, program, and engineering management roles.
             </p>
             
             {/* Practice and Learn Options */}

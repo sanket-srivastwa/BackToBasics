@@ -19,7 +19,7 @@ import {
   type InsertUserProfile,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, like, desc, and } from "drizzle-orm";
+import { eq, like, desc, and, or, sql } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -44,6 +44,13 @@ export interface IStorage {
   getPopularQuestions(company?: string): Promise<Question[]>;
   createQuestion(question: InsertQuestion): Promise<Question>;
   searchQuestions(query: string): Promise<Question[]>;
+  getFilteredQuestions(filters: {
+    company?: string;
+    difficulty?: string;
+    role?: string;
+    topic?: string;
+    search?: string;
+  }): Promise<Question[]>;
 
   // Prompted Question operations
   getPromptedQuestions(topic: string, experienceLevel: string): Promise<PromptedQuestion[]>;
@@ -194,6 +201,50 @@ export class DatabaseStorage implements IStorage {
       .from(questions)
       .where(like(questions.title, `%${query}%`))
       .orderBy(desc(questions.createdAt));
+  }
+
+  async getFilteredQuestions(filters: {
+    company?: string;
+    difficulty?: string;
+    role?: string;
+    topic?: string;
+    search?: string;
+  }): Promise<Question[]> {
+    const conditions = [];
+
+    if (filters.company && filters.company !== 'all') {
+      conditions.push(eq(questions.company, filters.company));
+    }
+    
+    if (filters.difficulty && filters.difficulty !== 'all') {
+      conditions.push(eq(questions.difficulty, filters.difficulty));
+    }
+    
+    if (filters.role && filters.role !== 'all') {
+      // For role filtering, we'll use a simple approach for now
+      conditions.push(sql`${questions.roles} @> ARRAY[${filters.role}]::text[]`);
+    }
+    
+    if (filters.topic && filters.topic !== 'all') {
+      conditions.push(eq(questions.topic, filters.topic));
+    }
+    
+    if (filters.search) {
+      conditions.push(
+        or(
+          like(questions.title, `%${filters.search}%`),
+          like(questions.description, `%${filters.search}%`)
+        )
+      );
+    }
+
+    let baseQuery = db.select().from(questions);
+    
+    if (conditions.length > 0) {
+      baseQuery = baseQuery.where(and(...conditions));
+    }
+
+    return await baseQuery.orderBy(desc(questions.createdAt));
   }
 
   // Prompted Question operations

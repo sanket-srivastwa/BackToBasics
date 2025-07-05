@@ -106,6 +106,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get filtered questions with advanced filtering
+  app.get("/api/questions/filtered", async (req, res) => {
+    try {
+      const { company, difficulty, role, topic, search } = req.query;
+      
+      const filters = {
+        company: company as string,
+        difficulty: difficulty as string,
+        role: role as string,
+        topic: topic as string,
+        search: search as string
+      };
+
+      const questions = await storage.getFilteredQuestions(filters);
+      res.json(questions);
+    } catch (error) {
+      console.error("Error filtering questions:", error);
+      res.status(500).json({ error: "Failed to filter questions" });
+    }
+  });
+
   // Get questions by topic and category
   app.get("/api/questions", async (req, res) => {
     try {

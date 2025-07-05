@@ -10,6 +10,7 @@ interface QuestionCardProps {
     company?: string;
     topic: string;
     difficulty: string;
+    roles?: string[];
     timeLimit: number;
     createdAt?: Date;
   };
@@ -89,6 +90,15 @@ export default function QuestionCard({
             <span>{getTimeAgo(question.createdAt)}</span>
           )}
         </div>
+        {question.roles && question.roles.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-4">
+            {question.roles.map((role, index) => (
+              <Badge key={index} variant="secondary" className="text-xs">
+                {role.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+              </Badge>
+            ))}
+          </div>
+        )}
       </CardHeader>
       <CardContent className="pt-0">
         <div className="flex items-center justify-between">

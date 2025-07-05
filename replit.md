@@ -1,8 +1,8 @@
-# InterviewAce - AI-Powered Interview Practice Platform
+# PrepMaster - AI-Powered Interview Practice Platform
 
 ## Overview
 
-InterviewAce is a full-stack web application designed to help users practice for technical interviews, particularly for Product Management (PM), Technical Program Management (TPM), and Project Management roles at major technology companies (MAANG - Meta, Amazon, Apple, Netflix, Google). The platform provides AI-powered feedback on mock interviews and case studies.
+PrepMaster is a full-stack web application designed to help users practice for technical interviews, particularly for Product Management (PM), Technical Program Management (TPM), and Engineering Management roles at top technology companies including Microsoft, Google, Amazon, Meta, Apple, Oracle, Cisco, Salesforce, Adobe, NVIDIA, and Netflix. The platform provides AI-powered feedback on mock interviews and case studies with comprehensive role-based filtering and difficulty categorization.
 
 ## System Architecture
 
@@ -193,6 +193,7 @@ Changelog:
 - July 04, 2025. Complete authentication system: Replit Auth integration, freemium access model (5 free questions), user profiles, session management, and professional UI design inspired by tryexponent.com
 - July 05, 2025. Comprehensive Learning Platform: Added structured learning modules for Product Management, Program Management, Engineering Management, and Business Analytics with professional course navigation, progress tracking, and Coursera/edX-inspired design
 - July 05, 2025. Advanced Account Management: Implemented complete user profile system with personal/professional information editing, photo upload, contact verification, social media integration, two-factor authentication, security settings, and privacy controls
+- July 05, 2025. Major Platform Overhaul: Rebranded to "PrepMaster", expanded company coverage to top tech companies (Microsoft, Google, Amazon, Meta, Apple, Oracle, Cisco, Salesforce, Adobe, NVIDIA, Netflix), implemented comprehensive role-based filtering (Product Management, Program Management, Engineering Management, General Management), enhanced difficulty categorization (Easy, Medium, Hard), improved search functionality with advanced filtering API, updated UI with better company colors and enhanced search box styling
 ```
 
 ## User Preferences

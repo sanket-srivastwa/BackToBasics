@@ -40,8 +40,9 @@ export const questions = pgTable("questions", {
   description: text("description").notNull(),
   category: text("category").notNull(), // "mock-interview" or "case-study"
   topic: text("topic").notNull(), // "tpm", "pm", "project-management", or custom
-  company: text("company"), // "meta", "amazon", "apple", "netflix", "google"
+  company: text("company"), // "microsoft", "google", "amazon", "meta", "apple", "oracle", "cisco", "salesforce", "adobe", "nvidia"
   difficulty: text("difficulty").notNull(), // "easy", "medium", "hard"
+  roles: text("roles").array(), // ["product-management", "program-management", "engineering-management", "general"]
   timeLimit: integer("time_limit").notNull(), // in minutes
   tips: text("tips").array(),
   optimalAnswer: text("optimal_answer").notNull(),

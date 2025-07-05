@@ -19,6 +19,7 @@ export default function Practice() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
+  const [selectedRole, setSelectedRole] = useState("all");
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -40,22 +41,20 @@ export default function Practice() {
 
   // Comprehensive questions query with all filters
   const { data: questions, isLoading } = useQuery({
-    queryKey: ["/api/questions/filtered", selectedTopic, selectedCompany, selectedDifficulty, searchQuery || localSearchQuery],
+    queryKey: ["/api/questions/filtered", selectedTopic, selectedCompany, selectedDifficulty, selectedRole, searchQuery || localSearchQuery],
     queryFn: async () => {
       const params = new URLSearchParams();
       
-      if (searchQuery || localSearchQuery) {
-        params.append('q', searchQuery || localSearchQuery);
-        const response = await fetch(`/api/questions/search?${params.toString()}`);
-        return response.json();
-      }
-      
-      // For non-search queries, use popular questions with filters
+      // Add all filters to params
       if (selectedCompany !== "all") params.append('company', selectedCompany);
-      if (selectedTopic !== "all") params.append('topic', selectedTopic);
       if (selectedDifficulty !== "all") params.append('difficulty', selectedDifficulty);
+      if (selectedRole !== "all") params.append('role', selectedRole);
+      if (selectedTopic !== "all") params.append('topic', selectedTopic);
+      if (searchQuery || localSearchQuery) params.append('search', searchQuery || localSearchQuery);
       
-      const url = params.toString() ? `/api/questions/popular?${params.toString()}` : "/api/questions/popular";
+      // Use filtered endpoint if any filters are applied, otherwise get popular questions
+      const hasFilters = params.toString().length > 0;
+      const url = hasFilters ? `/api/questions/filtered?${params.toString()}` : "/api/questions/popular";
       const response = await fetch(url);
       return response.json();
     },
@@ -87,11 +86,25 @@ export default function Practice() {
 
   const companies = [
     { id: "all", name: "All Companies" },
-    { id: "meta", name: "Meta" },
+    { id: "microsoft", name: "Microsoft" },
+    { id: "google", name: "Google" },
     { id: "amazon", name: "Amazon" },
+    { id: "meta", name: "Meta" },
     { id: "apple", name: "Apple" },
-    { id: "netflix", name: "Netflix" },
-    { id: "google", name: "Google" }
+    { id: "oracle", name: "Oracle" },
+    { id: "cisco", name: "Cisco" },
+    { id: "salesforce", name: "Salesforce" },
+    { id: "adobe", name: "Adobe" },
+    { id: "nvidia", name: "NVIDIA" },
+    { id: "netflix", name: "Netflix" }
+  ];
+
+  const roles = [
+    { id: "all", name: "All Roles" },
+    { id: "product-management", name: "Product Management" },
+    { id: "program-management", name: "Program Management" },
+    { id: "engineering-management", name: "Engineering Management" },
+    { id: "general", name: "General Management" }
   ];
 
   const handleQuestionClick = (questionId: number) => {
@@ -100,11 +113,17 @@ export default function Practice() {
 
   const getCompanyBadgeColor = (company: string) => {
     const colors = {
-      meta: "bg-blue-100 text-blue-800",
-      amazon: "bg-orange-100 text-orange-800", 
-      apple: "bg-purple-100 text-purple-800",
-      netflix: "bg-red-100 text-red-800",
+      microsoft: "bg-blue-100 text-blue-800",
       google: "bg-green-100 text-green-800",
+      amazon: "bg-orange-100 text-orange-800", 
+      meta: "bg-blue-100 text-blue-800",
+      apple: "bg-purple-100 text-purple-800",
+      oracle: "bg-red-100 text-red-800",
+      cisco: "bg-cyan-100 text-cyan-800",
+      salesforce: "bg-indigo-100 text-indigo-800",
+      adobe: "bg-red-100 text-red-800",
+      nvidia: "bg-green-100 text-green-800",
+      netflix: "bg-red-100 text-red-800"
     };
     return colors[company as keyof typeof colors] || "bg-gray-100 text-gray-800";
   };
@@ -224,6 +243,24 @@ export default function Practice() {
                         className="transition-colors"
                       >
                         {topic.name}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Role Filter */}
+                <div>
+                  <h4 className="text-sm font-medium mb-3">Role Focus</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {roles.map((role) => (
+                      <Button
+                        key={role.id}
+                        variant={selectedRole === role.id ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedRole(role.id)}
+                        className="transition-colors"
+                      >
+                        {role.name}
                       </Button>
                     ))}
                   </div>
