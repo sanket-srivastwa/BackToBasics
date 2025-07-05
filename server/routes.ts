@@ -470,7 +470,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error: any) {
       console.error("Failed to generate case study:", error);
-      res.status(500).json({ error: "Failed to generate case study" });
+      if (error.message?.includes("quota exceeded") || error.status === 429) {
+        res.status(429).json({ error: "AI case study generator temporarily unavailable due to high demand. Please try the standard case study format or try again in a few minutes." });
+      } else {
+        res.status(500).json({ error: "Failed to generate case study" });
+      }
     }
   });
 
@@ -557,8 +561,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(content);
     } catch (error: any) {
       console.error("Failed to generate learning content:", error);
-      if (error.message.includes("quota exceeded")) {
-        res.status(429).json({ error: "AI service temporarily unavailable. Please try again later." });
+      if (error.message.includes("quota exceeded") || error.status === 429) {
+        res.status(429).json({ error: "AI service temporarily unavailable due to high demand. Please explore our pre-built learning materials below or try again in a few minutes." });
       } else {
         res.status(500).json({ error: "Failed to generate learning content" });
       }
@@ -617,8 +621,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(result);
     } catch (error: any) {
       console.error("Failed to search learning content:", error);
-      if (error.message.includes("quota exceeded")) {
-        res.status(429).json({ error: "AI service temporarily unavailable. Please try again later." });
+      if (error.message.includes("quota exceeded") || error.status === 429) {
+        res.status(429).json({ error: "AI assistant temporarily unavailable due to high demand. Please explore our comprehensive learning materials below or try again in a few minutes." });
       } else {
         res.status(500).json({ error: "Failed to search learning content" });
       }
@@ -638,8 +642,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ response });
     } catch (error: any) {
       console.error("Failed to generate learning response:", error);
-      if (error.message.includes("quota exceeded")) {
-        res.status(429).json({ error: "AI assistant temporarily unavailable due to API limitations. Please try again later." });
+      if (error.message.includes("quota exceeded") || error.status === 429) {
+        res.status(429).json({ error: "AI assistant temporarily unavailable due to high demand. Please explore our comprehensive learning materials or try again in a few minutes." });
       } else {
         res.status(500).json({ error: "Failed to generate response" });
       }

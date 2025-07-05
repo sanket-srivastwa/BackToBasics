@@ -1009,6 +1009,11 @@ export default function Learning() {
       });
 
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to search' }));
+        
+        if (response.status === 429 || errorData.error?.includes('temporarily unavailable')) {
+          throw new Error('quota_exceeded');
+        }
         throw new Error('Failed to search');
       }
 
@@ -1016,9 +1021,16 @@ export default function Learning() {
       setSearchResults(result);
     } catch (error) {
       console.error('Search failed:', error);
+      
+      let errorContent = "Sorry, I couldn't search for that right now. Please try again later.";
+      
+      if (error instanceof Error && error.message === 'quota_exceeded') {
+        errorContent = "🤖 Our AI assistant is currently at capacity. Please explore our comprehensive learning materials below, or try the search again in a few minutes.";
+      }
+      
       setSearchResults({
         query: aiSearchQuery,
-        content: "Sorry, I couldn't search for that right now. Please try again later.",
+        content: errorContent,
         timestamp: new Date().toISOString()
       });
     } finally {
@@ -1035,6 +1047,11 @@ export default function Learning() {
       const response = await fetch(`/api/learning/materials/${encodeURIComponent(topic)}`);
       
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to generate materials' }));
+        
+        if (response.status === 429 || errorData.error?.includes('temporarily unavailable')) {
+          throw new Error('quota_exceeded');
+        }
         throw new Error('Failed to generate materials');
       }
 
@@ -1042,13 +1059,20 @@ export default function Learning() {
       setGeneratedMaterials(prev => ({ ...prev, [topicKey]: result }));
     } catch (error) {
       console.error('Failed to generate materials:', error);
+      
+      let errorMessage = "Unable to generate materials. Please try again later.";
+      
+      if (error instanceof Error && error.message === 'quota_exceeded') {
+        errorMessage = "🤖 Our AI assistant is currently at capacity. Please explore our comprehensive pre-built learning materials below, or try again in a few minutes.";
+      }
+      
       // Set fallback message
       setGeneratedMaterials(prev => ({ 
         ...prev, 
         [topicKey]: { 
           topic, 
           modules: [], 
-          error: "Unable to generate materials. Please try again later." 
+          error: errorMessage
         } 
       }));
     } finally {

@@ -473,10 +473,10 @@ export default function CustomCaseStudy() {
     },
     onError: (error: Error) => {
       console.error("Case study generation error:", error);
-      if (error.message.includes("quota exceeded")) {
+      if (error.message.includes("quota exceeded") || error.message.includes("429")) {
         toast({
-          title: "Service Temporarily Unavailable",
-          description: "AI service is currently at capacity. Please try again in a few minutes.",
+          title: "AI Service at Capacity",
+          description: "🤖 Our AI case study generator is currently busy. Try the prompted questions instead or check back in a few minutes.",
           variant: "destructive",
         });
       } else {
