@@ -11,34 +11,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Auth routes (mock for now)
   app.get('/api/auth/user', async (req: any, res) => {
-    // Return 401 for unauthenticated users (simulation)
-    res.status(401).json({ message: "Unauthorized" });
-  });
-
-  // Mock login route - redirects to home with a message
-  app.get('/api/login', async (req: any, res) => {
-    res.redirect('/?message=auth-required');
-  });
-
-  // Mock logout route
-  app.get('/api/logout', async (req: any, res) => {
-    res.redirect('/?message=logged-out');
-  });
-
-  // Check user's question access status (freemium model)
-  app.get('/api/auth/access-status', async (req: any, res) => {
-    try {
-      // For now, always return unauthenticated state with 5 free questions
-      res.json({ 
-        isAuthenticated: false, 
-        questionsViewed: 0, 
-        questionsRemaining: 5,
-        requiresAuth: false 
-      });
-    } catch (error) {
-      console.error("Error checking access status:", error);
-      res.status(500).json({ message: "Failed to check access status" });
+    if (req.session && req.session.user) {
+      res.json(req.session.user);
+    } else {
+      res.status(401).json({ message: "Unauthorized" });
     }
+  });
+
+  // Demo authentication for development
+  app.get('/api/login', async (req: any, res) => {
+    // For demo purposes, create a mock session
+    req.session.user = {
+      id: "demo-user-123",
+      email: "demo@example.com", 
+      firstName: "Demo",
+      lastName: "User",
+      profileImageUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face"
+    };
+    res.redirect('/?message=signed-in');
+  });
+
+  app.get('/api/logout', async (req: any, res) => {
+    req.session.destroy((err: any) => {
+      if (err) {
+        console.error('Session destruction error:', err);
+      }
+      res.redirect('/?message=logged-out');
+    });
   });
 
   // Middleware to track question views for unauthenticated users

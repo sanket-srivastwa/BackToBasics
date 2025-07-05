@@ -8,16 +8,12 @@ import { useLocation } from "wouter";
 import { Search, User, LogOut, Settings } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useAccessControl } from "@/hooks/useAccessControl";
-import AuthPromptModal from "@/components/auth-prompt-modal";
 
 export default function Header() {
   const [location, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("practice");
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const { user, isAuthenticated, isLoading } = useAuth();
-  const { questionsRemaining, questionsViewed } = useAccessControl();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,13 +101,6 @@ export default function Header() {
                 <>
                   {isAuthenticated ? (
                     <div className="flex items-center space-x-3">
-                      {/* Questions Remaining Badge */}
-                      {questionsRemaining !== undefined && questionsRemaining > 0 && (
-                        <Badge variant="outline" className="text-xs">
-                          {questionsRemaining} free left
-                        </Badge>
-                      )}
-                      
                       {/* User Profile Dropdown */}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -151,21 +140,13 @@ export default function Header() {
                       </DropdownMenu>
                     </div>
                   ) : (
-                    <>
-                      <Button 
-                        variant="ghost" 
-                        className="font-medium"
-                        onClick={() => setShowAuthModal(true)}
-                      >
-                        Sign In
-                      </Button>
-                      <Button 
-                        className="font-medium"
-                        onClick={() => setLocation("/practice")}
-                      >
-                        Get Started
-                      </Button>
-                    </>
+                    <Button 
+                      variant="ghost" 
+                      className="font-medium"
+                      onClick={() => window.location.href = "/api/login"}
+                    >
+                      Sign In
+                    </Button>
                   )}
                 </>
               )}
@@ -173,14 +154,6 @@ export default function Header() {
           </div>
         </div>
       </header>
-
-      {/* Authentication Modal */}
-      <AuthPromptModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        questionsViewed={questionsViewed || 0}
-        questionsRemaining={questionsRemaining || 5}
-      />
     </div>
   );
 }

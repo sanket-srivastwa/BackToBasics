@@ -1,24 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 export function useAuth() {
-  const [demoUser, setDemoUser] = useState<any>(null);
-  
-  // Check for demo authentication in URL
+  // Check for authentication status changes in URL and refresh
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('message') === 'signed-in-demo') {
-      const mockUser = {
-        id: "demo-user-123",
-        email: "demo@example.com",
-        firstName: "Demo",
-        lastName: "User",
-        profileImageUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
-        questionsViewed: 0
-      };
-      setDemoUser(mockUser);
-      // Clean up URL
+    if (urlParams.get('message') === 'signed-in' || urlParams.get('message') === 'logged-out') {
+      // Clean up URL and refresh auth state
       window.history.replaceState({}, '', window.location.pathname);
+      // Refresh the page to update auth state
+      window.location.reload();
     }
   }, []);
 
@@ -27,12 +18,9 @@ export function useAuth() {
     retry: false,
   });
 
-  // Return demo user if available, otherwise API user
-  const finalUser = demoUser || user;
-
   return {
-    user: finalUser,
-    isLoading: !demoUser && isLoading,
-    isAuthenticated: !!finalUser,
+    user,
+    isLoading,
+    isAuthenticated: !!user,
   };
 }
