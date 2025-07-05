@@ -79,11 +79,12 @@ export default function Header() {
               <nav className="hidden md:ml-8 md:flex md:space-x-8">
                 <button 
                   onClick={() => setLocation("/")}
-                  className={`px-3 py-2 rounded-md text-sm font-bold transition-colors ${
+                  className={`px-4 py-2 rounded-md text-sm font-bold transition-colors ${
                     location === "/" 
                       ? "text-primary bg-primary/10" 
-                      : "text-neutral-600 hover:text-primary"
+                      : "text-slate-700 hover:text-primary"
                   }`}
+                  style={{ fontWeight: '700', fontSize: '15px' }}
                 >
                   Home
                 </button>
@@ -92,11 +93,12 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button 
-                      className={`px-3 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-1 ${
+                      className={`px-4 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-1 ${
                         location === "/practice" 
                           ? "text-primary bg-primary/10" 
-                          : "text-neutral-600 hover:text-primary"
+                          : "text-slate-700 hover:text-primary"
                       }`}
+                      style={{ fontWeight: '700', fontSize: '15px' }}
                     >
                       Practice
                       <ChevronDown className="h-3 w-3" />
@@ -126,11 +128,12 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button 
-                      className={`px-3 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-1 ${
+                      className={`px-4 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-1 ${
                         location === "/learning" 
                           ? "text-primary bg-primary/10" 
-                          : "text-neutral-600 hover:text-primary"
+                          : "text-slate-700 hover:text-primary"
                       }`}
+                      style={{ fontWeight: '700', fontSize: '15px' }}
                     >
                       Learning
                       <ChevronDown className="h-3 w-3" />
@@ -156,16 +159,40 @@ export default function Header() {
                   </DropdownMenuContent>
                 </DropdownMenu>
                 
-                <button 
-                  onClick={() => setLocation("/custom-case-study")}
-                  className={`px-3 py-2 rounded-md text-sm font-bold transition-colors ${
-                    location === "/custom-case-study" 
-                      ? "text-primary bg-primary/10" 
-                      : "text-neutral-600 hover:text-primary"
-                  }`}
-                >
-                  AI Case Study
-                </button>
+                {/* AI Case Study Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button 
+                      className={`px-4 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-1 ${
+                        location === "/custom-case-study" 
+                          ? "text-primary bg-primary/10" 
+                          : "text-slate-700 hover:text-primary"
+                      }`}
+                      style={{ fontWeight: '700', fontSize: '15px' }}
+                    >
+                      AI Case Study
+                      <ChevronDown className="h-3 w-3" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-56">
+                    <DropdownMenuItem onClick={() => setLocation("/custom-case-study?topic=product-management")}>
+                      Product Management Cases
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLocation("/custom-case-study?topic=program-management")}>
+                      Program Management Cases
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLocation("/custom-case-study?topic=engineering-management")}>
+                      Engineering Management Cases
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLocation("/custom-case-study?topic=business-strategy")}>
+                      Business Strategy Cases
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setLocation("/custom-case-study")}>
+                      Custom Case Generator
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </nav>
             </div>
             

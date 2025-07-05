@@ -87,6 +87,23 @@ export default function CustomCaseStudy() {
   const [difficulty, setDifficulty] = useState("medium");
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
+  // Handle URL parameters for topic filtering
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const topicParam = urlParams.get('topic');
+    
+    if (topicParam) {
+      const topicMap: { [key: string]: string } = {
+        'product-management': 'Product Management',
+        'program-management': 'Technical Program Management',
+        'engineering-management': 'Engineering Management',
+        'business-strategy': 'Business Strategy'
+      };
+      const mappedTopic = topicMap[topicParam] || topicParam;
+      setSelectedTopic(mappedTopic);
+    }
+  }, []);
+
   // Stepper navigation helpers - Track completed steps
   const [completedSteps, setCompletedSteps] = useState<StepType[]>(['mode']);
   
