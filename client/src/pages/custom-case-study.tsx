@@ -187,20 +187,47 @@ export default function CustomCaseStudy() {
     }
   }, []);
 
-  const topics = [
-    "Technical Program Management",
-    "Product Management", 
-    "Project Management",
-    "Engineering Management",
-    "Data Science Leadership",
-    "Product Strategy",
-    "Customer Experience",
-    "Growth Strategy",
-    "Operations Management",
-    "Business Analytics",
-    "Market Research",
-    "Digital Transformation"
-  ];
+  // Hierarchical topic structure with main topics and sub-topics
+  const topicStructure = {
+    "Product Management": [
+      "Growth Strategy",
+      "Product Strategy", 
+      "User Research",
+      "Product Analytics",
+      "Go-to-Market",
+      "Feature Prioritization"
+    ],
+    "Technical Program Management": [
+      "Cross-functional Coordination",
+      "Technical Roadmaps",
+      "Risk Management", 
+      "Stakeholder Alignment",
+      "Platform Strategy",
+      "Migration Planning"
+    ],
+    "Engineering Management": [
+      "Team Leadership",
+      "Technical Architecture",
+      "Performance Management",
+      "Hiring & Scaling",
+      "Process Optimization", 
+      "Technical Debt"
+    ],
+    "Business Strategy": [
+      "Market Analysis",
+      "Competitive Intelligence", 
+      "Strategic Planning",
+      "Business Development",
+      "Digital Transformation",
+      "Operational Excellence"
+    ]
+  };
+
+  // Flatten topics for compatibility with existing code
+  const topics = Object.keys(topicStructure);
+  
+  // Selected sub-topic state
+  const [selectedSubTopic, setSelectedSubTopic] = useState<string>("");
 
   const difficultyLevels = [
     { id: "easy", name: "Easy", description: "Entry-level scenarios with clear structure" },
@@ -419,6 +446,7 @@ export default function CustomCaseStudy() {
         },
         body: JSON.stringify({
           topic: selectedTopic,
+          subTopic: selectedSubTopic,
           difficulty: difficulty,
           timestamp: timestamp,
           forceGenerate: true
@@ -590,11 +618,11 @@ export default function CustomCaseStudy() {
                     <Brain className="w-8 h-8 text-primary mr-3" />
                     <h3 className="text-xl font-semibold">AI Case Study</h3>
                   </div>
-                  <p className="text-gray-600 mb-4">Get a professionally structured case study following PM Solutions format with company context and challenges.</p>
+                  <p className="text-gray-600 mb-4">Generate a professionally structured case study with realistic company context, stakeholder dynamics, and business challenges.</p>
                   <ul className="text-sm text-gray-500 space-y-1">
-                    <li>• Realistic business scenarios</li>
-                    <li>• Professional format</li>
-                    <li>• Company & stakeholder details</li>
+                    <li>• Industry-relevant scenarios</li>
+                    <li>• Detailed company context</li>
+                    <li>• Clear objectives & constraints</li>
                   </ul>
                 </div>
 
@@ -629,9 +657,11 @@ export default function CustomCaseStudy() {
                 <div>
                   <h3 className="text-lg font-semibold mb-4 flex items-center">
                     <Brain className="w-5 h-5 text-primary mr-2" />
-                    Select Topic
+                    Select Topic & Focus Area
                   </h3>
-                  <div className="grid md:grid-cols-3 gap-4">
+                  
+                  {/* Main Topics */}
+                  <div className="grid md:grid-cols-2 gap-4 mb-6">
                     {topics.map((topic) => (
                       <div
                         key={topic}
@@ -640,12 +670,48 @@ export default function CustomCaseStudy() {
                             ? "border-primary bg-primary/5 text-primary"
                             : "border-gray-200 hover:border-primary hover:bg-primary/5"
                         }`}
-                        onClick={() => setSelectedTopic(topic)}
+                        onClick={() => {
+                          setSelectedTopic(topic);
+                          setSelectedSubTopic(""); // Reset sub-topic when main topic changes
+                        }}
                       >
-                        <h4 className="font-medium text-sm">{topic}</h4>
+                        <h4 className="font-semibold text-base mb-1">{topic}</h4>
+                        <p className="text-xs text-gray-600">
+                          {topicStructure[topic as keyof typeof topicStructure].length} focus areas available
+                        </p>
                       </div>
                     ))}
                   </div>
+
+                  {/* Sub-Topics */}
+                  {selectedTopic && (
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-medium text-sm text-gray-700 mb-3 flex items-center">
+                        <Target className="w-4 h-4 mr-2" />
+                        Choose a specific focus area for {selectedTopic}:
+                      </h4>
+                      <div className="grid md:grid-cols-3 gap-3">
+                        {topicStructure[selectedTopic as keyof typeof topicStructure]?.map((subTopic) => (
+                          <div
+                            key={subTopic}
+                            className={`border rounded-md p-3 cursor-pointer text-center transition-colors ${
+                              selectedSubTopic === subTopic
+                                ? "border-primary bg-primary text-white"
+                                : "border-gray-300 bg-white hover:border-primary hover:bg-primary/5"
+                            }`}
+                            onClick={() => setSelectedSubTopic(subTopic)}
+                          >
+                            <span className="text-sm font-medium">{subTopic}</span>
+                          </div>
+                        ))}
+                      </div>
+                      {!selectedSubTopic && (
+                        <p className="text-xs text-gray-500 mt-2 text-center">
+                          Select a focus area to generate targeted case studies
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Difficulty Selection */}
@@ -684,11 +750,22 @@ export default function CustomCaseStudy() {
                     <h4 className="font-semibold text-primary">What You'll Get:</h4>
                   </div>
                   <ul className="text-blue-700 space-y-1 text-sm">
-                    <li>• Professional case study following PM Solutions format</li>
+                    <li>• Realistic business case study tailored to your selected focus area</li>
                     <li>• Detailed company context and stakeholder analysis</li>
-                    <li>• Clear constraints and success objectives</li>
-                    <li>• AI-powered evaluation with actionable feedback</li>
+                    <li>• Clear constraints, objectives, and success metrics</li>
+                    <li>• AI-powered evaluation with personalized feedback</li>
+                    <li>• Industry-relevant scenarios from top tech companies</li>
                   </ul>
+                  {selectedTopic && selectedSubTopic && (
+                    <div className="mt-3 p-3 bg-white rounded border">
+                      <p className="text-sm font-medium text-primary">
+                        Selected: {selectedTopic} → {selectedSubTopic}
+                      </p>
+                      <p className="text-xs text-gray-600 mt-1">
+                        Your case study will focus specifically on {selectedSubTopic.toLowerCase()} challenges
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex gap-4">
@@ -701,11 +778,27 @@ export default function CustomCaseStudy() {
                   </Button>
                   <Button
                     onClick={() => {
+                      if (!selectedTopic) {
+                        toast({
+                          title: "Please select a topic",
+                          description: "Choose a main topic area first.",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      if (!selectedSubTopic) {
+                        toast({
+                          title: "Please select a focus area",
+                          description: "Choose a specific focus area to generate a targeted case study.",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
                       markStepAsCompleted('configure');
                       setMode("ai-generated");
                       generateCaseStudyMutation.mutate();
                     }}
-                    disabled={generateCaseStudyMutation.isPending}
+                    disabled={generateCaseStudyMutation.isPending || !selectedTopic || !selectedSubTopic}
                     className="flex-1"
                   >
                     {generateCaseStudyMutation.isPending ? (
@@ -713,7 +806,7 @@ export default function CustomCaseStudy() {
                     ) : (
                       <Brain className="mr-2 h-4 w-4" />
                     )}
-                    Generate Fresh Case Study
+                    Generate {selectedTopic && selectedSubTopic ? `${selectedSubTopic} ` : ''}Case Study
                   </Button>
                 </div>
               </div>
@@ -732,7 +825,7 @@ export default function CustomCaseStudy() {
                 <div>
                   <CardTitle className="text-2xl">Create Your Interview Question</CardTitle>
                   <CardDescription className="text-base mt-2">
-                    Write a thoughtful interview question related to your chosen topic
+                    Write a thoughtful interview question focused on your selected topic and area
                   </CardDescription>
                 </div>
               </div>
@@ -741,22 +834,51 @@ export default function CustomCaseStudy() {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Select Topic
+                    Select Topic & Focus Area
                   </label>
-                  <div className="flex flex-wrap gap-2">
+                  
+                  {/* Main Topics */}
+                  <div className="grid md:grid-cols-2 gap-3 mb-4">
                     {topics.map((topic) => (
-                      <Badge
+                      <div
                         key={topic}
-                        variant={selectedTopic === topic ? "default" : "outline"}
-                        className={`cursor-pointer px-4 py-2 ${
-                          selectedTopic === topic ? "bg-primary text-white" : "hover:bg-primary/10"
+                        className={`border-2 rounded-lg p-3 cursor-pointer transition-colors text-center ${
+                          selectedTopic === topic
+                            ? "border-primary bg-primary/5 text-primary"
+                            : "border-gray-200 hover:border-primary hover:bg-primary/5"
                         }`}
-                        onClick={() => setSelectedTopic(topic)}
+                        onClick={() => {
+                          setSelectedTopic(topic);
+                          setSelectedSubTopic(""); // Reset sub-topic when main topic changes
+                        }}
                       >
-                        {topic}
-                      </Badge>
+                        <h4 className="font-medium text-sm">{topic}</h4>
+                      </div>
                     ))}
                   </div>
+
+                  {/* Sub-Topics */}
+                  {selectedTopic && (
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-medium text-xs text-gray-700 mb-3">
+                        Choose a specific focus area for {selectedTopic}:
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {topicStructure[selectedTopic as keyof typeof topicStructure]?.map((subTopic) => (
+                          <Badge
+                            key={subTopic}
+                            variant={selectedSubTopic === subTopic ? "default" : "outline"}
+                            className={`cursor-pointer px-3 py-1 text-xs ${
+                              selectedSubTopic === subTopic ? "bg-primary text-white" : "hover:bg-primary/10"
+                            }`}
+                            onClick={() => setSelectedSubTopic(subTopic)}
+                          >
+                            {subTopic}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>
