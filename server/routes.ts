@@ -364,34 +364,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error: any) {
         console.log("OpenAI unavailable, using demo case study");
         
-        // Demo case study for testing functionality
+        // Demo case study with variety for testing functionality
+        const companies = ["TechCorp Inc.", "InnovateLabs", "DataDriven Co.", "ScaleTech Solutions", "NextGen Systems"];
+        const industries = ["Technology", "FinTech", "E-commerce", "Healthcare Tech", "EdTech"];
+        const companySizes = ["100-500 employees", "500-1000 employees", "1000-5000 employees", "5000+ employees"];
+        const timeframes = ["3 months for MVP delivery", "6 months for full implementation", "9 months with phased rollout", "12 months comprehensive transformation"];
+        
+        const randomCompany = companies[Math.floor(Math.random() * companies.length)];
+        const randomIndustry = industries[Math.floor(Math.random() * industries.length)];
+        const randomSize = companySizes[Math.floor(Math.random() * companySizes.length)];
+        const randomTimeframe = timeframes[Math.floor(Math.random() * timeframes.length)];
+        
         const demoCaseStudy = {
-          title: `${topic} Challenge at TechCorp`,
-          company: "TechCorp Inc.",
-          industry: "Technology",
-          companySize: "500-1000 employees",
+          title: `${topic} Challenge at ${randomCompany}`,
+          company: randomCompany,
+          industry: randomIndustry,
+          companySize: randomSize,
           challenge: `The company faces a critical ${topic.toLowerCase()} challenge that requires immediate strategic attention.`,
-          detailedChallenge: `TechCorp is experiencing significant challenges with their ${topic.toLowerCase()} strategy. Market pressures have intensified, customer expectations have evolved, and internal processes need optimization. The leadership team needs a comprehensive solution that addresses both immediate concerns and long-term sustainability.`,
+          detailedChallenge: `${randomCompany} is experiencing significant challenges with their ${topic.toLowerCase()} strategy. Market pressures have intensified, customer expectations have evolved, and internal processes need optimization. The leadership team needs a comprehensive solution that addresses both immediate concerns and long-term sustainability while maintaining competitive advantage in the ${randomIndustry.toLowerCase()} sector.`,
           stakeholders: [
             "CEO and Executive Team",
             "Product Management",
             "Engineering Teams",
             "Customer Success",
-            "Sales and Marketing"
+            "Sales and Marketing",
+            "Operations Team"
           ],
           constraints: [
-            "Limited budget of $2M for implementation",
+            `Limited budget of $${Math.floor(Math.random() * 3 + 1)}M for implementation`,
             "Must maintain current service levels",
             "Regulatory compliance requirements",
-            "Legacy system dependencies"
+            "Legacy system dependencies",
+            "Resource constraints during peak season"
           ],
           objectives: [
-            "Improve operational efficiency by 25%",
+            `Improve operational efficiency by ${Math.floor(Math.random() * 20 + 15)}%`,
             "Enhance customer satisfaction scores",
             "Reduce time-to-market for new features",
-            "Establish scalable processes for growth"
+            "Establish scalable processes for growth",
+            "Increase team productivity and collaboration"
           ],
-          timeframe: "6 months for full implementation with quarterly milestones"
+          timeframe: randomTimeframe
         };
         
         res.json(demoCaseStudy);

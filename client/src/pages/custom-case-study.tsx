@@ -68,7 +68,7 @@ export default function CustomCaseStudy() {
   const [userAnswer, setUserAnswer] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("Technical Program Management");
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
-  const [step, setStep] = useState<"mode" | "question" | "answer" | "feedback">("mode");
+  const [step, setStep] = useState<"mode" | "ai-config" | "question" | "answer" | "feedback">("mode");
   const [mode, setMode] = useState<"custom" | "prompted" | "ai-generated">("custom");
   const [promptedQuestions, setPromptedQuestions] = useState<any[]>([]);
   const [selectedPrompted, setSelectedPrompted] = useState<any>(null);
@@ -81,7 +81,20 @@ export default function CustomCaseStudy() {
     "Product Management", 
     "Project Management",
     "Engineering Management",
-    "Data Science Leadership"
+    "Data Science Leadership",
+    "Product Strategy",
+    "Customer Experience",
+    "Growth Strategy",
+    "Operations Management",
+    "Business Analytics",
+    "Market Research",
+    "Digital Transformation"
+  ];
+
+  const difficultyLevels = [
+    { id: "easy", name: "Easy", description: "Entry-level scenarios with clear structure" },
+    { id: "medium", name: "Medium", description: "Complex business challenges requiring strategic thinking" },
+    { id: "hard", name: "Hard", description: "Executive-level decisions with multiple stakeholders" }
   ];
 
   const topicMapping: { [key: string]: string } = {
@@ -254,6 +267,8 @@ export default function CustomCaseStudy() {
     setUserAnswer("");
     setAnalysis(null);
     setSelectedPrompted(null);
+    setCaseStudy(null);
+    setMode("custom");
     setStep("mode");
   };
 
@@ -371,32 +386,39 @@ export default function CustomCaseStudy() {
         {/* Progress Steps */}
         <div className="flex justify-center mb-12">
           <div className="flex items-center space-x-4">
-            <div className={`flex items-center ${step === "mode" ? "text-primary" : (step === "question" || step === "answer" || step === "feedback") ? "text-green-600" : "text-gray-400"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "mode" ? "bg-primary text-white" : (step === "question" || step === "answer" || step === "feedback") ? "bg-green-600 text-white" : "bg-gray-200"}`}>
+            <div className={`flex items-center ${step === "mode" ? "text-primary" : (step === "ai-config" || step === "question" || step === "answer" || step === "feedback") ? "text-green-600" : "text-gray-400"}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "mode" ? "bg-primary text-white" : (step === "ai-config" || step === "question" || step === "answer" || step === "feedback") ? "bg-green-600 text-white" : "bg-gray-200"}`}>
                 1
               </div>
               <span className="ml-2 font-medium">Choose Mode</span>
             </div>
             <div className="w-8 h-0.5 bg-gray-300"></div>
-            <div className={`flex items-center ${step === "question" ? "text-primary" : (step === "answer" || step === "feedback") ? "text-green-600" : "text-gray-400"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "question" ? "bg-primary text-white" : (step === "answer" || step === "feedback") ? "bg-green-600 text-white" : "bg-gray-200"}`}>
+            <div className={`flex items-center ${step === "ai-config" ? "text-primary" : (step === "question" || step === "answer" || step === "feedback") ? "text-green-600" : "text-gray-400"}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "ai-config" ? "bg-primary text-white" : (step === "question" || step === "answer" || step === "feedback") ? "bg-green-600 text-white" : "bg-gray-200"}`}>
                 2
               </div>
-              <span className="ml-2 font-medium">Select Question</span>
+              <span className="ml-2 font-medium">Configure</span>
+            </div>
+            <div className="w-8 h-0.5 bg-gray-300"></div>
+            <div className={`flex items-center ${step === "question" ? "text-primary" : (step === "answer" || step === "feedback") ? "text-green-600" : "text-gray-400"}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "question" ? "bg-primary text-white" : (step === "answer" || step === "feedback") ? "bg-green-600 text-white" : "bg-gray-200"}`}>
+                3
+              </div>
+              <span className="ml-2 font-medium">Question</span>
             </div>
             <div className="w-8 h-0.5 bg-gray-300"></div>
             <div className={`flex items-center ${step === "answer" ? "text-primary" : step === "feedback" ? "text-green-600" : "text-gray-400"}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "answer" ? "bg-primary text-white" : step === "feedback" ? "bg-green-600 text-white" : "bg-gray-200"}`}>
-                3
+                4
               </div>
-              <span className="ml-2 font-medium">Answer Question</span>
+              <span className="ml-2 font-medium">Answer</span>
             </div>
             <div className="w-8 h-0.5 bg-gray-300"></div>
             <div className={`flex items-center ${step === "feedback" ? "text-green-600" : "text-gray-400"}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "feedback" ? "bg-green-600 text-white" : "bg-gray-200"}`}>
-                4
+                5
               </div>
-              <span className="ml-2 font-medium">Get Feedback</span>
+              <span className="ml-2 font-medium">Feedback</span>
             </div>
           </div>
         </div>
@@ -426,7 +448,7 @@ export default function CustomCaseStudy() {
 
                 <div 
                   className="border-2 border-gray-200 rounded-lg p-6 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
-                  onClick={() => handleModeSelect("ai-generated")}
+                  onClick={() => setStep("ai-config")}
                 >
                   <div className="flex items-center mb-4">
                     <Brain className="w-8 h-8 text-primary mr-3" />
@@ -460,7 +482,109 @@ export default function CustomCaseStudy() {
           </div>
         )}
 
-        {/* Step 2: Custom Question Input */}
+        {/* Step 2: AI Configuration */}
+        {step === "ai-config" && (
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-lg shadow-md p-8">
+              <h2 className="text-2xl font-bold mb-6 text-center">Configure Your AI Case Study</h2>
+              
+              <div className="space-y-8">
+                {/* Topic Selection */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <Brain className="w-5 h-5 text-primary mr-2" />
+                    Select Topic
+                  </h3>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    {topics.map((topic) => (
+                      <div
+                        key={topic}
+                        className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${
+                          selectedTopic === topic
+                            ? "border-primary bg-primary/5 text-primary"
+                            : "border-gray-200 hover:border-primary hover:bg-primary/5"
+                        }`}
+                        onClick={() => setSelectedTopic(topic)}
+                      >
+                        <h4 className="font-medium text-sm">{topic}</h4>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Difficulty Selection */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4 flex items-center">
+                    <Target className="w-5 h-5 text-orange-600 mr-2" />
+                    Select Difficulty Level
+                  </h3>
+                  <div className="grid md:grid-cols-3 gap-6">
+                    {difficultyLevels.map((level) => (
+                      <div
+                        key={level.id}
+                        className={`border-2 rounded-lg p-6 cursor-pointer transition-colors ${
+                          difficulty === level.id
+                            ? "border-primary bg-primary/5"
+                            : "border-gray-200 hover:border-primary hover:bg-primary/5"
+                        }`}
+                        onClick={() => setDifficulty(level.id)}
+                      >
+                        <div className="flex items-center mb-3">
+                          <div className={`w-4 h-4 rounded-full mr-3 ${
+                            level.id === "easy" ? "bg-green-500" :
+                            level.id === "medium" ? "bg-yellow-500" : "bg-red-500"
+                          }`}></div>
+                          <h4 className="font-semibold text-lg">{level.name}</h4>
+                        </div>
+                        <p className="text-gray-600 text-sm">{level.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border-l-4 border-primary p-6 rounded-r-lg">
+                  <div className="flex items-center mb-2">
+                    <Sparkles className="h-5 w-5 text-primary mr-2" />
+                    <h4 className="font-semibold text-primary">What You'll Get:</h4>
+                  </div>
+                  <ul className="text-blue-700 space-y-1 text-sm">
+                    <li>• Professional case study following PM Solutions format</li>
+                    <li>• Detailed company context and stakeholder analysis</li>
+                    <li>• Clear constraints and success objectives</li>
+                    <li>• AI-powered evaluation with actionable feedback</li>
+                  </ul>
+                </div>
+
+                <div className="flex gap-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setStep("mode")}
+                    className="flex-1"
+                  >
+                    Back to Mode Selection
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setMode("ai-generated");
+                      generateCaseStudyMutation.mutate();
+                    }}
+                    disabled={generateCaseStudyMutation.isPending}
+                    className="flex-1"
+                  >
+                    {generateCaseStudyMutation.isPending ? (
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
+                    ) : (
+                      <Brain className="mr-2 h-4 w-4" />
+                    )}
+                    Generate Case Study
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Custom Question Input */}
         {step === "question" && mode === "custom" && (
           <Card className="shadow-lg border max-w-4xl mx-auto">
             <CardHeader>
@@ -1026,6 +1150,21 @@ Result: Share the outcome and impact..."
                   >
                     Try New Question
                   </Button>
+                  {mode === "ai-generated" && (
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => {
+                        setCaseStudy(null);
+                        setUserAnswer("");
+                        setAnalysis(null);
+                        setStep("ai-config");
+                      }}
+                    >
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      New Case Study
+                    </Button>
+                  )}
                   <Button
                     className="flex-1"
                     onClick={() => setLocation("/practice")}
