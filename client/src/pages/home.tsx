@@ -102,12 +102,15 @@ export default function Home() {
 
     switch (searchType) {
       case "practice":
+        // Practice + search content = practice questions with search
         setLocation(`/practice?search=${encodeURIComponent(searchQuery)}`);
         break;
       case "learning":
+        // Learning + search content = learning page with search
         setLocation(`/learning?search=${encodeURIComponent(searchQuery)}`);
         break;
       case "companies":
+        // Companies + search content = practice questions filtered by company
         setLocation(`/practice?company=${encodeURIComponent(searchQuery)}`);
         break;
       default:
@@ -149,13 +152,13 @@ export default function Home() {
       {/* Hero Section */}
       <section className="gradient-hero text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Search Bar - Top Right */}
+          {/* Search Bar - Top Center */}
           <div className="flex justify-center mb-8">
             <form onSubmit={handleSearch} className="hidden lg:flex items-center space-x-3">
-              {/* Practice Dropdown */}
+              {/* Single Dropdown for Search Type */}
               <Select value={searchType} onValueChange={setSearchType}>
-                <SelectTrigger className="w-32 h-12 bg-white text-gray-800 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                  <SelectValue placeholder="Practice" />
+                <SelectTrigger className="w-36 h-12 bg-white text-gray-800 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                  <SelectValue placeholder="Search Type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="practice">Practice</SelectItem>
@@ -164,43 +167,21 @@ export default function Home() {
                 </SelectContent>
               </Select>
 
-              {/* Learning Dropdown */}
-              <Select>
-                <SelectTrigger className="w-32 h-12 bg-white text-gray-800 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                  <SelectValue placeholder="Learning" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pm">Product Management</SelectItem>
-                  <SelectItem value="tpm">Program Management</SelectItem>
-                  <SelectItem value="em">Engineering Management</SelectItem>
-                  <SelectItem value="analytics">Business Analytics</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Companies Dropdown */}
-              <Select>
-                <SelectTrigger className="w-36 h-12 bg-white text-gray-800 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                  <SelectValue placeholder="Companies" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="microsoft">Microsoft</SelectItem>
-                  <SelectItem value="google">Google</SelectItem>
-                  <SelectItem value="amazon">Amazon</SelectItem>
-                  <SelectItem value="meta">Meta</SelectItem>
-                  <SelectItem value="apple">Apple</SelectItem>
-                  <SelectItem value="oracle">Oracle</SelectItem>
-                </SelectContent>
-              </Select>
-
               {/* Search Input */}
               <div className="relative flex items-center">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                 <Input
                   type="text"
-                  placeholder="Search interview questions, topics, and more..."
+                  placeholder={
+                    searchType === "practice" 
+                      ? "Search interview questions and topics..." 
+                      : searchType === "learning" 
+                      ? "Search learning materials and courses..."
+                      : "Search by company name..."
+                  }
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 pr-4 w-80 h-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 placeholder-gray-500 text-base font-medium"
+                  className="pl-12 pr-4 w-96 h-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 placeholder-gray-500 text-base font-medium"
                 />
               </div>
 
