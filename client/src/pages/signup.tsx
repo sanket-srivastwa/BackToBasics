@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import Footer from "@/components/footer";
 
 export default function SignUp() {
   const [, setLocation] = useLocation();
@@ -304,6 +305,8 @@ export default function SignUp() {
           <a href="#" className="text-blue-600 hover:text-blue-500">Privacy Policy</a>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 }

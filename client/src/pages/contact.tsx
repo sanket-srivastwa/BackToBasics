@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Mail, MapPin, Phone, Clock } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import Footer from "@/components/footer";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -197,6 +198,8 @@ export default function Contact() {
           </div>
         </div>
       </section>
+      
+      <Footer />
     </div>
   );
 }

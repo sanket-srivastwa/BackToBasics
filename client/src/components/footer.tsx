@@ -7,7 +7,12 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">Learn Lab Solution</h3>
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">A</span>
+              </div>
+              <h3 className="text-xl font-bold">Auto The Dact</h3>
+            </div>
             <p className="text-neutral-300 mb-4">
               Empowering IT professionals in Bangalore and beyond with AI-powered interview preparation and skill development.
             </p>
@@ -41,7 +46,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-neutral-700 mt-12 pt-8 text-center text-neutral-400">
-          <p>&copy; 2024 Learn Lab Solution. All rights reserved.</p>
+          <p>&copy; 2024 Auto The Dact. All rights reserved.</p>
         </div>
       </div>
     </footer>
