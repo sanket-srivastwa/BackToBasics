@@ -14,6 +14,8 @@ import Learning from "@/pages/learning";
 import Account from "@/pages/account";
 import SignIn from "@/pages/signin";
 import SignUp from "@/pages/signup";
+import About from "@/pages/about";
+import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 
 function ScrollToTop() {
@@ -41,6 +43,8 @@ function Router() {
         <Route path="/account" component={Account} />
         <Route path="/signin" component={SignIn} />
         <Route path="/signup" component={SignUp} />
+        <Route path="/about" component={About} />
+        <Route path="/contact" component={Contact} />
         <Route component={NotFound} />
       </Switch>
     </>
