@@ -212,41 +212,54 @@ export default function EnhancedCaseStudy() {
   // Stepper Component
   const StepperNavigation = () => {
     const maxCompletedIndex = getMaxCompletedStepIndex();
+    const currentIndex = getCurrentStepIndex();
     
     return (
       <div className="mb-8">
         <div className="flex items-center justify-between">
           {STEPS.map((step, index) => {
             const isActive = currentStep === step.id;
-            const isCompleted = index < maxCompletedIndex;
-            const isClickable = canNavigateToStep(step.id);
+            const isCompleted = index < currentIndex; // Previous steps are completed
+            const isAccessible = index <= maxCompletedIndex; // Can access any step up to max completed
+            
+            const handleStepClick = () => {
+              if (isAccessible) {
+                console.log(`Navigating to step: ${step.id} (index ${index})`);
+                setCurrentStep(step.id);
+              }
+            };
             
             return (
               <div key={step.id} className="flex items-center">
                 <div className="flex flex-col items-center">
                   <button
-                    onClick={() => navigateToStep(step.id)}
-                    disabled={!isClickable}
+                    onClick={handleStepClick}
+                    disabled={!isAccessible}
                     className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
                       isActive 
-                        ? 'bg-blue-600 text-white' 
+                        ? 'bg-blue-600 text-white shadow-md' 
                         : isCompleted 
-                        ? 'bg-green-600 text-white cursor-pointer hover:bg-green-700' 
+                        ? 'bg-green-600 text-white cursor-pointer hover:bg-green-700 shadow-md' 
+                        : isAccessible
+                        ? 'bg-gray-300 text-gray-700 cursor-pointer hover:bg-gray-400'
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     }`}
                   >
                     {isCompleted ? <CheckCircle className="h-5 w-5" /> : index + 1}
                   </button>
-                  <span className={`mt-2 text-xs text-center ${isActive ? 'font-medium text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'}`}>
+                  <span className={`mt-2 text-xs text-center max-w-16 ${isActive ? 'font-medium text-blue-600' : isCompleted ? 'text-green-600 font-medium' : 'text-gray-500'}`}>
                     {step.label}
                   </span>
                 </div>
                 {index < STEPS.length - 1 && (
-                  <div className={`h-0.5 w-16 mx-2 ${isCompleted ? 'bg-green-600' : 'bg-gray-200'}`} />
+                  <div className={`h-0.5 w-16 mx-2 transition-colors ${isCompleted ? 'bg-green-600' : 'bg-gray-200'}`} />
                 )}
               </div>
             );
           })}
+        </div>
+        <div className="text-xs text-gray-500 mt-2 text-center">
+          Current: {currentStep} (Index: {currentIndex}) | Max Completed: {maxCompletedIndex}
         </div>
       </div>
     );
