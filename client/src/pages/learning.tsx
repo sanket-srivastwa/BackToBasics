@@ -366,22 +366,31 @@ const learningModules: LearningModule[] = [
     category: "program",
     topics: [
       {
-        id: "tpm-intro",
+        id: "program-management-intro",
         title: "Introduction to Program Management",
-        description: "What is TPM and how it differs from PM and engineering management",
+        description: "Overview of program management roles and responsibilities",
         duration: "35 min",
         type: "video",
         completed: false,
-        content: "Program Management bridges the gap between technical execution and business strategy. Learn the core responsibilities of TPMs including cross-functional coordination, technical decision-making, and risk management across large-scale technical programs."
+        content: "Program Management encompasses various specialized roles including Technical Program Management (TPM). Learn the core responsibilities across different program management domains including cross-functional coordination, technical decision-making, and risk management across large-scale programs."
       },
       {
-        id: "tpm-skills",
-        title: "Essential TPM Skills & Competencies",
-        description: "Technical and soft skills required for TPMs",
+        id: "technical-program-management",
+        title: "Technical Program Management (TPM)",
+        description: "Deep dive into technical program management specifics",
+        duration: "45 min",
+        type: "video",
+        completed: false,
+        content: "Technical Program Management is a specialized area within program management that bridges technical execution and business strategy. Learn TPM-specific responsibilities including system architecture coordination, technical roadmap planning, and engineering team leadership."
+      },
+      {
+        id: "program-management-skills",
+        title: "Essential Program Management Skills",
+        description: "Core competencies for effective program management",
         duration: "45 min",
         type: "article",
         completed: false,
-        content: "Develop technical depth, system thinking, communication skills, and leadership capabilities. Learn how to balance technical constraints with business requirements."
+        content: "Develop technical depth, system thinking, communication skills, and leadership capabilities. Learn how to balance technical constraints with business requirements across different program management specializations."
       },
       {
         id: "tpm-vs-pm",

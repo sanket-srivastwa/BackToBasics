@@ -118,7 +118,7 @@ export default function Practice() {
   const topics = [
     { id: "all", name: "All Topics" },
     { id: "pm", name: "Product Management" },
-    { id: "tpm", name: "Technical Program Management" },
+    { id: "tpm", name: "Program Management" },
     { id: "em", name: "Engineering Management" },
     { id: "project-management", name: "Project Management" }
   ];

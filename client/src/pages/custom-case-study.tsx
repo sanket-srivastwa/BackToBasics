@@ -198,12 +198,12 @@ export default function CustomCaseStudy() {
       "Feature Prioritization"
     ],
     "Program Management": [
+      "Technical Program Management",
       "Cross-functional Coordination",
       "Technical Roadmaps",
       "Risk Management", 
       "Stakeholder Alignment",
-      "Platform Strategy",
-      "Migration Planning"
+      "Platform Strategy"
     ],
     "Engineering Management": [
       "Team Leadership",
