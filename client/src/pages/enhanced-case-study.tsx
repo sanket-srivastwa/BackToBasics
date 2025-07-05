@@ -188,10 +188,19 @@ export default function EnhancedCaseStudy() {
 
   // Stepper navigation helpers
   const getCurrentStepIndex = () => STEPS.findIndex(step => step.id === currentStep);
+  const getMaxCompletedStepIndex = () => {
+    // Determine the maximum step index the user has reached
+    if (analysisResult) return 4; // Feedback step (index 4)
+    if (caseStudy && userAnswer.length > 0) return 3; // Answer step (index 3)
+    if (caseStudy) return 2; // Question step (index 2)
+    if (selectedTopic && selectedDifficulty) return 1; // Configure step (index 1)
+    return 0; // Mode step (index 0)
+  };
+  
   const canNavigateToStep = (targetStep: StepType) => {
     const targetIndex = STEPS.findIndex(step => step.id === targetStep);
-    const currentIndex = getCurrentStepIndex();
-    return targetIndex <= currentIndex; // Only allow backward navigation
+    const maxCompletedIndex = getMaxCompletedStepIndex();
+    return targetIndex <= maxCompletedIndex; // Allow navigation to any completed step
   };
 
   const navigateToStep = (targetStep: StepType) => {
@@ -201,43 +210,47 @@ export default function EnhancedCaseStudy() {
   };
 
   // Stepper Component
-  const StepperNavigation = () => (
-    <div className="mb-8">
-      <div className="flex items-center justify-between">
-        {STEPS.map((step, index) => {
-          const isActive = currentStep === step.id;
-          const isCompleted = getCurrentStepIndex() > index;
-          const isClickable = canNavigateToStep(step.id);
-          
-          return (
-            <div key={step.id} className="flex items-center">
-              <div className="flex flex-col items-center">
-                <button
-                  onClick={() => navigateToStep(step.id)}
-                  disabled={!isClickable}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-                    isActive 
-                      ? 'bg-blue-600 text-white' 
-                      : isCompleted 
-                      ? 'bg-green-600 text-white cursor-pointer hover:bg-green-700' 
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  {isCompleted ? <CheckCircle className="h-5 w-5" /> : index + 1}
-                </button>
-                <span className={`mt-2 text-xs text-center ${isActive ? 'font-medium text-blue-600' : 'text-gray-500'}`}>
-                  {step.label}
-                </span>
+  const StepperNavigation = () => {
+    const maxCompletedIndex = getMaxCompletedStepIndex();
+    
+    return (
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          {STEPS.map((step, index) => {
+            const isActive = currentStep === step.id;
+            const isCompleted = index < maxCompletedIndex;
+            const isClickable = canNavigateToStep(step.id);
+            
+            return (
+              <div key={step.id} className="flex items-center">
+                <div className="flex flex-col items-center">
+                  <button
+                    onClick={() => navigateToStep(step.id)}
+                    disabled={!isClickable}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                      isActive 
+                        ? 'bg-blue-600 text-white' 
+                        : isCompleted 
+                        ? 'bg-green-600 text-white cursor-pointer hover:bg-green-700' 
+                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    {isCompleted ? <CheckCircle className="h-5 w-5" /> : index + 1}
+                  </button>
+                  <span className={`mt-2 text-xs text-center ${isActive ? 'font-medium text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'}`}>
+                    {step.label}
+                  </span>
+                </div>
+                {index < STEPS.length - 1 && (
+                  <div className={`h-0.5 w-16 mx-2 ${isCompleted ? 'bg-green-600' : 'bg-gray-200'}`} />
+                )}
               </div>
-              {index < STEPS.length - 1 && (
-                <div className={`h-0.5 w-16 mx-2 ${isCompleted ? 'bg-green-600' : 'bg-gray-200'}`} />
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Step 1: Choose Mode
   if (currentStep === 'mode') {
