@@ -103,17 +103,17 @@ export default function Header() {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-56">
-                    <DropdownMenuItem onClick={() => setLocation("/practice?topic=product-management")}>
+                    <DropdownMenuItem onClick={() => setLocation("/practice?topic=pm")}>
                       Product Management
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setLocation("/practice?topic=program-management")}>
-                      Program Management
+                    <DropdownMenuItem onClick={() => setLocation("/practice?topic=tpm")}>
+                      Technical Program Management
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setLocation("/practice?topic=engineering-management")}>
+                    <DropdownMenuItem onClick={() => setLocation("/practice?topic=em")}>
                       Engineering Management
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setLocation("/practice?topic=general-management")}>
-                      General Management
+                    <DropdownMenuItem onClick={() => setLocation("/practice?topic=project-management")}>
+                      Project Management
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setLocation("/practice")}>

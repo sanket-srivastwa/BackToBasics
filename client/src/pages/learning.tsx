@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { 
@@ -36,7 +37,11 @@ import {
   MessageSquare,
   Zap,
   Globe,
-  Lock
+  Lock,
+  Filter,
+  Search,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 
 interface LearningModule {
@@ -396,15 +401,27 @@ export default function Learning() {
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
 
-  // Handle search parameter from URL
+  // Handle URL parameters
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const search = urlParams.get('search');
+    const track = urlParams.get('track');
+    
     if (search) {
       setSearchQuery(search);
-      // Clear URL parameters after extracting the search query
-      window.history.replaceState({}, '', '/learning');
+    }
+    if (track) {
+      // Map track parameter to category
+      const trackMap: { [key: string]: string } = {
+        'product-management': 'product',
+        'program-management': 'program',
+        'engineering-management': 'engineering',
+        'business-analytics': 'analytics'
+      };
+      const category = trackMap[track] || 'all';
+      setActiveCategory(category);
     }
   }, []);
 
@@ -721,6 +738,85 @@ export default function Learning() {
   return (
     <div className="min-h-screen bg-[#FAFAFA]" style={{ fontFamily: "'Source Sans Pro', 'Roboto', sans-serif" }}>
       <Header />
+      
+      {/* Filter Section */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search learning materials..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 w-64"
+                />
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => setFiltersExpanded(!filtersExpanded)}
+                className="flex items-center gap-2"
+              >
+                <Filter className="h-4 w-4" />
+                Filters
+                {filtersExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
+            </div>
+            
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span>{filteredModules.length} modules available</span>
+            </div>
+          </div>
+          
+          {filtersExpanded && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Learning Track</label>
+                  <div className="flex flex-wrap gap-2">
+                    {categories.map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => setActiveCategory(category.id)}
+                        className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                          activeCategory === category.id
+                            ? "bg-[#2962FF] text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {category.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Quick Actions</label>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSearchQuery("")}
+                      className="text-xs"
+                    >
+                      Clear Search
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setActiveCategory("all")}
+                      className="text-xs"
+                    >
+                      Show All
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
       
       <div className="flex">
         {/* Sidebar */}
