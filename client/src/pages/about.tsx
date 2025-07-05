@@ -12,7 +12,7 @@ export default function About() {
       {/* Header */}
       <section className="py-20 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">About Auto The Dact</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">About AutoDiDact</h1>
           <p className="text-xl md:text-2xl font-light opacity-90">
             Empowering IT professionals to master their next career milestone
           </p>
@@ -188,7 +188,7 @@ export default function About() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-gray-800 mb-6">Ready to Start Your Journey?</h2>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Join thousands of IT professionals who are already practicing and improving their skills with Auto The Dact.
+            Join thousands of IT professionals who are already practicing and improving their skills with AutoDiDact.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 

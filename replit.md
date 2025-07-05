@@ -1,8 +1,8 @@
-# Auto The Dact - AI-Powered Interview Practice Platform
+# AutoDiDact - AI-Powered Interview Practice Platform
 
 ## Overview
 
-Auto The Dact is a full-stack web application designed to help users practice for technical interviews, particularly for Product Management (PM), Technical Program Management (TPM), and Engineering Management roles at top technology companies including Microsoft, Google, Amazon, Meta, Apple, Oracle, Cisco, Salesforce, Adobe, NVIDIA, and Netflix. The platform provides AI-powered feedback on mock interviews and case studies with comprehensive role-based filtering and difficulty categorization.
+AutoDiDact is a full-stack web application designed to help users practice for technical interviews, particularly for Product Management (PM), Technical Program Management (TPM), and Engineering Management roles at top technology companies including Microsoft, Google, Amazon, Meta, Apple, Oracle, Cisco, Salesforce, Adobe, NVIDIA, and Netflix. The platform provides AI-powered feedback on mock interviews and case studies with comprehensive role-based filtering and difficulty categorization.
 
 ## System Architecture
 
@@ -197,7 +197,7 @@ Changelog:
 - July 05, 2025. Final Rebranding & Comprehensive Account Management: Rebranded platform from "PrepMaster" to "BackToBasics", created beautiful Coursera-inspired sign-in/sign-up pages with professional design, implemented comprehensive account management system with four main sections: Personal Information (profile picture upload, contact details, demographics), Professional Information (company, education, social media links), Security Settings (password reset, multi-factor authentication with SMS and authenticator app, backup codes), and Privacy & Notifications (notification preferences, profile visibility, data sharing controls). Enhanced authentication flow to show Account option instead of Sign In/Sign Up when user is logged in.
 - July 05, 2025. Authentication Flow Fixes: Fixed sign-up process to automatically log in users after account creation, updated header to display actual signed-in user information instead of hardcoded "John Doe", implemented proper logout functionality to clear authentication state, and added localStorage synchronization for seamless authentication state management across page refreshes.
 - July 05, 2025. Brand Update to Learn Lab Solution: Renamed platform from "BackToBasics" to "Learn Lab Solution" across all pages (header, footer, about page, contact page), updated contact email to learnlabsolution@gmail.com, created comprehensive About Us and Contact pages with company information about IT sector operations in Bangalore, India, and updated HTML title and meta descriptions for better SEO.
-- July 05, 2025. Final Rebranding to Auto The Dact: Complete rebranding from "Learn Lab Solution" to "Auto The Dact" with professional logo design inspired by wisdomhatch.com featuring gradient blue-purple logo icon with "A" letter. Updated all pages (header, footer, about, contact, signin, signup, account), added footer component to all pages that were missing it, maintained learnlabsolution@gmail.com email contact, and updated documentation with new brand identity.
+- July 05, 2025. Final Rebranding to AutoDiDact: Complete rebranding from "Learn Lab Solution" to "AutoDiDact" with meaningful autodidact-themed imagery (book with lightbulb icon) representing self-learning concept. Updated all pages (header, footer, about, contact, signin, signup, account), added Contact Us and About Us links to user dropdown menu in header, created comprehensive contact page with FAQ section, maintained learnlabsolution@gmail.com email contact, and updated documentation with new brand identity.
 ```
 
 ## User Preferences

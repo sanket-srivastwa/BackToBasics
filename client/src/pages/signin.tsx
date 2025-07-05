@@ -41,7 +41,7 @@ export default function SignIn() {
       
       toast({
         title: "Sign in successful",
-        description: "Welcome back to BackToBasics!",
+        description: "Welcome back to AutoDiDact!",
       });
       
       setLocation("/");
@@ -75,7 +75,7 @@ export default function SignIn() {
             className="mb-4 text-blue-600 hover:text-blue-700"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to BackToBasics
+            Back to AutoDiDact
           </Button>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h1>
           <p className="text-gray-600">Sign in to continue your learning journey</p>

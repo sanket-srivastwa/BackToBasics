@@ -68,7 +68,7 @@ export default function SignUp() {
       
       toast({
         title: "Account created successfully",
-        description: "Welcome to BackToBasics!",
+        description: "Welcome to AutoDiDact!",
       });
       
       setLocation("/");
@@ -102,9 +102,9 @@ export default function SignUp() {
             className="mb-4 text-blue-600 hover:text-blue-700"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to BackToBasics
+            Back to AutoDiDact
           </Button>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Join BackToBasics</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Join AutoDiDact</h1>
           <p className="text-gray-600">Start your interview preparation journey today</p>
         </div>
 

@@ -8,10 +8,23 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">A</span>
-              </div>
-              <h3 className="text-xl font-bold">Auto The Dact</h3>
+              <svg width="24" height="24" viewBox="0 0 32 32" className="drop-shadow-sm">
+                <defs>
+                  <linearGradient id="footerBookGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#3B82F6" />
+                    <stop offset="100%" stopColor="#8B5CF6" />
+                  </linearGradient>
+                </defs>
+                <rect x="6" y="4" width="20" height="24" rx="2" fill="url(#footerBookGradient)" />
+                <rect x="8" y="6" width="16" height="2" rx="1" fill="white" opacity="0.9" />
+                <rect x="8" y="10" width="12" height="1.5" rx="0.75" fill="white" opacity="0.7" />
+                <rect x="8" y="13" width="14" height="1.5" rx="0.75" fill="white" opacity="0.7" />
+                <rect x="8" y="16" width="10" height="1.5" rx="0.75" fill="white" opacity="0.7" />
+                <circle cx="23" cy="10" r="5" fill="#FCD34D" opacity="0.9" />
+                <circle cx="23" cy="10" r="3" fill="#F59E0B" />
+                <path d="M21.5 12.5 L24.5 12.5" stroke="white" strokeWidth="0.8" strokeLinecap="round" />
+              </svg>
+              <h3 className="text-xl font-bold">AutoDiDact</h3>
             </div>
             <p className="text-neutral-300 mb-4">
               Empowering IT professionals in Bangalore and beyond with AI-powered interview preparation and skill development.
@@ -46,7 +59,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-neutral-700 mt-12 pt-8 text-center text-neutral-400">
-          <p>&copy; 2024 Auto The Dact. All rights reserved.</p>
+          <p>&copy; 2024 AutoDiDact. All rights reserved.</p>
         </div>
       </div>
     </footer>

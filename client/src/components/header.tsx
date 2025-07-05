@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
-import { Search, User, LogOut, Settings } from "lucide-react";
+import { Search, User, LogOut, Settings, Info, Mail } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -49,12 +49,29 @@ export default function Header() {
                   className="flex items-center cursor-pointer" 
                   onClick={() => setLocation("/")}
                 >
-                  <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">A</span>
+                  <div className="flex items-center space-x-3">
+                    <div className="relative">
+                      <svg width="32" height="32" viewBox="0 0 32 32" className="drop-shadow-sm">
+                        <defs>
+                          <linearGradient id="bookGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#3B82F6" />
+                            <stop offset="100%" stopColor="#8B5CF6" />
+                          </linearGradient>
+                        </defs>
+                        {/* Book/Learning Icon */}
+                        <rect x="6" y="4" width="20" height="24" rx="2" fill="url(#bookGradient)" />
+                        <rect x="8" y="6" width="16" height="2" rx="1" fill="white" opacity="0.9" />
+                        <rect x="8" y="10" width="12" height="1.5" rx="0.75" fill="white" opacity="0.7" />
+                        <rect x="8" y="13" width="14" height="1.5" rx="0.75" fill="white" opacity="0.7" />
+                        <rect x="8" y="16" width="10" height="1.5" rx="0.75" fill="white" opacity="0.7" />
+                        {/* Lightbulb overlay for self-learning */}
+                        <circle cx="23" cy="10" r="5" fill="#FCD34D" opacity="0.9" />
+                        <circle cx="23" cy="10" r="3" fill="#F59E0B" />
+                        <path d="M21.5 12.5 L24.5 12.5" stroke="white" strokeWidth="0.8" strokeLinecap="round" />
+                      </svg>
                     </div>
                     <h1 className="text-2xl font-bold text-gray-800">
-                      Auto The Dact
+                      AutoDiDact
                     </h1>
                   </div>
                 </div>
@@ -137,6 +154,14 @@ export default function Header() {
                           <DropdownMenuItem onClick={() => setLocation("/account")}>
                             <User className="mr-2 h-4 w-4" />
                             <span>Account Settings</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setLocation("/about")}>
+                            <Info className="mr-2 h-4 w-4" />
+                            <span>About Us</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setLocation("/contact")}>
+                            <Mail className="mr-2 h-4 w-4" />
+                            <span>Contact Us</span>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => {
