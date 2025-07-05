@@ -5,26 +5,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import QuestionCard from "@/components/question-card";
 import AuthPromptModal from "@/components/auth-prompt-modal";
 import { useAccessControl } from "@/hooks/useAccessControl";
-import { ArrowLeft, Users, Clock, Target, TrendingUp, Bookmark, Star, Flame, Search, Filter, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Users, Clock, Target, TrendingUp, Bookmark, Star, Flame, Search, Filter, ChevronDown, ChevronUp, Briefcase } from "lucide-react";
 
 export default function Practice() {
   const [, setLocation] = useLocation();
   const [selectedTopic, setSelectedTopic] = useState("all");
   const [selectedCompany, setSelectedCompany] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(""); // Single unified search state
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(""); // Debounced version for API calls
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-
+  
   const { canViewQuestions, shouldShowAuthPrompt, questionsRemaining, questionsViewed } = useAccessControl();
 
-  // Initialize from URL parameters
+  // Get search query and company filter from URL parameters
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const search = urlParams.get('search');
@@ -36,41 +37,49 @@ export default function Practice() {
       setSearchTerm(search);
       setDebouncedSearchTerm(search);
     }
-    if (company) setSelectedCompany(company);
-    if (difficulty) setSelectedDifficulty(difficulty);
-    if (topic) setSelectedTopic(topic);
+    if (company) {
+      setSelectedCompany(company);
+    }
+    if (difficulty) {
+      setSelectedDifficulty(difficulty);
+    }
+    if (topic) {
+      setSelectedTopic(topic);
+    }
   }, []);
 
-  // Debounce search input
+  // Debounce search term to prevent excessive API calls
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 500);
+    }, 500); // 500ms debounce
 
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
-  // Questions query with proper deduplication
+  // Comprehensive questions query with all filters
   const { data: questionsData, isLoading } = useQuery({
     queryKey: ["/api/questions/filtered", selectedTopic, selectedCompany, selectedDifficulty, debouncedSearchTerm],
     queryFn: async () => {
       const params = new URLSearchParams();
       
+      // Add all filters to params
       if (selectedCompany !== "all") params.append('company', selectedCompany);
       if (selectedDifficulty !== "all") params.append('difficulty', selectedDifficulty);
       if (selectedTopic !== "all") params.append('topic', selectedTopic);
-      if (debouncedSearchTerm.trim()) params.append('search', debouncedSearchTerm);
+      if (debouncedSearchTerm) params.append('search', debouncedSearchTerm);
       
+      // Use filtered endpoint if any filters are applied, otherwise get popular questions
       const hasFilters = params.toString().length > 0;
       const url = hasFilters ? `/api/questions/filtered?${params.toString()}` : "/api/questions/popular";
       const response = await fetch(url);
       return response.json();
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
   });
 
-  // Deduplicate questions
+  // Deduplicate questions by ID to prevent duplicates
   const questions = useMemo(() => {
     if (!questionsData || !Array.isArray(questionsData)) return [];
     
@@ -84,33 +93,22 @@ export default function Practice() {
     return Array.from(uniqueQuestions.values());
   }, [questionsData]);
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
+  // Handle search form submission
+  const handleLocalSearch = (e: React.FormEvent) => {
     e.preventDefault();
-  };
-
-  const handleQuestionClick = (questionId: number) => {
-    setLocation(`/question/${questionId}`);
-  };
-
-  const clearAllFilters = () => {
-    setSelectedDifficulty("all");
-    setSelectedTopic("all");
-    setSelectedCompany("all");
-    setSearchTerm("");
-    setDebouncedSearchTerm("");
-    window.history.pushState({}, '', '/practice');
+    // The search is handled automatically by the debounced effect
   };
 
   const topics = [
     { id: "all", name: "All Topics" },
-    { id: "pm", name: "Product Management" },
     { id: "tpm", name: "Technical Program Management" },
-    { id: "em", name: "Engineering Management" },
-    { id: "project-management", name: "Project Management" }
+    { id: "pm", name: "Product Management" },
+    { id: "project-management", name: "Project Management" },
+    { id: "em", name: "Engineering Management" }
   ];
 
   const difficulties = [
-    { id: "all", name: "All Levels" },
+    { id: "all", name: "All Difficulties" },
     { id: "easy", name: "Easy" },
     { id: "medium", name: "Medium" },
     { id: "hard", name: "Hard" }
@@ -131,67 +129,95 @@ export default function Practice() {
     { id: "netflix", name: "Netflix" }
   ];
 
+
+
+  const handleQuestionClick = (questionId: number) => {
+    setLocation(`/question/${questionId}`);
+  };
+
+  const getCompanyBadgeColor = (company: string) => {
+    const colors = {
+      microsoft: "bg-blue-100 text-blue-800",
+      google: "bg-green-100 text-green-800",
+      amazon: "bg-orange-100 text-orange-800", 
+      meta: "bg-blue-100 text-blue-800",
+      apple: "bg-purple-100 text-purple-800",
+      oracle: "bg-red-100 text-red-800",
+      cisco: "bg-cyan-100 text-cyan-800",
+      salesforce: "bg-indigo-100 text-indigo-800",
+      adobe: "bg-red-100 text-red-800",
+      nvidia: "bg-green-100 text-green-800",
+      netflix: "bg-red-100 text-red-800"
+    };
+    return colors[company as keyof typeof colors] || "bg-gray-100 text-gray-800";
+  };
+
+  const getStatusIcon = (company: string, index: number) => {
+    const icons = [Flame, Star, Clock, TrendingUp, Bookmark];
+    const IconComponent = icons[index % icons.length];
+    const colors = ["text-orange-500", "text-yellow-500", "text-gray-500", "text-green-500", "text-blue-500"];
+    return <IconComponent className={`w-4 h-4 ${colors[index % colors.length]}`} />;
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+    <div className="min-h-screen bg-neutral-50">
       <Header />
-      <main className="container mx-auto px-4 pt-24 pb-12">
-        {/* Header Section */}
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header with Search */}
         <div className="mb-8">
-          <div className="flex items-center mb-4">
-            <Button
-              variant="ghost"
-              onClick={() => setLocation("/")}
-              className="mr-4 hover:bg-gray-100"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
-          </div>
+          <Button 
+            variant="ghost" 
+            onClick={() => setLocation("/")}
+            className="mb-4"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Home
+          </Button>
           
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Practice Interview Questions
-            </h1>
-            <p className="text-xl text-gray-600 mb-6">
-              Master management interviews with real questions from top tech companies
-            </p>
-
-            {/* Questions viewed counter for non-authenticated users */}
-            {!canViewQuestions && (
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
-                <p className="text-orange-800">
-                  <strong>{questionsViewed}/5</strong> free questions viewed. 
-                  <button 
-                    onClick={() => setShowAuthModal(true)}
-                    className="text-orange-600 hover:text-orange-800 underline ml-1"
-                  >
-                    Sign in for unlimited access
-                  </button>
-                </p>
-              </div>
-            )}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-neutral-800 mb-2">
+                {(searchQuery || localSearchQuery)
+                  ? `Search Results for "${searchQuery || localSearchQuery}"` 
+                  : selectedCompany !== "all" 
+                    ? `${selectedCompany.charAt(0).toUpperCase() + selectedCompany.slice(1)} Questions`
+                    : "Practice Questions"
+                }
+              </h1>
+              <p className="text-neutral-600">
+                {(searchQuery || localSearchQuery)
+                  ? `Found ${questions?.length || 0} questions matching your search`
+                  : selectedCompany !== "all"
+                    ? `Practice questions specifically from ${selectedCompany.charAt(0).toUpperCase() + selectedCompany.slice(1)}`
+                    : "Browse and practice with curated questions from top tech companies"
+                }
+              </p>
+            </div>
+            
+            {/* Search Section */}
+            <div className="lg:min-w-96">
+              <form onSubmit={handleLocalSearch} className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    type="text"
+                    placeholder="Search questions..."
+                    value={localSearchQuery}
+                    onChange={(e) => setLocalSearchQuery(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                <Button type="submit" size="sm">
+                  <Search className="w-4 h-4" />
+                </Button>
+              </form>
+            </div>
           </div>
         </div>
 
-        {/* Search Bar */}
+        {/* Collapsible Filters */}
         <div className="mb-8">
-          <form onSubmit={handleSearchSubmit} className="max-w-2xl mx-auto">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input
-                type="text"
-                placeholder="Search questions by keyword, company, or topic..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-3 text-lg border-2 border-gray-200 focus:border-blue-500 rounded-xl"
-              />
-            </div>
-          </form>
-        </div>
-
-        {/* Filters */}
-        <div className="mb-8">
-          <Card className="border-2 border-gray-200 shadow-lg">
+          <Card>
             <CardHeader 
               className="cursor-pointer hover:bg-gray-50 transition-colors" 
               onClick={() => setFiltersExpanded(!filtersExpanded)}
@@ -291,11 +317,19 @@ export default function Practice() {
                   </div>
                 </div>
                 
-                {/* Clear All Filters */}
+                {/* Clear All Filters Button */}
                 <div className="mt-8 pt-6 border-t border-gray-200">
                   <Button
                     variant="ghost"
-                    onClick={clearAllFilters}
+                    onClick={() => {
+                      setSelectedDifficulty("all");
+                      setSelectedTopic("all");
+                      setSelectedCompany("all");
+                      setLocalSearchQuery("");
+                      setSearchQuery("");
+                      // Clear URL parameters as well
+                      window.history.pushState({}, '', '/practice');
+                    }}
                     className="text-gray-600 hover:text-gray-800 hover:bg-gray-100"
                   >
                     Clear All Filters
@@ -306,40 +340,92 @@ export default function Practice() {
           </Card>
         </div>
 
+        {/* Legacy Topic Filter (keeping for compatibility) */}
+        <div className="mb-8" style={{ display: 'none' }}>
+          <h3 className="text-lg font-semibold mb-4">Filter by Topic</h3>
+          <div className="flex flex-wrap gap-2">
+            {topics.map((topic) => (
+              <Button
+                key={topic.id}
+                variant={selectedTopic === topic.id ? "default" : "outline"}
+                onClick={() => setSelectedTopic(topic.id)}
+              >
+                {topic.name}
+              </Button>
+            ))}
+          </div>
+        </div>
+
         {/* Questions List */}
         <div className="space-y-6">
           {isLoading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading questions...</p>
-            </div>
-          ) : questions.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No questions found. Try adjusting your filters.</p>
-            </div>
-          ) : (
             <div className="grid gap-6">
-              {questions.map((question: any) => (
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardHeader>
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : questions && questions.length > 0 ? (
+            <div className="grid gap-6">
+              {questions.map((question: any, index: number) => (
                 <QuestionCard
                   key={question.id}
                   question={question}
+                  companyBadgeColor={getCompanyBadgeColor(question.company)}
+                  statusIcon={getStatusIcon(question.company, index)}
                   onClick={() => handleQuestionClick(question.id)}
                 />
               ))}
             </div>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  {searchQuery ? "No Search Results" : "No Questions Available"}
+                </CardTitle>
+                <CardDescription>
+                  {searchQuery 
+                    ? `No questions found matching "${searchQuery}". Try different keywords or browse all questions.`
+                    : "There are no questions available at the moment. Try creating a custom case study instead."
+                  }
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {searchQuery ? (
+                  <Button onClick={() => {
+                    setSearchQuery("");
+                    window.history.replaceState({}, '', '/practice');
+                  }}>
+                    Browse All Questions
+                  </Button>
+                ) : (
+                  <Button onClick={() => setLocation("/custom-case-study")}>
+                    Create Custom Case Study
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
           )}
         </div>
-
-        {/* Auth Modal */}
-        {showAuthModal && (
-          <AuthPromptModal
-            isOpen={showAuthModal}
-            onClose={() => setShowAuthModal(false)}
-            questionsRemaining={questionsRemaining}
-          />
-        )}
-      </main>
+      </div>
+      
       <Footer />
+      
+      {/* Authentication Modal */}
+      <AuthPromptModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        questionsViewed={questionsViewed}
+        questionsRemaining={questionsRemaining}
+      />
     </div>
   );
 }
