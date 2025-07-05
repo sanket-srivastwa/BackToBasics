@@ -138,13 +138,9 @@ export default function Header() {
                             </div>
                           </div>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => setLocation("/profile")}>
+                          <DropdownMenuItem onClick={() => setLocation("/account")}>
                             <User className="mr-2 h-4 w-4" />
-                            <span>Profile</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setLocation("/settings")}>
-                            <Settings className="mr-2 h-4 w-4" />
-                            <span>Settings</span>
+                            <span>Account Settings</span>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => window.location.href = "/api/logout"}>

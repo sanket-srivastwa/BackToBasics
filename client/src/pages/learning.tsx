@@ -1,17 +1,13 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, 
   BookOpen, 
@@ -24,915 +20,789 @@ import {
   Lightbulb,
   Code,
   TrendingUp,
-  Settings,
-  MessageSquare,
   BarChart3,
-  Zap,
-  GitBranch,
-  Shield,
-  Layers,
-  Globe,
   Database,
-  Search,
-  Send,
-  ChevronDown,
   ChevronRight,
-  Bot,
-  User,
-  Star,
   Award,
   Calendar,
   Monitor,
   Network,
-  Briefcase
+  Briefcase,
+  Brain,
+  Calculator,
+  PieChart,
+  LineChart,
+  DollarSign,
+  MessageSquare,
+  Zap,
+  Globe,
+  Lock
 } from "lucide-react";
 
-interface LearningContent {
+interface LearningModule {
+  id: string;
+  title: string;
+  description: string;
+  icon: any;
+  duration: string;
+  difficulty: "Beginner" | "Intermediate" | "Advanced";
+  progress: number;
+  topics: LearningTopic[];
+  category: "product" | "program" | "engineering" | "analytics";
+}
+
+interface LearningTopic {
+  id: string;
   title: string;
   description: string;
   duration: string;
-  difficulty: string;
-  objectives: string[];
-  prerequisites: string[];
-  modules: Array<{
-    id: string;
-    title: string;
-    duration: string;
-    topics: string[];
-    keySkills: string[];
-    practicalExercises: string[];
-  }>;
-  concepts: Array<{ title: string; explanation: string }>;
-  examples: Array<{ scenario: string; solution: string }>;
-  exercises: string[];
-  resources: Array<{ title: string; type: string; description: string; url?: string }>;
-  assessment: Array<{ question: string; answer: string }>;
-  certification: {
-    available: boolean;
-    requirements: string[];
-    skills: string[];
-  };
+  type: "video" | "article" | "exercise" | "quiz";
+  completed: boolean;
+  content?: string;
 }
 
-interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-}
-
-interface AISearchProps {
-  onQuestionSelect?: (question: string) => void;
-}
-
-// AI Learning Assistant Component
-function AILearningAssistant({ onQuestionSelect }: AISearchProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [inputMessage, setInputMessage] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const { toast } = useToast();
-
-  const aiSearchMutation = useMutation({
-    mutationFn: async (query: string) => {
-      const response = await fetch('/api/ai/learning-search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'API request failed' }));
-        if (response.status === 429 || errorData.error?.includes('quota')) {
-          throw new Error('Our AI assistant is currently at capacity. Please try again in a few minutes, or explore our comprehensive learning materials below.');
-        }
-        throw new Error(errorData.error || 'Failed to get AI response');
+const learningModules: LearningModule[] = [
+  // Product Management
+  {
+    id: "product-strategy",
+    title: "Product Strategy & Vision",
+    description: "Learn to define product vision, strategy, and roadmaps that align with business goals",
+    icon: Target,
+    duration: "6 hours",
+    difficulty: "Intermediate",
+    progress: 65,
+    category: "product",
+    topics: [
+      {
+        id: "vision-framework",
+        title: "Product Vision Framework",
+        description: "Creating compelling product visions that guide decision-making",
+        duration: "45 min",
+        type: "video",
+        completed: true,
+        content: "Learn the essential components of a strong product vision including customer needs, market opportunity, and competitive differentiation. We'll cover frameworks like the Product Vision Board and how to communicate vision effectively across stakeholders."
+      },
+      {
+        id: "strategy-canvas",
+        title: "Strategy Canvas & Business Model",
+        description: "Understanding business models and strategic positioning",
+        duration: "60 min",
+        type: "article",
+        completed: true,
+        content: "Explore how to use strategy canvas to map out your product's value proposition, key partnerships, cost structure, and revenue streams. Learn to identify strategic opportunities and threats in your market."
+      },
+      {
+        id: "roadmap-planning",
+        title: "Roadmap Planning & Prioritization",
+        description: "Building effective product roadmaps with clear priorities",
+        duration: "50 min",
+        type: "exercise",
+        completed: false,
+        content: "Master the art of roadmap creation using frameworks like RICE, Value vs Effort, and OKRs. Learn to balance customer needs, business objectives, and technical constraints while maintaining flexibility."
       }
+    ]
+  },
+  {
+    id: "user-research",
+    title: "User Research & Analytics",
+    description: "Master data-driven decision making through user research and analytics",
+    icon: BarChart3,
+    duration: "5 hours",
+    difficulty: "Intermediate",
+    progress: 40,
+    category: "product",
+    topics: [
+      {
+        id: "research-methods",
+        title: "Research Methods & User Interviews",
+        description: "Conducting effective user research to validate assumptions",
+        duration: "55 min",
+        type: "video",
+        completed: true,
+        content: "Learn qualitative and quantitative research methods including user interviews, surveys, usability testing, and A/B testing. Understand when to use each method and how to avoid common biases."
+      },
+      {
+        id: "analytics-frameworks",
+        title: "Product Analytics & Metrics",
+        description: "Setting up analytics and defining success metrics",
+        duration: "50 min",
+        type: "article",
+        completed: false,
+        content: "Discover how to implement product analytics, define KPIs, and create dashboards that drive decision-making. Cover acquisition, activation, retention, referral, and revenue metrics."
+      }
+    ]
+  },
+  
+  // Program Management
+  {
+    id: "program-execution",
+    title: "Program Execution & Delivery",
+    description: "Execute complex programs with multiple stakeholders and dependencies",
+    icon: Network,
+    duration: "7 hours",
+    difficulty: "Advanced",
+    progress: 25,
+    category: "program",
+    topics: [
+      {
+        id: "program-planning",
+        title: "Program Planning & Architecture",
+        description: "Breaking down complex programs into manageable workstreams",
+        duration: "60 min",
+        type: "video",
+        completed: true,
+        content: "Learn to decompose large-scale programs into workstreams, identify dependencies, and create execution plans. Cover work breakdown structures, critical path analysis, and risk assessment."
+      },
+      {
+        id: "stakeholder-management",
+        title: "Stakeholder Management & Communication",
+        description: "Managing diverse stakeholders and driving alignment",
+        duration: "45 min",
+        type: "article",
+        completed: false,
+        content: "Master stakeholder mapping, influence strategies, and communication frameworks. Learn to build consensus, manage conflicts, and keep programs on track through effective relationship management."
+      }
+    ]
+  },
+  {
+    id: "systems-design",
+    title: "Systems Design for TPMs",
+    description: "Technical system design principles for program managers",
+    icon: Monitor,
+    duration: "8 hours",
+    difficulty: "Advanced",
+    progress: 15,
+    category: "program",
+    topics: [
+      {
+        id: "architecture-patterns",
+        title: "System Architecture Patterns",
+        description: "Understanding scalable system architectures",
+        duration: "75 min",
+        type: "video",
+        completed: false,
+        content: "Explore microservices, distributed systems, APIs, and cloud architectures. Learn to evaluate trade-offs between different architectural approaches and their impact on program execution."
+      },
+      {
+        id: "technical-risks",
+        title: "Technical Risk Assessment",
+        description: "Identifying and mitigating technical risks in programs",
+        duration: "40 min",
+        type: "exercise",
+        completed: false,
+        content: "Develop skills to assess technical feasibility, identify potential bottlenecks, and create mitigation strategies for complex technical programs."
+      }
+    ]
+  },
 
-      return response.json();
-    },
-    onSuccess: (data, query) => {
-      const aiMessage: ChatMessage = {
-        id: Date.now().toString() + '-ai',
-        role: 'assistant',
-        content: data.response || 'I apologize, but I couldn\'t generate a response. Please try rephrasing your question.',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, aiMessage]);
-      setIsTyping(false);
-    },
-    onError: (error: Error) => {
-      setIsTyping(false);
-      const errorMessage: ChatMessage = {
-        id: Date.now().toString() + '-error',
-        role: 'assistant', 
-        content: error.message,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-      
-      toast({
-        title: "AI Assistant Unavailable",
-        description: "Please explore our comprehensive learning materials below while our AI assistant is at capacity.",
-        variant: "destructive"
-      });
-    }
-  });
+  // Engineering Management
+  {
+    id: "team-leadership",
+    title: "Engineering Team Leadership",
+    description: "Building and leading high-performing engineering teams",
+    icon: Users,
+    duration: "6 hours",
+    difficulty: "Intermediate",
+    progress: 55,
+    category: "engineering",
+    topics: [
+      {
+        id: "team-building",
+        title: "Building High-Performance Teams",
+        description: "Creating psychological safety and team dynamics",
+        duration: "50 min",
+        type: "video",
+        completed: true,
+        content: "Learn the fundamentals of team formation, establishing psychological safety, and creating an environment where engineers can do their best work. Cover team topology and communication patterns."
+      },
+      {
+        id: "performance-coaching",
+        title: "Performance Management & Coaching",
+        description: "Developing engineers and managing performance",
+        duration: "55 min",
+        type: "article",
+        completed: false,
+        content: "Master one-on-one meetings, goal setting, performance reviews, and career development conversations. Learn to provide constructive feedback and support engineer growth."
+      }
+    ]
+  },
+  {
+    id: "technical-leadership",
+    title: "Technical Leadership & Architecture",
+    description: "Leading technical decisions and system architecture",
+    icon: Code,
+    duration: "7 hours",
+    difficulty: "Advanced",
+    progress: 30,
+    category: "engineering",
+    topics: [
+      {
+        id: "tech-strategy",
+        title: "Technical Strategy & Roadmaps",
+        description: "Creating technical roadmaps aligned with business goals",
+        duration: "60 min",
+        type: "video",
+        completed: true,
+        content: "Learn to balance technical debt, new feature development, and platform investments. Create technical roadmaps that support business objectives while maintaining system health."
+      },
+      {
+        id: "architecture-decisions",
+        title: "Architecture Decision Making",
+        description: "Making sound technical architecture decisions",
+        duration: "45 min",
+        type: "exercise",
+        completed: false,
+        content: "Develop frameworks for evaluating technical alternatives, documenting decisions, and communicating technical trade-offs to stakeholders."
+      }
+    ]
+  },
 
-  const handleSendMessage = () => {
-    if (!inputMessage.trim()) return;
+  // Business Analytics
+  {
+    id: "probability-stats",
+    title: "Probability & Statistics",
+    description: "Foundation of statistical thinking for business analytics",
+    icon: Calculator,
+    duration: "10 hours",
+    difficulty: "Beginner",
+    progress: 80,
+    category: "analytics",
+    topics: [
+      {
+        id: "probability-basics",
+        title: "Probability Fundamentals",
+        description: "Basic probability concepts and distributions",
+        duration: "90 min",
+        type: "video",
+        completed: true,
+        content: "Master probability theory including conditional probability, Bayes' theorem, and common probability distributions. Learn applications in business decision-making and risk assessment."
+      },
+      {
+        id: "statistical-inference",
+        title: "Statistical Inference & Hypothesis Testing",
+        description: "Drawing conclusions from data using statistical methods",
+        duration: "75 min",
+        type: "article",
+        completed: true,
+        content: "Learn hypothesis testing, confidence intervals, p-values, and statistical significance. Understand how to design experiments and interpret results in business contexts."
+      },
+      {
+        id: "stats-practice",
+        title: "Statistics Practice Problems",
+        description: "Apply statistical concepts to real business scenarios",
+        duration: "60 min",
+        type: "quiz",
+        completed: false,
+        content: "Practice statistical analysis with real-world business problems including A/B testing, customer segmentation, and performance metrics analysis."
+      }
+    ]
+  },
+  {
+    id: "python-analytics",
+    title: "Python for Analytics",
+    description: "Python programming for data analysis and visualization",
+    icon: Code,
+    duration: "12 hours",
+    difficulty: "Intermediate",
+    progress: 35,
+    category: "analytics",
+    topics: [
+      {
+        id: "python-basics",
+        title: "Python Fundamentals",
+        description: "Core Python concepts for data analysis",
+        duration: "120 min",
+        type: "video",
+        completed: true,
+        content: "Learn Python syntax, data types, control structures, and functions. Focus on pandas, numpy, and matplotlib libraries essential for data analysis."
+      },
+      {
+        id: "data-manipulation",
+        title: "Data Manipulation with Pandas",
+        description: "Advanced data cleaning and transformation techniques",
+        duration: "90 min",
+        type: "exercise",
+        completed: false,
+        content: "Master data cleaning, merging, grouping, and transformation using pandas. Learn to handle missing data, outliers, and prepare data for analysis."
+      }
+    ]
+  },
+  {
+    id: "machine-learning",
+    title: "Machine Learning Fundamentals",
+    description: "Introduction to machine learning concepts and applications",
+    icon: Brain,
+    duration: "15 hours",
+    difficulty: "Intermediate",
+    progress: 20,
+    category: "analytics",
+    topics: [
+      {
+        id: "ml-concepts",
+        title: "Machine Learning Concepts",
+        description: "Understanding different types of ML algorithms",
+        duration: "75 min",
+        type: "video",
+        completed: true,
+        content: "Explore supervised, unsupervised, and reinforcement learning. Understand when to use classification, regression, clustering, and recommendation systems."
+      },
+      {
+        id: "model-evaluation",
+        title: "Model Evaluation & Validation",
+        description: "Assessing model performance and avoiding overfitting",
+        duration: "60 min",
+        type: "article",
+        completed: false,
+        content: "Learn cross-validation, performance metrics, and techniques to ensure your models generalize well to new data."
+      }
+    ]
+  },
+  {
+    id: "financial-analytics",
+    title: "Financial Analytics",
+    description: "Financial modeling and analysis for business decisions",
+    icon: DollarSign,
+    duration: "8 hours",
+    difficulty: "Intermediate",
+    progress: 10,
+    category: "analytics",
+    topics: [
+      {
+        id: "financial-metrics",
+        title: "Key Financial Metrics",
+        description: "Understanding ROI, NPV, IRR, and other financial indicators",
+        duration: "50 min",
+        type: "video",
+        completed: false,
+        content: "Master essential financial metrics for evaluating business performance and investment decisions. Learn to calculate and interpret profitability ratios."
+      },
+      {
+        id: "forecasting",
+        title: "Financial Forecasting & Modeling",
+        description: "Building financial models for planning and analysis",
+        duration: "70 min",
+        type: "exercise",
+        completed: false,
+        content: "Create financial forecasts, scenario analysis, and sensitivity models to support strategic business decisions."
+      }
+    ]
+  }
+];
 
-    const userMessage: ChatMessage = {
-      id: Date.now().toString() + '-user',
-      role: 'user',
-      content: inputMessage.trim(),
-      timestamp: new Date()
-    };
+export default function Learning() {
+  const [location, setLocation] = useLocation();
+  const [selectedModule, setSelectedModule] = useState<LearningModule | null>(null);
+  const [selectedTopic, setSelectedTopic] = useState<LearningTopic | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-    setMessages(prev => [...prev, userMessage]);
-    setIsTyping(true);
-    aiSearchMutation.mutate(inputMessage.trim());
-    setInputMessage("");
-  };
-
-  const quickQuestions = [
-    "How do I prioritize competing product requirements?",
-    "What's the difference between TPM and PM roles?",
-    "How do I manage technical debt effectively?",
-    "What are key engineering management frameworks?",
-    "How do I conduct effective stakeholder meetings?",
-    "What metrics should I track for team performance?"
+  const categories = [
+    { id: "all", name: "All Courses", icon: BookOpen },
+    { id: "product", name: "Product Management", icon: Target },
+    { id: "program", name: "Program Management", icon: Network },
+    { id: "engineering", name: "Engineering Management", icon: Code },
+    { id: "analytics", name: "Business Analytics", icon: BarChart3 }
   ];
 
-  const handleQuickQuestion = (question: string) => {
-    setInputMessage(question);
-    if (onQuestionSelect) {
-      onQuestionSelect(question);
+  const filteredModules = activeCategory === "all" 
+    ? learningModules 
+    : learningModules.filter(module => module.category === activeCategory);
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case "Beginner": return "bg-green-100 text-green-800";
+      case "Intermediate": return "bg-blue-100 text-blue-800";
+      case "Advanced": return "bg-purple-100 text-purple-800";
+      default: return "bg-gray-100 text-gray-800";
     }
   };
 
-  return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg">
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-            <Bot className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">AI Learning Assistant</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Ask any question about management practices, frameworks, or career advice</p>
-          </div>
-        </div>
-
-        {/* Quick Questions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
-          {quickQuestions.map((question, index) => (
-            <Button
-              key={index}
-              variant="outline"
-              size="sm"
-              className="text-left justify-start h-auto p-3 text-xs"
-              onClick={() => handleQuickQuestion(question)}
-            >
-              <MessageSquare className="w-3 h-3 mr-2 flex-shrink-0" />
-              <span className="truncate">{question}</span>
-            </Button>
-          ))}
-        </div>
-
-        {/* Search Input */}
-        <div className="flex gap-2">
-          <Input
-            placeholder="Ask anything about management, leadership, or career development..."
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            className="flex-1"
-            disabled={aiSearchMutation.isPending}
-          />
-          <Button 
-            onClick={handleSendMessage}
-            disabled={!inputMessage.trim() || aiSearchMutation.isPending}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Chat Messages */}
-      {messages.length > 0 && (
-        <ScrollArea className="h-96 p-4">
-          <div className="space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex gap-3 ${
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
-                }`}
-              >
-                {message.role === 'assistant' && (
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-4 h-4 text-white" />
-                  </div>
-                )}
-                <div
-                  className={`max-w-[80%] p-3 rounded-lg ${
-                    message.role === 'user'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
-                  }`}
-                >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                  <span className="text-xs opacity-70 mt-1 block">
-                    {message.timestamp.toLocaleTimeString()}
-                  </span>
-                </div>
-                {message.role === 'user' && (
-                  <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                  </div>
-                )}
-              </div>
-            ))}
-            {isTyping && (
-              <div className="flex gap-3 justify-start">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <Bot className="w-4 h-4 text-white" />
-                </div>
-                <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </ScrollArea>
-      )}
-    </div>
-  );
-}
-
-// Course Content Component 
-function CourseContent({ track, module }: { track: string; module: string }) {
-  const getStaticContent = (track: string, module: string): LearningContent | null => {
-    const contentMap: { [key: string]: { [key: string]: LearningContent } } = {
-      "tpm": {
-        "TPM Foundations": {
-          title: "Technical Program Management Foundations",
-          description: "Master the fundamentals of technical program management, from role clarity to cross-functional leadership and technical planning.",
-          duration: "6-8 weeks",
-          difficulty: "Beginner to Intermediate",
-          prerequisites: ["Basic understanding of software development", "Some project management experience helpful"],
-          modules: [
-            {
-              id: "tpm-001",
-              title: "TPM Role & Responsibilities",
-              duration: "1 week",
-              topics: ["Role definition", "TPM vs PM vs TL", "Career progression", "Day-to-day activities"],
-              keySkills: ["Role clarity", "Career planning", "Expectation setting"],
-              practicalExercises: ["Role comparison analysis", "Career roadmap creation", "Skill gap assessment"]
-            },
-            {
-              id: "tpm-002", 
-              title: "Cross-Functional Leadership",
-              duration: "2 weeks",
-              topics: ["Leading without authority", "Influence techniques", "Team dynamics", "Conflict resolution"],
-              keySkills: ["Influencing", "Team leadership", "Conflict management", "Communication"],
-              practicalExercises: ["Stakeholder mapping", "Influence strategy development", "Team assessment"]
-            },
-            {
-              id: "tpm-003",
-              title: "Technical Planning & Execution",
-              duration: "2 weeks", 
-              topics: ["Project scoping", "Technical dependencies", "Risk assessment", "Milestone planning"],
-              keySkills: ["Technical planning", "Risk management", "Timeline estimation", "Dependency mapping"],
-              practicalExercises: ["Project plan creation", "Risk register development", "Dependency analysis"]
-            },
-            {
-              id: "tpm-004",
-              title: "Stakeholder Management",
-              duration: "1-2 weeks",
-              topics: ["Executive communication", "Status reporting", "Meeting facilitation", "Decision making"],
-              keySkills: ["Executive presence", "Communication", "Facilitation", "Decision frameworks"],
-              practicalExercises: ["Executive presentation", "Status report writing", "Meeting facilitation practice"]
-            }
-          ],
-          objectives: [
-            "Understand the role of a Technical Program Manager and career progression paths",
-            "Learn cross-functional team coordination and leadership without authority",
-            "Master stakeholder communication strategies and executive presence",
-            "Apply project planning and execution frameworks for technical initiatives"
-          ],
-          concepts: [
-            { 
-              title: "Role Definition & Scope", 
-              explanation: "TPMs bridge technical and business teams, driving complex technical initiatives across multiple teams and stakeholders. They focus on program-level coordination, technical planning, and risk management while ensuring delivery excellence."
-            },
-            { 
-              title: "Cross-functional Leadership", 
-              explanation: "Lead without authority by building relationships, facilitating decisions, and aligning teams toward common goals. Use influence techniques, clear communication, and collaborative problem-solving to drive results."
-            },
-            { 
-              title: "Technical Depth & Planning", 
-              explanation: "Maintain sufficient technical knowledge to understand trade-offs, risks, and dependencies in complex systems. Apply systematic planning approaches to break down complex technical initiatives."
-            },
-            {
-              title: "Stakeholder Communication",
-              explanation: "Develop executive presence and clear communication strategies. Create compelling narratives, manage up effectively, and facilitate productive cross-team discussions."
-            }
-          ],
-          examples: [
-            {
-              scenario: "Managing a microservices migration across 8 teams with tight deadline",
-              solution: "Create detailed dependency mapping, establish migration phases with clear success criteria, coordinate team schedules with buffer time, implement daily standups and weekly stakeholder updates, and track progress with automated metrics dashboard."
-            },
-            {
-              scenario: "Cross-team API standardization initiative with resistance from legacy teams",
-              solution: "Conduct stakeholder interviews to understand concerns, create migration timeline with incremental adoption, establish API design standards committee, provide training and support resources, and implement pilot program with early adopters."
-            }
-          ],
-          exercises: [
-            "Design a comprehensive project plan for API versioning across 15 services",
-            "Create a stakeholder communication matrix for a major infrastructure upgrade",
-            "Develop a risk management framework for a complex technical migration",
-            "Build an influence strategy for driving adoption of new technical standards"
-          ],
-          resources: [
-            { title: "TPM Career Guide", type: "Guide", description: "Comprehensive guide to TPM roles, responsibilities, and career progression", url: "#" },
-            { title: "Cross-Functional Leadership Toolkit", type: "Toolkit", description: "Templates and frameworks for leading without authority", url: "#" },
-            { title: "Technical Planning Templates", type: "Templates", description: "Project planning, risk assessment, and communication templates", url: "#" },
-            { title: "Stakeholder Management Best Practices", type: "Best Practices", description: "Proven strategies for effective stakeholder engagement", url: "#" }
-          ],
-          assessment: [
-            { question: "What are the key responsibilities of a TPM compared to a PM?", answer: "TPMs focus on technical program coordination, architecture alignment, and engineering team coordination, while PMs focus on product strategy, market requirements, and customer needs. TPMs drive technical execution while PMs drive product direction." },
-            { question: "How do you influence without authority in cross-functional teams?", answer: "Build relationships, understand stakeholder motivations, create compelling shared vision, use data-driven arguments, facilitate collaborative decision-making, and establish clear accountability and communication processes." }
-          ],
-          certification: {
-            available: true,
-            requirements: ["Complete all 4 modules", "Pass assessment with 80% score", "Submit capstone project plan", "Peer review participation"],
-            skills: ["Technical program management", "Cross-functional leadership", "Stakeholder communication", "Technical planning"]
-          }
-        }
-      },
-      "pm": {
-        "Product Strategy": {
-          title: "Product Strategy Fundamentals",
-          description: "Build comprehensive product strategy skills from vision development to market analysis and competitive positioning.",
-          duration: "4-6 weeks",
-          difficulty: "Intermediate",
-          prerequisites: ["Basic business understanding", "Customer empathy", "Data analysis skills"],
-          modules: [
-            {
-              id: "pm-001",
-              title: "Product Vision & Mission",
-              duration: "1 week",
-              topics: ["Vision crafting", "Mission alignment", "Value propositions", "North star metrics"],
-              keySkills: ["Strategic thinking", "Vision communication", "Goal setting"],
-              practicalExercises: ["Vision statement creation", "Mission alignment workshop", "Value prop canvas"]
-            },
-            {
-              id: "pm-002",
-              title: "Market Analysis & Research",
-              duration: "2 weeks",
-              topics: ["Market sizing", "Customer segmentation", "Competitive analysis", "User research"],
-              keySkills: ["Market research", "Data analysis", "Customer insights", "Competitive intelligence"],
-              practicalExercises: ["TAM/SAM/SOM analysis", "Persona development", "Competitive positioning map"]
-            },
-            {
-              id: "pm-003",
-              title: "Product Roadmapping",
-              duration: "2 weeks",
-              topics: ["Roadmap frameworks", "Priority setting", "Resource allocation", "Timeline planning"],
-              keySkills: ["Strategic planning", "Prioritization", "Communication", "Stakeholder alignment"],
-              practicalExercises: ["Roadmap creation", "Priority matrix development", "Stakeholder presentation"]
-            }
-          ],
-          objectives: [
-            "Develop product vision and strategy frameworks",
-            "Learn market analysis and customer research techniques", 
-            "Master product roadmapping and prioritization",
-            "Understand competitive positioning and differentiation"
-          ],
-          concepts: [
-            { 
-              title: "Product Vision", 
-              explanation: "A clear, inspiring picture of what the product will achieve for users and the business in the future. Should be aspirational yet achievable, customer-focused, and aligned with company strategy."
-            },
-            { 
-              title: "Market Analysis", 
-              explanation: "Understanding market size, customer segments, competitive landscape, and growth opportunities through data-driven research and customer insights."
-            },
-            {
-              title: "Product-Market Fit",
-              explanation: "The degree to which a product satisfies strong market demand. Achieved when target customers are buying, using, and telling others about your product."
-            }
-          ],
-          examples: [
-            {
-              scenario: "Defining strategy for a new social media feature with limited resources",
-              solution: "Conduct targeted user research, analyze competitor features, define clear success metrics, create MVP scope, and develop phased rollout plan with feedback loops."
-            }
-          ],
-          exercises: [
-            "Create a comprehensive product strategy for entering a new market segment",
-            "Develop a competitive analysis framework and apply it to your product space",
-            "Build a customer persona based on research and data"
-          ],
-          resources: [
-            { title: "Product Strategy Templates", type: "Template", description: "Ready-to-use frameworks for strategy development", url: "#" },
-            { title: "Market Research Toolkit", type: "Toolkit", description: "Complete guide to market analysis and customer research", url: "#" }
-          ],
-          assessment: [
-            { question: "What components make up a strong product strategy?", answer: "Vision, market analysis, competitive positioning, customer insights, success metrics, and clear roadmap with prioritized initiatives." }
-          ],
-          certification: {
-            available: true,
-            requirements: ["Complete all 3 modules", "Pass strategy assessment", "Create product strategy presentation"],
-            skills: ["Product strategy", "Market analysis", "Roadmapping", "Competitive positioning"]
-          }
-        }
-      },
-      "em": {
-        "Engineering Leadership": {
-          title: "Engineering Management Foundations",
-          description: "Essential skills for leading engineering teams, from technical leadership to people management and organizational effectiveness.",
-          duration: "6-8 weeks", 
-          difficulty: "Intermediate to Advanced",
-          prerequisites: ["Software engineering experience", "Team collaboration experience", "Basic understanding of SDLC"],
-          modules: [
-            {
-              id: "em-001",
-              title: "Technical Leadership",
-              duration: "2 weeks",
-              topics: ["Architecture decisions", "Code quality", "Technical debt management", "System design"],
-              keySkills: ["Technical decision making", "Architecture planning", "Quality standards", "Technology evaluation"],
-              practicalExercises: ["Architecture review process", "Technical debt assessment", "Technology evaluation framework"]
-            },
-            {
-              id: "em-002",
-              title: "People Management",
-              duration: "2 weeks",
-              topics: ["1:1 meetings", "Performance management", "Career development", "Team dynamics"],
-              keySkills: ["Coaching", "Performance evaluation", "Career planning", "Conflict resolution"],
-              practicalExercises: ["1:1 template creation", "Performance review process", "Career ladder development"]
-            },
-            {
-              id: "em-003", 
-              title: "Team Productivity & Culture",
-              duration: "2 weeks",
-              topics: ["Agile practices", "Team processes", "Culture building", "Innovation management"],
-              keySkills: ["Process optimization", "Culture development", "Team building", "Innovation facilitation"],
-              practicalExercises: ["Process improvement plan", "Culture assessment", "Innovation workshop design"]
-            }
-          ],
-          objectives: [
-            "Develop technical leadership and architecture decision-making skills",
-            "Learn people management and team development techniques",
-            "Master team productivity optimization and culture building",
-            "Apply engineering management frameworks and best practices"
-          ],
-          concepts: [
-            {
-              title: "Technical Leadership",
-              explanation: "Guiding technical decisions, architecture choices, and engineering practices while balancing innovation with reliability and maintainability."
-            },
-            {
-              title: "People Management",
-              explanation: "Supporting individual growth, managing performance, and creating conditions for engineers to do their best work through coaching and development."
-            },
-            {
-              title: "Team Effectiveness",
-              explanation: "Building high-performing teams through clear processes, strong culture, effective communication, and continuous improvement practices."
-            }
-          ],
-          examples: [
-            {
-              scenario: "Managing a team transition from monolith to microservices while maintaining feature velocity",
-              solution: "Create incremental migration plan, establish architecture review process, provide training and mentorship, set up monitoring and rollback procedures, and maintain regular team communication about progress and challenges."
-            }
-          ],
-          exercises: [
-            "Design a technical decision-making framework for your team",
-            "Create a comprehensive onboarding plan for new engineering hires",
-            "Develop a process for managing technical debt while delivering features"
-          ],
-          resources: [
-            { title: "Engineering Management Handbook", type: "Guide", description: "Comprehensive guide to engineering leadership", url: "#" },
-            { title: "Technical Decision Templates", type: "Templates", description: "Frameworks for architecture and technical decisions", url: "#" }
-          ],
-          assessment: [
-            { question: "How do you balance technical debt with feature delivery?", answer: "Establish technical debt visibility through metrics, allocate dedicated time for improvements, prioritize based on business impact, and communicate trade-offs clearly to stakeholders." }
-          ],
-          certification: {
-            available: true,
-            requirements: ["Complete all 3 modules", "Leadership assessment", "Team improvement project", "Peer feedback"],
-            skills: ["Technical leadership", "People management", "Team productivity", "Engineering culture"]
-          }
-        }
-      }
-    };
-
-    return contentMap[track]?.[module] || null;
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "video": return PlayCircle;
+      case "article": return FileText;
+      case "exercise": return Code;
+      case "quiz": return CheckCircle;
+      default: return BookOpen;
+    }
   };
 
-  const content = getStaticContent(track, module);
+  const completeCurrentTopic = () => {
+    if (selectedTopic && selectedModule) {
+      // In a real app, this would update the backend
+      selectedTopic.completed = true;
+      
+      // Move to next topic if available
+      const currentIndex = selectedModule.topics.findIndex(t => t.id === selectedTopic.id);
+      if (currentIndex < selectedModule.topics.length - 1) {
+        setSelectedTopic(selectedModule.topics[currentIndex + 1]);
+      }
+    }
+  };
 
-  if (!content) {
+  if (selectedModule && selectedTopic) {
+    // Topic Content View
+    const TypeIcon = getTypeIcon(selectedTopic.type);
+    const currentTopicIndex = selectedModule.topics.findIndex(t => t.id === selectedTopic.id);
+    const nextTopic = currentTopicIndex < selectedModule.topics.length - 1 
+      ? selectedModule.topics[currentTopicIndex + 1] 
+      : null;
+
     return (
-      <Card className="border-gray-200 bg-gray-50">
-        <CardContent className="p-6">
-          <div className="text-gray-600 text-center">
-            <h3 className="font-semibold mb-2">Content Coming Soon</h3>
-            <p className="text-sm">This module content is being developed and will be available soon.</p>
+      <div className="min-h-screen bg-[#FAFAFA]" style={{ fontFamily: "'Source Sans Pro', 'Roboto', sans-serif" }}>
+        <Header />
+        
+        {/* Content Area */}
+        <div className="flex">
+          {/* Sidebar */}
+          <div className="w-80 bg-white border-r border-gray-200 h-screen sticky top-0">
+            <div className="p-6">
+              <Button 
+                variant="ghost" 
+                onClick={() => {
+                  setSelectedTopic(null);
+                  setSelectedModule(null);
+                }}
+                className="mb-4 text-[#455A64]"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Modules
+              </Button>
+              
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-[#263238] mb-2">{selectedModule.title}</h2>
+                <div className="flex items-center gap-2 text-sm text-[#455A64] mb-4">
+                  <Clock className="h-4 w-4" />
+                  {selectedModule.duration}
+                  <Badge className={getDifficultyColor(selectedModule.difficulty)}>
+                    {selectedModule.difficulty}
+                  </Badge>
+                </div>
+                <Progress value={selectedModule.progress} className="h-2" />
+                <p className="text-xs text-[#455A64] mt-1">{selectedModule.progress}% complete</p>
+              </div>
+
+              <ScrollArea className="h-[calc(100vh-300px)]">
+                <div className="space-y-2">
+                  {selectedModule.topics.map((topic, index) => {
+                    const TopicIcon = getTypeIcon(topic.type);
+                    return (
+                      <button
+                        key={topic.id}
+                        onClick={() => setSelectedTopic(topic)}
+                        className={`w-full text-left p-3 rounded-lg transition-colors ${
+                          selectedTopic.id === topic.id
+                            ? "bg-[#2962FF] text-white"
+                            : "bg-gray-50 hover:bg-gray-100 text-[#263238]"
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 mt-1">
+                            {topic.completed ? (
+                              <CheckCircle className="h-4 w-4 text-[#00BFA5]" />
+                            ) : (
+                              <TopicIcon className="h-4 w-4" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm mb-1">{topic.title}</p>
+                            <p className={`text-xs ${
+                              selectedTopic.id === topic.id ? "text-blue-100" : "text-[#455A64]"
+                            }`}>
+                              {topic.duration}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Main Content */}
+          <div className="flex-1 p-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <TypeIcon className="h-6 w-6 text-[#2962FF]" />
+                  <div>
+                    <h1 className="text-2xl font-bold text-[#263238]">{selectedTopic.title}</h1>
+                    <p className="text-[#455A64] mt-1">{selectedTopic.description}</p>
+                  </div>
+                  {selectedTopic.completed && (
+                    <Badge className="bg-[#00BFA5] text-white ml-auto">
+                      Completed
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="prose max-w-none">
+                  <div className="text-[#263238] leading-relaxed text-base">
+                    {selectedTopic.content}
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+                  <div className="text-sm text-[#455A64]">
+                    Duration: {selectedTopic.duration}
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    {!selectedTopic.completed && (
+                      <Button
+                        onClick={completeCurrentTopic}
+                        className="bg-[#00BFA5] hover:bg-[#00ACC1] text-white"
+                      >
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Mark Complete
+                      </Button>
+                    )}
+                    
+                    {nextTopic && (
+                      <Button
+                        onClick={() => setSelectedTopic(nextTopic)}
+                        className="bg-[#2962FF] hover:bg-[#1E88E5] text-white"
+                      >
+                        Next Topic
+                        <ChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Course Overview */}
-      <Card className="border-l-4 border-l-blue-500">
-        <CardHeader>
-          <div className="flex justify-between items-start">
-            <div>
-              <CardTitle className="text-2xl mb-2">{content.title}</CardTitle>
-              <CardDescription className="text-base">{content.description}</CardDescription>
-            </div>
-            {content.certification.available && (
-              <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
-                <Award className="w-3 h-3 mr-1" />
-                Certificate Available
-              </Badge>
-            )}
-          </div>
-          
-          <div className="flex flex-wrap gap-4 mt-4">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-600">{content.duration}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Target className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-600">{content.difficulty}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-600">{content.modules.length} Modules</span>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
+  if (selectedModule) {
+    // Module Overview
+    const ModuleIcon = selectedModule.icon;
+    
+    return (
+      <div className="min-h-screen bg-[#FAFAFA]" style={{ fontFamily: "'Source Sans Pro', 'Roboto', sans-serif" }}>
+        <Header />
+        
+        <div className="max-w-6xl mx-auto px-6 py-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => setSelectedModule(null)}
+            className="mb-6 text-[#455A64]"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to All Modules
+          </Button>
 
-      {/* Course Modules */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Layers className="w-5 h-5" />
-            Course Modules
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4">
-            {content.modules.map((module, idx) => (
-              <Card key={module.id} className="border border-gray-200">
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">{idx + 1}. {module.title}</CardTitle>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {module.duration}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Target className="w-3 h-3" />
-                          {module.keySkills.length} Skills
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-3">
-                    <div>
-                      <h5 className="font-medium text-sm mb-2">Topics Covered:</h5>
-                      <div className="flex flex-wrap gap-2">
-                        {module.topics.map((topic, topicIdx) => (
-                          <Badge key={topicIdx} variant="outline" className="text-xs">
-                            {topic}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h5 className="font-medium text-sm mb-2">Key Skills:</h5>
-                      <div className="flex flex-wrap gap-2">
-                        {module.keySkills.map((skill, skillIdx) => (
-                          <Badge key={skillIdx} className="bg-blue-100 text-blue-800 text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h5 className="font-medium text-sm mb-2">Practical Exercises:</h5>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        {module.practicalExercises.map((exercise, exerciseIdx) => (
-                          <li key={exerciseIdx} className="flex items-start">
-                            <CheckCircle className="w-3 h-3 text-green-500 mt-1 mr-2 flex-shrink-0" />
-                            {exercise}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Learning Objectives */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="w-5 h-5" />
-            Learning Objectives
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-3">
-            {content.objectives.map((objective, idx) => (
-              <li key={idx} className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
-                <span>{objective}</span>
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
-
-      {/* Key Concepts */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Lightbulb className="w-5 h-5" />
-            Key Concepts
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Accordion type="single" collapsible className="w-full">
-            {content.concepts.map((concept, idx) => (
-              <AccordionItem key={idx} value={`concept-${idx}`}>
-                <AccordionTrigger className="text-left">{concept.title}</AccordionTrigger>
-                <AccordionContent>
-                  <p className="text-gray-700 leading-relaxed">{concept.explanation}</p>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </CardContent>
-      </Card>
-
-      {/* Practical Examples */}
-      {content.examples.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Code className="w-5 h-5" />
-              Real-World Examples
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {content.examples.map((example, idx) => (
-                <Card key={idx} className="bg-blue-50 border-blue-200">
-                  <CardContent className="p-4">
-                    <div className="space-y-3">
-                      <div>
-                        <h5 className="font-medium text-blue-800 mb-2 flex items-center gap-2">
-                          <Briefcase className="w-4 h-4" />
-                          Scenario:
-                        </h5>
-                        <p className="text-sm text-blue-700">{example.scenario}</p>
-                      </div>
-                      <Separator className="bg-blue-200" />
-                      <div>
-                        <h5 className="font-medium text-blue-800 mb-2 flex items-center gap-2">
-                          <Zap className="w-4 h-4" />
-                          Solution Approach:
-                        </h5>
-                        <p className="text-sm text-blue-700">{example.solution}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Certification */}
-      {content.certification.available && (
-        <Card className="border-yellow-200 bg-yellow-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-yellow-800">
-              <Award className="w-5 h-5" />
-              Professional Certification
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <h5 className="font-medium mb-2">Requirements:</h5>
-                <ul className="space-y-1">
-                  {content.certification.requirements.map((req, idx) => (
-                    <li key={idx} className="flex items-start text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                      {req}
-                    </li>
-                  ))}
-                </ul>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
+            <div className="flex items-start gap-6">
+              <div className="bg-[#2962FF]/10 p-4 rounded-lg">
+                <ModuleIcon className="h-12 w-12 text-[#2962FF]" />
               </div>
               
-              <div>
-                <h5 className="font-medium mb-2">Skills Certified:</h5>
-                <div className="flex flex-wrap gap-2">
-                  {content.certification.skills.map((skill, idx) => (
-                    <Badge key={idx} className="bg-yellow-200 text-yellow-800">
-                      {skill}
-                    </Badge>
-                  ))}
+              <div className="flex-1">
+                <h1 className="text-3xl font-bold text-[#263238] mb-2">{selectedModule.title}</h1>
+                <p className="text-lg text-[#455A64] mb-4">{selectedModule.description}</p>
+                
+                <div className="flex items-center gap-6 mb-4">
+                  <div className="flex items-center gap-2 text-[#455A64]">
+                    <Clock className="h-4 w-4" />
+                    {selectedModule.duration}
+                  </div>
+                  <Badge className={getDifficultyColor(selectedModule.difficulty)}>
+                    {selectedModule.difficulty}
+                  </Badge>
+                  <div className="flex items-center gap-2 text-[#455A64]">
+                    <Award className="h-4 w-4" />
+                    {selectedModule.topics.filter(t => t.completed).length} / {selectedModule.topics.length} completed
+                  </div>
                 </div>
+
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm text-[#455A64] mb-2">
+                    <span>Progress</span>
+                    <span>{selectedModule.progress}%</span>
+                  </div>
+                  <Progress value={selectedModule.progress} className="h-3" />
+                </div>
+
+                <Button 
+                  onClick={() => setSelectedTopic(selectedModule.topics[0])}
+                  className="bg-[#2962FF] hover:bg-[#1E88E5] text-white"
+                >
+                  Start Learning
+                  <PlayCircle className="ml-2 h-4 w-4" />
+                </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-}
+          </div>
 
-export default function Learning() {
-  const [location, navigate] = useLocation();
-  const [selectedTrack, setSelectedTrack] = useState("tpm");
-  const [selectedModule, setSelectedModule] = useState("TPM Foundations");
+          {/* Topics List */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+            <h2 className="text-xl font-bold text-[#263238] mb-6">Course Content</h2>
+            
+            <div className="space-y-4">
+              {selectedModule.topics.map((topic, index) => {
+                const TopicIcon = getTypeIcon(topic.type);
+                
+                return (
+                  <div
+                    key={topic.id}
+                    className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                    onClick={() => setSelectedTopic(topic)}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 mt-1">
+                        {topic.completed ? (
+                          <CheckCircle className="h-5 w-5 text-[#00BFA5]" />
+                        ) : (
+                          <TopicIcon className="h-5 w-5 text-[#455A64]" />
+                        )}
+                      </div>
+                      
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-[#263238] mb-1">{topic.title}</h3>
+                        <p className="text-[#455A64] text-sm mb-2">{topic.description}</p>
+                        
+                        <div className="flex items-center gap-4 text-xs text-[#455A64]">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {topic.duration}
+                          </span>
+                          <span className="capitalize">{topic.type}</span>
+                          {topic.completed && (
+                            <Badge className="bg-[#00BFA5] text-white text-xs">
+                              Completed
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
 
-  const tracks = [
-    { 
-      id: "tpm", 
-      name: "Technical Program Management", 
-      icon: Code, 
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200" 
-    },
-    { 
-      id: "pm", 
-      name: "Product Management", 
-      icon: TrendingUp, 
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      borderColor: "border-green-200" 
-    },
-    { 
-      id: "em", 
-      name: "Engineering Management", 
-      icon: Settings, 
-      color: "text-purple-600",
-      bgColor: "bg-purple-50", 
-      borderColor: "border-purple-200"
-    }
-  ];
+                      <ChevronRight className="h-4 w-4 text-[#455A64] flex-shrink-0 mt-1" />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  const modules: { [key: string]: string[] } = {
-    tpm: ["TPM Foundations", "Systems Design", "Technical Strategy"],
-    pm: ["Product Strategy", "Analytics & Metrics", "User Research"],
-    em: ["Engineering Leadership", "Team Management", "Technical Culture"]
-  };
-
+  // Main Learning Dashboard
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-[#FAFAFA]" style={{ fontFamily: "'Source Sans Pro', 'Roboto', sans-serif" }}>
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => navigate("/")}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-            </Button>
-          </div>
-          
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Professional Learning Platform
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-              Master management skills with comprehensive courses designed for Technical Program Management, 
-              Product Management, and Engineering Leadership roles.
-            </p>
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="w-64 bg-white border-r border-gray-200 h-screen sticky top-0">
+          <div className="p-6">
+            <h2 className="text-lg font-bold text-[#263238] mb-6">Learning Paths</h2>
+            
+            <div className="space-y-2">
+              {categories.map((category) => {
+                const CategoryIcon = category.icon;
+                return (
+                  <button
+                    key={category.id}
+                    onClick={() => setActiveCategory(category.id)}
+                    className={`w-full text-left p-3 rounded-lg transition-colors flex items-center gap-3 ${
+                      activeCategory === category.id
+                        ? "bg-[#2962FF] text-white"
+                        : "text-[#455A64] hover:bg-gray-50"
+                    }`}
+                  >
+                    <CategoryIcon className="h-4 w-4" />
+                    <span className="text-sm font-medium">{category.name}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* AI Learning Assistant - Prominently Featured */}
-        <div className="mb-8">
-          <AILearningAssistant />
-        </div>
+        {/* Main Content */}
+        <div className="flex-1 p-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-[#263238] mb-2">
+                {activeCategory === "all" ? "All Learning Modules" : categories.find(c => c.id === activeCategory)?.name}
+              </h1>
+              <p className="text-[#455A64]">
+                Comprehensive courses designed by industry experts to advance your career
+              </p>
+            </div>
 
-        {/* Track Selection */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-center">Choose Your Learning Track</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-4">
-              {tracks.map((track) => {
-                const IconComponent = track.icon;
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filteredModules.map((module) => {
+                const ModuleIcon = module.icon;
+                const completedTopics = module.topics.filter(t => t.completed).length;
+                
                 return (
                   <Card 
-                    key={track.id} 
-                    className={`cursor-pointer transition-all hover:shadow-lg ${
-                      selectedTrack === track.id 
-                        ? `${track.bgColor} ${track.borderColor} border-2` 
-                        : "hover:shadow-md"
-                    }`}
-                    onClick={() => {
-                      setSelectedTrack(track.id);
-                      setSelectedModule(modules[track.id][0]);
-                    }}
+                    key={module.id}
+                    className="cursor-pointer hover:shadow-md transition-shadow border-gray-200"
+                    onClick={() => setSelectedModule(module)}
                   >
-                    <CardContent className="p-6 text-center">
-                      <IconComponent className={`w-12 h-12 mx-auto mb-4 ${track.color}`} />
-                      <h3 className="font-semibold text-lg mb-2">{track.name}</h3>
-                      <p className="text-sm text-gray-600">
-                        {track.id === "tpm" && "Lead complex technical programs across multiple teams"}
-                        {track.id === "pm" && "Drive product strategy and customer-focused solutions"} 
-                        {track.id === "em" && "Build and lead high-performing engineering teams"}
-                      </p>
+                    <CardHeader className="pb-4">
+                      <div className="flex items-start gap-4">
+                        <div className="bg-[#2962FF]/10 p-3 rounded-lg">
+                          <ModuleIcon className="h-6 w-6 text-[#2962FF]" />
+                        </div>
+                        <div className="flex-1">
+                          <CardTitle className="text-lg text-[#263238] mb-2">{module.title}</CardTitle>
+                          <Badge className={getDifficultyColor(module.difficulty)}>
+                            {module.difficulty}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    
+                    <CardContent>
+                      <p className="text-[#455A64] text-sm mb-4">{module.description}</p>
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between text-sm text-[#455A64]">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {module.duration}
+                          </span>
+                          <span>{completedTopics} / {module.topics.length} topics</span>
+                        </div>
+                        
+                        <div>
+                          <div className="flex justify-between text-xs text-[#455A64] mb-1">
+                            <span>Progress</span>
+                            <span>{module.progress}%</span>
+                          </div>
+                          <Progress value={module.progress} className="h-2" />
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        className="w-full mt-4 bg-[#2962FF] hover:bg-[#1E88E5] text-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedModule(module);
+                        }}
+                      >
+                        {module.progress > 0 ? "Continue Learning" : "Start Course"}
+                        <ChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
                     </CardContent>
                   </Card>
                 );
               })}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Module Selection and Content */}
-        <div className="grid lg:grid-cols-4 gap-8">
-          {/* Module Sidebar */}
-          <div className="lg:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Course Modules</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="space-y-1">
-                  {modules[selectedTrack].map((module) => (
-                    <Button
-                      key={module}
-                      variant={selectedModule === module ? "default" : "ghost"}
-                      className="w-full justify-start text-left h-auto p-4"
-                      onClick={() => setSelectedModule(module)}
-                    >
-                      <div>
-                        <div className="font-medium">{module}</div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {module === "TPM Foundations" && "6-8 weeks"}
-                          {module === "Product Strategy" && "4-6 weeks"}
-                          {module === "Engineering Leadership" && "6-8 weeks"}
-                          {!["TPM Foundations", "Product Strategy", "Engineering Leadership"].includes(module) && "Coming Soon"}
-                        </div>
-                      </div>
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Course Content */}
-          <div className="lg:col-span-3">
-            <CourseContent track={selectedTrack} module={selectedModule} />
           </div>
         </div>
-      </main>
-
+      </div>
+      
       <Footer />
     </div>
   );
