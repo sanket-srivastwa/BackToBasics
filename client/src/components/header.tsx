@@ -109,7 +109,7 @@ export default function Header() {
                       Product Management
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setLocation("/practice?topic=tpm")}>
-                      Technical Program Management
+                      Program Management
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setLocation("/practice?topic=em")}>
                       Engineering Management

@@ -357,7 +357,7 @@ const learningModules: LearningModule[] = [
   // Program Management - Comprehensive Course
   {
     id: "tpm-fundamentals",
-    title: "Technical Program Management Fundamentals",
+    title: "Program Management Fundamentals",
     description: "Complete guide to technical program management from basics to advanced",
     icon: Network,
     duration: "10 hours",
@@ -367,12 +367,12 @@ const learningModules: LearningModule[] = [
     topics: [
       {
         id: "tpm-intro",
-        title: "Introduction to Technical Program Management",
+        title: "Introduction to Program Management",
         description: "What is TPM and how it differs from PM and engineering management",
         duration: "35 min",
         type: "video",
         completed: false,
-        content: "Technical Program Management bridges the gap between technical execution and business strategy. Learn the core responsibilities of TPMs including cross-functional coordination, technical decision-making, and risk management across large-scale technical programs."
+        content: "Program Management bridges the gap between technical execution and business strategy. Learn the core responsibilities of TPMs including cross-functional coordination, technical decision-making, and risk management across large-scale technical programs."
       },
       {
         id: "tpm-skills",
@@ -462,7 +462,7 @@ const learningModules: LearningModule[] = [
   },
   {
     id: "systems-design",
-    title: "Systems Design for TPMs",
+    title: "Systems Design for Program Managers",
     description: "Technical system design principles for program managers",
     icon: Monitor,
     duration: "8 hours",

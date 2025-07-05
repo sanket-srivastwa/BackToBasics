@@ -76,7 +76,7 @@ export default function CustomCaseStudy() {
   const { toast } = useToast();
   const [question, setQuestion] = useState("");
   const [userAnswer, setUserAnswer] = useState("");
-  const [selectedTopic, setSelectedTopic] = useState("Technical Program Management");
+  const [selectedTopic, setSelectedTopic] = useState("Program Management");
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [step, setStep] = useState<StepType>("mode");
   const [mode, setMode] = useState<"custom" | "prompted" | "ai-generated">("custom");
@@ -95,7 +95,7 @@ export default function CustomCaseStudy() {
     if (topicParam) {
       const topicMap: { [key: string]: string } = {
         'product-management': 'Product Management',
-        'program-management': 'Technical Program Management',
+        'program-management': 'Program Management',
         'engineering-management': 'Engineering Management',
         'business-strategy': 'Business Strategy'
       };
@@ -197,7 +197,7 @@ export default function CustomCaseStudy() {
       "Go-to-Market",
       "Feature Prioritization"
     ],
-    "Technical Program Management": [
+    "Program Management": [
       "Cross-functional Coordination",
       "Technical Roadmaps",
       "Risk Management", 
@@ -228,6 +228,7 @@ export default function CustomCaseStudy() {
   
   // Selected sub-topic state
   const [selectedSubTopic, setSelectedSubTopic] = useState<string>("");
+  const [customSubTopic, setCustomSubTopic] = useState<string>("");
 
   const difficultyLevels = [
     { id: "easy", name: "Easy", description: "Entry-level scenarios with clear structure" },
@@ -427,7 +428,9 @@ export default function CustomCaseStudy() {
     setCaseStudy(null);
     setIsLoadingQuestions(false);
     // Reset to default values
-    setSelectedTopic("Technical Program Management");
+    setSelectedTopic("Program Management");
+    setSelectedSubTopic("");
+    setCustomSubTopic("");
     setExperienceLevel("mid");
     setDifficulty("medium");
     setMode("custom");
@@ -446,7 +449,7 @@ export default function CustomCaseStudy() {
         },
         body: JSON.stringify({
           topic: selectedTopic,
-          subTopic: selectedSubTopic,
+          subTopic: selectedSubTopic || customSubTopic.trim(),
           difficulty: difficulty,
           timestamp: timestamp,
           forceGenerate: true
@@ -695,19 +698,37 @@ export default function CustomCaseStudy() {
                           <div
                             key={subTopic}
                             className={`border rounded-md p-3 cursor-pointer text-center transition-colors ${
-                              selectedSubTopic === subTopic
+                              selectedSubTopic === subTopic && !customSubTopic
                                 ? "border-primary bg-primary text-white"
                                 : "border-gray-300 bg-white hover:border-primary hover:bg-primary/5"
                             }`}
-                            onClick={() => setSelectedSubTopic(subTopic)}
+                            onClick={() => {
+                              setSelectedSubTopic(subTopic);
+                              setCustomSubTopic("");
+                            }}
                           >
                             <span className="text-sm font-medium">{subTopic}</span>
                           </div>
                         ))}
+                        
+                        {/* Custom Sub-Topic Input */}
+                        <div className="border rounded-md p-3 border-gray-300 bg-white">
+                          <Input
+                            placeholder="Other (specify)"
+                            value={customSubTopic}
+                            onChange={(e) => {
+                              setCustomSubTopic(e.target.value);
+                              if (e.target.value.trim()) {
+                                setSelectedSubTopic("");
+                              }
+                            }}
+                            className="text-sm h-8 border-0 p-0 focus:ring-0"
+                          />
+                        </div>
                       </div>
-                      {!selectedSubTopic && (
+                      {!selectedSubTopic && !customSubTopic.trim() && (
                         <p className="text-xs text-gray-500 mt-2 text-center">
-                          Select a focus area to generate targeted case studies
+                          Select a focus area or specify your own to generate targeted case studies
                         </p>
                       )}
                     </div>
@@ -756,13 +777,13 @@ export default function CustomCaseStudy() {
                     <li>• AI-powered evaluation with personalized feedback</li>
                     <li>• Industry-relevant scenarios from top tech companies</li>
                   </ul>
-                  {selectedTopic && selectedSubTopic && (
+                  {selectedTopic && (selectedSubTopic || customSubTopic.trim()) && (
                     <div className="mt-3 p-3 bg-white rounded border">
                       <p className="text-sm font-medium text-primary">
-                        Selected: {selectedTopic} → {selectedSubTopic}
+                        Selected: {selectedTopic} → {selectedSubTopic || customSubTopic.trim()}
                       </p>
                       <p className="text-xs text-gray-600 mt-1">
-                        Your case study will focus specifically on {selectedSubTopic.toLowerCase()} challenges
+                        Your case study will focus specifically on {(selectedSubTopic || customSubTopic.trim()).toLowerCase()} challenges
                       </p>
                     </div>
                   )}
@@ -786,10 +807,10 @@ export default function CustomCaseStudy() {
                         });
                         return;
                       }
-                      if (!selectedSubTopic) {
+                      if (!selectedSubTopic && !customSubTopic.trim()) {
                         toast({
                           title: "Please select a focus area",
-                          description: "Choose a specific focus area to generate a targeted case study.",
+                          description: "Choose a specific focus area or enter your own to generate a targeted case study.",
                           variant: "destructive",
                         });
                         return;
@@ -798,7 +819,7 @@ export default function CustomCaseStudy() {
                       setMode("ai-generated");
                       generateCaseStudyMutation.mutate();
                     }}
-                    disabled={generateCaseStudyMutation.isPending || !selectedTopic || !selectedSubTopic}
+                    disabled={generateCaseStudyMutation.isPending || !selectedTopic || (!selectedSubTopic && !customSubTopic.trim())}
                     className="flex-1"
                   >
                     {generateCaseStudyMutation.isPending ? (
@@ -806,7 +827,7 @@ export default function CustomCaseStudy() {
                     ) : (
                       <Brain className="mr-2 h-4 w-4" />
                     )}
-                    Generate {selectedTopic && selectedSubTopic ? `${selectedSubTopic} ` : ''}Case Study
+                    Generate {selectedTopic && (selectedSubTopic || customSubTopic.trim()) ? `${selectedSubTopic || customSubTopic.trim()} ` : ''}Case Study
                   </Button>
                 </div>
               </div>
@@ -867,15 +888,33 @@ export default function CustomCaseStudy() {
                         {topicStructure[selectedTopic as keyof typeof topicStructure]?.map((subTopic) => (
                           <Badge
                             key={subTopic}
-                            variant={selectedSubTopic === subTopic ? "default" : "outline"}
+                            variant={selectedSubTopic === subTopic && !customSubTopic ? "default" : "outline"}
                             className={`cursor-pointer px-3 py-1 text-xs ${
-                              selectedSubTopic === subTopic ? "bg-primary text-white" : "hover:bg-primary/10"
+                              selectedSubTopic === subTopic && !customSubTopic ? "bg-primary text-white" : "hover:bg-primary/10"
                             }`}
-                            onClick={() => setSelectedSubTopic(subTopic)}
+                            onClick={() => {
+                              setSelectedSubTopic(subTopic);
+                              setCustomSubTopic("");
+                            }}
                           >
                             {subTopic}
                           </Badge>
                         ))}
+                        
+                        {/* Custom Sub-Topic Input */}
+                        <div className="inline-flex items-center">
+                          <Input
+                            placeholder="Other (specify)"
+                            value={customSubTopic}
+                            onChange={(e) => {
+                              setCustomSubTopic(e.target.value);
+                              if (e.target.value.trim()) {
+                                setSelectedSubTopic("");
+                              }
+                            }}
+                            className="text-xs h-7 w-32 border-gray-300 focus:border-primary"
+                          />
+                        </div>
                       </div>
                     </div>
                   )}

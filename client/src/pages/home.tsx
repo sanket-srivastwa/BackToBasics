@@ -375,7 +375,7 @@ export default function Home() {
                 <div className="mx-auto mb-4 w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center float-animation">
                   <Target className="w-8 h-8 text-purple-600" />
                 </div>
-                <CardTitle className="text-xl text-purple-800">Technical Program Management</CardTitle>
+                <CardTitle className="text-xl text-purple-800">Program Management</CardTitle>
                 <CardDescription className="text-gray-600">
                   Lead complex technical programs across engineering teams
                 </CardDescription>
