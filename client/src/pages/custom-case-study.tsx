@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import VoiceInput from "@/components/voice-input";
+import { apiRequest } from "@/lib/queryClient";
 import { 
   ArrowLeft, 
   Send, 
@@ -31,7 +32,11 @@ import {
   Brain,
   Building,
   Users,
-  Target
+  Target,
+  FileText,
+  BarChart3,
+  DollarSign,
+  CalendarDays
 } from "lucide-react";
 
 interface AnalysisResult {
@@ -232,11 +237,16 @@ export default function CustomCaseStudy() {
       return;
     }
 
-    analyzeAnswerMutation.mutate({
-      question: question.trim(),
-      userAnswer: userAnswer.trim(),
-      topic: selectedTopic,
-    });
+    // Use case study evaluation for AI-generated cases, regular analysis for others
+    if (mode === "ai-generated" && caseStudy) {
+      evaluateCaseStudyMutation.mutate(userAnswer.trim());
+    } else {
+      analyzeAnswerMutation.mutate({
+        question: question.trim(),
+        userAnswer: userAnswer.trim(),
+        topic: selectedTopic,
+      });
+    }
   };
 
   const handleStartOver = () => {
@@ -247,23 +257,13 @@ export default function CustomCaseStudy() {
     setStep("mode");
   };
 
-  // Generate AI case study mutation
+  // Generate AI case study mutation with enhanced PM Solutions format
   const generateCaseStudyMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch("/api/case-studies/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          topic: selectedTopic,
-          difficulty: difficulty
-        }),
+      const response = await apiRequest("POST", "/api/case-studies/generate", {
+        topic: selectedTopic,
+        difficulty: difficulty
       });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to generate case study");
-      }
-      
       return response.json();
     },
     onSuccess: (data: CaseStudy) => {
@@ -271,35 +271,30 @@ export default function CustomCaseStudy() {
       setStep("answer");
       toast({
         title: "Case study generated!",
-        description: "Review the case study details and provide your solution.",
+        description: "Review the comprehensive case study details and provide your solution.",
       });
     },
     onError: (error: Error) => {
+      console.error("Case study generation error:", error);
       toast({
         title: "Generation failed",
-        description: error.message,
+        description: error.message.includes("quota") ? "OpenAI quota exceeded. Using demo case study for testing." : error.message,
         variant: "destructive",
       });
     },
   });
 
-  // Evaluate case study response mutation
+  // Evaluate case study response mutation with enhanced analysis
   const evaluateCaseStudyMutation = useMutation({
     mutationFn: async (answer: string) => {
-      const response = await fetch("/api/case-studies/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          caseStudy: caseStudy,
-          userAnswer: answer,
-        }),
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to evaluate response");
+      if (!answer.trim()) {
+        throw new Error("Please provide an answer before submitting");
       }
       
+      const response = await apiRequest("POST", "/api/case-studies/evaluate", { 
+        caseStudy, 
+        userAnswer: answer 
+      });
       return response.json();
     },
     onSuccess: (data: AnalysisResult) => {
@@ -307,13 +302,14 @@ export default function CustomCaseStudy() {
       setStep("feedback");
       toast({
         title: "Evaluation complete!",
-        description: "Your case study response has been analyzed.",
+        description: "Your case study response has been thoroughly analyzed with detailed feedback.",
       });
     },
     onError: (error: Error) => {
+      console.error("Case study evaluation error:", error);
       toast({
         title: "Evaluation failed",
-        description: error.message,
+        description: error.message.includes("quota") ? "OpenAI quota exceeded. Using demo evaluation for testing." : error.message,
         variant: "destructive",
       });
     },
@@ -657,24 +653,147 @@ export default function CustomCaseStudy() {
         {/* Step 3: Answer Input */}
         {step === "answer" && (
           <div className="space-y-6 max-w-4xl mx-auto">
-            <Card className="shadow-sm border">
-              <CardHeader>
-                <CardTitle className="text-lg">Your Question</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-neutral-700 whitespace-pre-wrap">{question}</p>
-                <div className="flex items-center mt-4 space-x-4">
-                  <Badge variant="secondary">{selectedTopic}</Badge>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setStep("question")}
-                  >
-                    Edit Question
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Display generated case study in PM Solutions format */}
+            {caseStudy && mode === "ai-generated" && (
+              <Card className="shadow-lg border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+                <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-2xl font-bold">{caseStudy.title}</CardTitle>
+                      <CardDescription className="text-blue-100 text-lg mt-2">
+                        {caseStudy.company} • {caseStudy.industry}
+                      </CardDescription>
+                    </div>
+                    <Badge variant="secondary" className="bg-white text-blue-600">
+                      {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} Level
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8">
+                  <div className="grid lg:grid-cols-2 gap-8">
+                    {/* Company Overview */}
+                    <div className="space-y-6">
+                      <div>
+                        <div className="flex items-center mb-3">
+                          <Building className="h-5 w-5 text-blue-600 mr-2" />
+                          <h3 className="text-lg font-semibold text-gray-800">Company Context</h3>
+                        </div>
+                        <div className="bg-white rounded-lg p-4 space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-sm font-medium text-gray-600">Industry:</span>
+                            <span className="text-sm text-gray-800">{caseStudy.industry}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm font-medium text-gray-600">Company Size:</span>
+                            <span className="text-sm text-gray-800">{caseStudy.companySize}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm font-medium text-gray-600">Timeline:</span>
+                            <span className="text-sm text-gray-800">{caseStudy.timeframe}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Stakeholders */}
+                      <div>
+                        <div className="flex items-center mb-3">
+                          <Users className="h-5 w-5 text-green-600 mr-2" />
+                          <h3 className="text-lg font-semibold text-gray-800">Key Stakeholders</h3>
+                        </div>
+                        <div className="bg-white rounded-lg p-4">
+                          <ul className="space-y-2">
+                            {caseStudy.stakeholders.map((stakeholder, index) => (
+                              <li key={index} className="flex items-center text-sm text-gray-700">
+                                <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                                {stakeholder}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Challenge & Constraints */}
+                    <div className="space-y-6">
+                      {/* Business Challenge */}
+                      <div>
+                        <div className="flex items-center mb-3">
+                          <AlertTriangle className="h-5 w-5 text-orange-600 mr-2" />
+                          <h3 className="text-lg font-semibold text-gray-800">The Challenge</h3>
+                        </div>
+                        <div className="bg-white rounded-lg p-4">
+                          <p className="text-gray-700 text-sm leading-relaxed">{caseStudy.detailedChallenge}</p>
+                        </div>
+                      </div>
+
+                      {/* Constraints */}
+                      <div>
+                        <div className="flex items-center mb-3">
+                          <DollarSign className="h-5 w-5 text-red-600 mr-2" />
+                          <h3 className="text-lg font-semibold text-gray-800">Constraints</h3>
+                        </div>
+                        <div className="bg-white rounded-lg p-4">
+                          <ul className="space-y-2">
+                            {caseStudy.constraints.map((constraint, index) => (
+                              <li key={index} className="flex items-center text-sm text-gray-700">
+                                <div className="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+                                {constraint}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Objectives */}
+                  <div className="mt-8">
+                    <div className="flex items-center mb-4">
+                      <Target className="h-5 w-5 text-purple-600 mr-2" />
+                      <h3 className="text-lg font-semibold text-gray-800">Success Objectives</h3>
+                    </div>
+                    <div className="bg-white rounded-lg p-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {caseStudy.objectives.map((objective, index) => (
+                          <div key={index} className="flex items-center text-sm text-gray-700">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full mr-3"></div>
+                            {objective}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Your Task:</strong> Analyze this situation and provide a comprehensive solution that addresses the challenge while considering all stakeholders, constraints, and objectives. Structure your response with clear reasoning and actionable recommendations.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Regular question display for custom and prompted modes */}
+            {(!caseStudy || mode !== "ai-generated") && (
+              <Card className="shadow-sm border">
+                <CardHeader>
+                  <CardTitle className="text-lg">Your Question</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-neutral-700 whitespace-pre-wrap">{question}</p>
+                  <div className="flex items-center mt-4 space-x-4">
+                    <Badge variant="secondary">{selectedTopic}</Badge>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setStep("question")}
+                    >
+                      Edit Question
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             <Card className="shadow-lg border">
               <CardHeader>
@@ -774,16 +893,16 @@ Result: Share the outcome and impact..."
 
                   <Button
                     onClick={handleAnswerSubmit}
-                    disabled={analyzeAnswerMutation.isPending || userAnswer.trim().length < 50}
+                    disabled={(analyzeAnswerMutation.isPending || evaluateCaseStudyMutation.isPending) || userAnswer.trim().length < 50}
                     className="w-full"
                     size="lg"
                   >
-                    {analyzeAnswerMutation.isPending ? (
+                    {(analyzeAnswerMutation.isPending || evaluateCaseStudyMutation.isPending) ? (
                       <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
                     ) : (
                       <Send className="mr-2 h-4 w-4" />
                     )}
-                    Analyze My Answer
+                    {mode === "ai-generated" && caseStudy ? "Evaluate Case Study Response" : "Analyze My Answer"}
                   </Button>
                 </div>
               </CardContent>
