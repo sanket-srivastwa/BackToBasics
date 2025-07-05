@@ -49,7 +49,7 @@ export default function Header() {
                   className="text-2xl font-bold text-primary cursor-pointer" 
                   onClick={() => setLocation("/")}
                 >
-                  PrepMaster
+                  BackToBasics
                 </h1>
               </div>
               <nav className="hidden md:ml-8 md:flex md:space-x-8">
@@ -140,13 +140,21 @@ export default function Header() {
                       </DropdownMenu>
                     </div>
                   ) : (
-                    <Button 
-                      variant="ghost" 
-                      className="font-medium"
-                      onClick={() => window.location.href = "/api/login"}
-                    >
-                      Sign In
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                      <Button 
+                        variant="ghost" 
+                        className="font-medium text-gray-700 hover:text-blue-600"
+                        onClick={() => setLocation("/signin")}
+                      >
+                        Sign In
+                      </Button>
+                      <Button 
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        onClick={() => setLocation("/signup")}
+                      >
+                        Sign Up
+                      </Button>
+                    </div>
                   )}
                 </>
               )}

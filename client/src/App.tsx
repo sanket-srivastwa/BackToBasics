@@ -11,6 +11,8 @@ import Feedback from "@/pages/feedback";
 import CustomCaseStudy from "@/pages/custom-case-study";
 import Learning from "@/pages/learning";
 import Account from "@/pages/account";
+import SignIn from "@/pages/signin";
+import SignUp from "@/pages/signup";
 import NotFound from "@/pages/not-found";
 
 function ScrollToTop() {
@@ -35,6 +37,8 @@ function Router() {
         <Route path="/custom-case-study" component={CustomCaseStudy} />
         <Route path="/learning" component={Learning} />
         <Route path="/account" component={Account} />
+        <Route path="/signin" component={SignIn} />
+        <Route path="/signup" component={SignUp} />
         <Route component={NotFound} />
       </Switch>
     </>

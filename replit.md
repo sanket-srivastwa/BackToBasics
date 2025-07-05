@@ -1,8 +1,8 @@
-# PrepMaster - AI-Powered Interview Practice Platform
+# BackToBasics - AI-Powered Interview Practice Platform
 
 ## Overview
 
-PrepMaster is a full-stack web application designed to help users practice for technical interviews, particularly for Product Management (PM), Technical Program Management (TPM), and Engineering Management roles at top technology companies including Microsoft, Google, Amazon, Meta, Apple, Oracle, Cisco, Salesforce, Adobe, NVIDIA, and Netflix. The platform provides AI-powered feedback on mock interviews and case studies with comprehensive role-based filtering and difficulty categorization.
+BackToBasics is a full-stack web application designed to help users practice for technical interviews, particularly for Product Management (PM), Technical Program Management (TPM), and Engineering Management roles at top technology companies including Microsoft, Google, Amazon, Meta, Apple, Oracle, Cisco, Salesforce, Adobe, NVIDIA, and Netflix. The platform provides AI-powered feedback on mock interviews and case studies with comprehensive role-based filtering and difficulty categorization.
 
 ## System Architecture
 
