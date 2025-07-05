@@ -23,12 +23,16 @@ export default function SignIn() {
       // Mock sign-in for now
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // Enable mock authentication
+      localStorage.setItem('mockAuth', 'true');
+      
       toast({
         title: "Sign in successful",
         description: "Welcome back to BackToBasics!",
       });
       
       setLocation("/");
+      window.location.reload();
     } catch (error) {
       toast({
         title: "Sign in failed",

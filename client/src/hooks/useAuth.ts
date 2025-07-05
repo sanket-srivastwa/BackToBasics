@@ -1,7 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export function useAuth() {
+  // Mock user for testing account management
+  const [mockUser] = useState(() => {
+    // Check if we should show mock authenticated state for testing
+    const mockAuth = localStorage.getItem('mockAuth');
+    return mockAuth === 'true' ? {
+      id: "1",
+      firstName: "John",
+      lastName: "Doe",
+      email: "john.doe@example.com",
+      profileImageUrl: null
+    } : null;
+  });
+
   // Check for authentication status changes in URL and refresh
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -18,9 +31,13 @@ export function useAuth() {
     retry: false,
   });
 
+  // Use real user if available, otherwise use mock user for testing
+  const finalUser = user || mockUser;
+  const finalIsAuthenticated = !!user || !!mockUser;
+
   return {
-    user,
+    user: finalUser,
     isLoading,
-    isAuthenticated: !!user,
+    isAuthenticated: finalIsAuthenticated,
   };
 }

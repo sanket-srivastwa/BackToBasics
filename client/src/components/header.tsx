@@ -106,9 +106,9 @@ export default function Header() {
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                             <Avatar className="h-8 w-8">
-                              <AvatarImage src={user?.profileImageUrl} alt={user?.email || "User"} />
+                              <AvatarImage src={(user as any)?.profileImageUrl} alt={(user as any)?.email || "User"} />
                               <AvatarFallback>
-                                {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase() || "U"}
+                                {(user as any)?.firstName?.[0] || (user as any)?.email?.[0]?.toUpperCase() || "U"}
                               </AvatarFallback>
                             </Avatar>
                           </Button>
@@ -116,12 +116,12 @@ export default function Header() {
                         <DropdownMenuContent className="w-56" align="end" forceMount>
                           <div className="flex items-center justify-start gap-2 p-2">
                             <div className="flex flex-col space-y-1 leading-none">
-                              {user?.firstName && user?.lastName && (
-                                <p className="font-medium">{user.firstName} {user.lastName}</p>
+                              {(user as any)?.firstName && (user as any)?.lastName && (
+                                <p className="font-medium">{(user as any).firstName} {(user as any).lastName}</p>
                               )}
-                              {user?.email && (
+                              {(user as any)?.email && (
                                 <p className="w-[200px] truncate text-sm text-muted-foreground">
-                                  {user.email}
+                                  {(user as any).email}
                                 </p>
                               )}
                             </div>
