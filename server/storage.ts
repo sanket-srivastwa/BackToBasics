@@ -238,15 +238,10 @@ export class DatabaseStorage implements IStorage {
       );
     }
 
-    console.log('Search filters:', filters);
-    console.log('Conditions:', conditions.length);
-
     if (conditions.length > 0) {
       const results = await db.select().from(questions)
         .where(and(...conditions))
         .orderBy(desc(questions.createdAt));
-      
-      console.log('Raw results count:', results.length);
       
       // Deduplication to ensure no duplicates
       const uniqueResults = new Map();
@@ -256,10 +251,7 @@ export class DatabaseStorage implements IStorage {
         }
       });
       
-      const finalResults = Array.from(uniqueResults.values());
-      console.log('Deduplicated results count:', finalResults.length);
-      
-      return finalResults;
+      return Array.from(uniqueResults.values());
     }
 
     const results = await db.select().from(questions)
