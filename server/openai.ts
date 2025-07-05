@@ -234,29 +234,44 @@ export interface CaseStudy {
 
 export async function generateCaseStudy(topic: string, difficulty: string = "medium"): Promise<CaseStudy> {
   try {
+    // Add timestamp to ensure uniqueness in AI generation
+    const timestamp = Date.now();
+    const uniqueId = Math.floor(Math.random() * 1000);
+
     const response = await openai.chat.completions.create({
       model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
       messages: [
         {
           role: "system",
-          content: `You are an expert case study creator for ${topic} interviews. Create realistic, challenging case studies following the PM Solutions format with proper company context, specific challenges, and measurable objectives. Focus on real-world business scenarios that test strategic thinking, problem-solving, and leadership skills.`
+          content: `You are an expert case study creator for ${topic} interviews at top technology companies. Create realistic, challenging case studies that test strategic thinking, problem-solving, and leadership skills. Each case study should be unique and based on contemporary business challenges. Generate fresh, varied content every time - avoid repetitive scenarios.`
         },
         {
           role: "user",
-          content: `Generate a ${difficulty} difficulty case study for ${topic}. Follow this structure and provide detailed, realistic information:
+          content: `Generate a completely unique ${difficulty} difficulty case study for ${topic}. Create a fresh scenario that hasn't been used before.
 
-1. Title: Create an engaging, specific title
-2. Company: Choose a realistic company (can be fictional but believable)
-3. Industry: Specify the industry sector
-4. Company Size: Employee count and revenue range
-5. Challenge: Brief 2-3 sentence summary
-6. Detailed Challenge: Comprehensive problem description with context
-7. Stakeholders: List key stakeholders involved
-8. Constraints: Budget, time, resource, or regulatory constraints
-9. Objectives: Specific, measurable goals
-10. Timeframe: Project timeline
+Requirements:
+- Make it realistic for a ${topic} professional at a major tech company
+- Use current industry trends and challenges (2024-2025)
+- Include specific metrics and business context
+- Vary the company type, industry, and challenge focus
+- Create unique stakeholder combinations
+- Add creative constraints that test problem-solving
 
-Make it realistic and challenging for a ${topic} professional. Output as JSON with these exact field names: title, company, industry, companySize, challenge, detailedChallenge, stakeholders, constraints, objectives, timeframe.`
+Structure (JSON format):
+1. title: Engaging, specific title that includes unique elements
+2. company: Realistic fictional company name (avoid generic names)
+3. industry: Specific tech sector or vertical
+4. companySize: Detailed employee count and revenue range
+5. challenge: Compelling 2-3 sentence problem statement
+6. detailedChallenge: Comprehensive context with market dynamics, internal factors, and urgency
+7. stakeholders: Realistic mix of internal and external stakeholders
+8. constraints: Mix of budget, timeline, technical, regulatory, and competitive constraints
+9. objectives: 4-6 specific, measurable business goals
+10. timeframe: Realistic project timeline with phases
+
+Ensure high variety - different industries (FinTech, HealthTech, EdTech, etc.), company stages (startup to enterprise), and challenge types. Use timestamp ${timestamp} and ID ${uniqueId} to ensure uniqueness.
+
+Output JSON with exact field names: title, company, industry, companySize, challenge, detailedChallenge, stakeholders, constraints, objectives, timeframe.`
         }
       ],
       response_format: { type: "json_object" },
@@ -265,16 +280,16 @@ Make it realistic and challenging for a ${topic} professional. Output as JSON wi
     const caseStudy = JSON.parse(response.choices[0].message.content || "{}");
     
     return {
-      title: caseStudy.title || "Strategic Initiative Case Study",
-      company: caseStudy.company || "TechCorp Inc.",
-      industry: caseStudy.industry || "Technology",
-      companySize: caseStudy.companySize || "500-1000 employees, $100M-500M revenue",
-      challenge: caseStudy.challenge || "Complex organizational challenge requiring strategic solution",
-      detailedChallenge: caseStudy.detailedChallenge || "Detailed challenge description",
-      stakeholders: caseStudy.stakeholders || ["CEO", "CTO", "Engineering Teams"],
-      constraints: caseStudy.constraints || ["Limited budget", "Tight timeline"],
-      objectives: caseStudy.objectives || ["Improve efficiency", "Reduce costs"],
-      timeframe: caseStudy.timeframe || "6 months"
+      title: caseStudy.title || `Strategic ${topic} Initiative ${uniqueId}`,
+      company: caseStudy.company || "InnovateTech Solutions",
+      industry: caseStudy.industry || "Technology Platform",
+      companySize: caseStudy.companySize || "800-1500 employees, $200M-600M revenue",
+      challenge: caseStudy.challenge || "Complex strategic challenge requiring innovative solution",
+      detailedChallenge: caseStudy.detailedChallenge || "Comprehensive business challenge with market and operational complexities",
+      stakeholders: caseStudy.stakeholders || ["CEO", "CTO", "VP Engineering", "Product Teams"],
+      constraints: caseStudy.constraints || ["Budget limitations", "Regulatory requirements", "Timeline pressure"],
+      objectives: caseStudy.objectives || ["Improve efficiency", "Reduce costs", "Scale operations", "Enhance user experience"],
+      timeframe: caseStudy.timeframe || "8 months"
     };
   } catch (error: any) {
     console.error("Error generating case study:", error);
@@ -282,6 +297,69 @@ Make it realistic and challenging for a ${topic} professional. Output as JSON wi
       throw new Error("OpenAI API quota exceeded. Please check your API plan and billing details.");
     }
     throw new Error("Failed to generate case study");
+  }
+}
+
+// Generate AI-powered prompted questions
+export async function generatePromptedQuestions(topic: string, experienceLevel: string, count: number = 5): Promise<any[]> {
+  try {
+    const difficultyMap: { [key: string]: string } = {
+      "junior": "easy",
+      "mid": "medium", 
+      "senior": "hard"
+    };
+
+    const difficulty = difficultyMap[experienceLevel] || "medium";
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert interviewer creating ${topic} interview questions. Generate realistic, challenging questions that test both theoretical knowledge and practical experience. Each question should include context about what skills it tests, suggested structure for answering, and key points to cover.`
+        },
+        {
+          role: "user",
+          content: `Generate ${count} unique ${difficulty} difficulty interview questions for ${topic} at ${experienceLevel} level.
+
+For each question, provide:
+1. questionPrompt: The main interview question (realistic scenario or behavioral question)
+2. context: What skills/knowledge this question tests
+3. suggestedStructure: How to structure the answer (e.g., "Use STAR method", "Framework approach")
+4. keyPoints: Array of 4-5 key points that should be covered in a good answer
+5. difficultyLevel: "${difficulty}"
+6. estimatedTime: Time in minutes to answer (8-15 minutes based on difficulty)
+
+Make questions varied - include technical scenarios, leadership challenges, strategic thinking, and behavioral examples. Ensure they're realistic for ${topic} interviews at top tech companies.
+
+Output as JSON array with these exact field names.`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    const result = JSON.parse(response.choices[0].message.content || "{}");
+    const questions = result.questions || [];
+
+    return questions.map((q: any, index: number) => ({
+      id: Date.now() + index, // Temporary ID for frontend
+      topic,
+      experienceLevel,
+      questionPrompt: q.questionPrompt || "Tell me about a challenging project you led.",
+      context: q.context || "Tests leadership and problem-solving skills.",
+      suggestedStructure: q.suggestedStructure || "Use the STAR method (Situation, Task, Action, Result).",
+      keyPoints: q.keyPoints || ["Problem identification", "Solution approach", "Results achieved"],
+      difficultyLevel: q.difficultyLevel || difficulty,
+      estimatedTime: q.estimatedTime || 10,
+      isActive: true,
+      createdAt: new Date().toISOString()
+    }));
+  } catch (error: any) {
+    console.error("Error generating prompted questions:", error);
+    if (error.status === 429) {
+      throw new Error("OpenAI API quota exceeded. Please check your API plan and billing details.");
+    }
+    throw new Error("Failed to generate questions");
   }
 }
 

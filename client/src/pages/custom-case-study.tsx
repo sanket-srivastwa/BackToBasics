@@ -75,6 +75,7 @@ export default function CustomCaseStudy() {
   const [experienceLevel, setExperienceLevel] = useState("mid");
   const [caseStudy, setCaseStudy] = useState<CaseStudy | null>(null);
   const [difficulty, setDifficulty] = useState("medium");
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
   // Handle URL parameter to auto-trigger AI case study mode
   useEffect(() => {
@@ -121,45 +122,51 @@ export default function CustomCaseStudy() {
     { id: "senior", name: "Senior (5+ years)", description: "Complex leadership and technical challenges" }
   ];
 
-  // Load prompted questions when topic or experience level changes
+  // Generate fresh AI questions every time the button is clicked
   const loadPromptedQuestions = async () => {
+    setIsLoadingQuestions(true);
     try {
-      console.log(`Loading questions for topic: ${selectedTopic}, experience: ${experienceLevel}`);
-      const response = await fetch(`/api/prompted-questions?topic=${encodeURIComponent(selectedTopic)}&experienceLevel=${experienceLevel}`);
+      console.log(`Generating fresh questions for topic: ${selectedTopic}, experience: ${experienceLevel}`);
+      
+      // Add timestamp to force fresh generation and avoid caching
+      const timestamp = Date.now();
+      const response = await fetch(`/api/prompted-questions?topic=${encodeURIComponent(selectedTopic)}&experienceLevel=${experienceLevel}&timestamp=${timestamp}&forceGenerate=true`);
       
       if (response.ok) {
         const questions = await response.json();
-        console.log('Loaded questions:', questions);
+        console.log('Generated fresh questions:', questions);
         setPromptedQuestions(questions);
         
         if (questions.length === 0) {
           toast({
-            title: "No questions found",
-            description: "Try a different topic or experience level combination.",
+            title: "Generation failed",
+            description: "Unable to generate questions. Please try again.",
             variant: "destructive",
           });
         } else {
           toast({
-            title: "Questions loaded",
-            description: `Found ${questions.length} questions for your selection.`,
+            title: "Fresh questions generated!",
+            description: `Generated ${questions.length} new AI-powered questions tailored to your selection.`,
           });
         }
       } else {
         const errorData = await response.json();
-        console.error('Error loading questions:', errorData);
+        console.error('Error generating questions:', errorData);
         toast({
-          title: "Failed to load questions",
+          title: "Generation failed",
           description: errorData.error || "Please try again.",
           variant: "destructive",
         });
       }
     } catch (error) {
-      console.error("Failed to load prompted questions:", error);
+      console.error("Failed to generate prompted questions:", error);
       toast({
         title: "Connection error",
         description: "Failed to connect to the server. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoadingQuestions(false);
     }
   };
 
@@ -282,9 +289,11 @@ export default function CustomCaseStudy() {
     setStep("mode");
   };
 
-  // Generate AI case study mutation with enhanced PM Solutions format
+  // Generate AI case study mutation with enhanced PM Solutions format (always fresh)
   const generateCaseStudyMutation = useMutation({
     mutationFn: async () => {
+      // Add timestamp to ensure fresh generation every time
+      const timestamp = Date.now();
       const response = await fetch("/api/case-studies/generate", {
         method: "POST",
         headers: {
@@ -292,7 +301,9 @@ export default function CustomCaseStudy() {
         },
         body: JSON.stringify({
           topic: selectedTopic,
-          difficulty: difficulty
+          difficulty: difficulty,
+          timestamp: timestamp,
+          forceGenerate: true
         }),
       });
       
@@ -306,17 +317,25 @@ export default function CustomCaseStudy() {
       setCaseStudy(data);
       setStep("answer");
       toast({
-        title: "Case study generated!",
-        description: "Review the comprehensive case study details and provide your solution.",
+        title: "Fresh case study generated!",
+        description: "Review the AI-generated case study details and provide your strategic solution.",
       });
     },
     onError: (error: Error) => {
       console.error("Case study generation error:", error);
-      toast({
-        title: "Generation failed",
-        description: error.message.includes("quota") ? "OpenAI quota exceeded. Using demo case study for testing." : error.message,
-        variant: "destructive",
-      });
+      if (error.message.includes("quota exceeded")) {
+        toast({
+          title: "Service Temporarily Unavailable",
+          description: "AI service is currently at capacity. Please try again in a few minutes.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Generation failed",
+          description: "Unable to generate case study. Please try again.",
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -608,7 +627,7 @@ export default function CustomCaseStudy() {
                     ) : (
                       <Brain className="mr-2 h-4 w-4" />
                     )}
-                    Generate Case Study
+                    Generate Fresh Case Study
                   </Button>
                 </div>
               </div>
@@ -754,11 +773,16 @@ export default function CustomCaseStudy() {
 
                   <Button
                     onClick={loadPromptedQuestions}
+                    disabled={isLoadingQuestions}
                     className="w-full"
                     size="lg"
                   >
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Load Questions
+                    {isLoadingQuestions ? (
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
+                    ) : (
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                    )}
+                    {isLoadingQuestions ? "Generating Fresh Questions..." : "Generate New Questions"}
                   </Button>
 
                   {promptedQuestions.length > 0 && (

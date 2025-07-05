@@ -328,20 +328,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get prompted questions by topic and experience level
+  // Get prompted questions by topic and experience level (AI-generated)
   app.get("/api/prompted-questions", async (req, res) => {
     try {
-      const { topic, experienceLevel } = req.query;
+      const { topic, experienceLevel, forceGenerate } = req.query;
       
       if (!topic || !experienceLevel) {
         return res.status(400).json({ error: "Topic and experience level are required" });
       }
 
-      const questions = await storage.getPromptedQuestions(
-        topic as string, 
-        experienceLevel as string
-      );
-      res.json(questions);
+      // Always generate fresh questions using AI
+      try {
+        const { generatePromptedQuestions } = await import("./openai");
+        const aiQuestions = await generatePromptedQuestions(
+          topic as string, 
+          experienceLevel as string, 
+          5
+        );
+        res.json(aiQuestions);
+      } catch (aiError: any) {
+        console.log("OpenAI unavailable for questions, falling back to database");
+        
+        // Fallback to existing database questions if AI fails
+        const questions = await storage.getPromptedQuestions(
+          topic as string, 
+          experienceLevel as string
+        );
+        
+        if (questions.length === 0) {
+          // Generate some demo questions if no database content
+          const demoQuestions = [
+            {
+              id: Date.now(),
+              topic: topic as string,
+              experienceLevel: experienceLevel as string,
+              questionPrompt: `Tell me about a time you had to manage competing priorities in a ${topic} context.`,
+              context: "Tests prioritization and time management skills under pressure.",
+              suggestedStructure: "Use the STAR method to structure your response.",
+              keyPoints: ["Problem identification", "Prioritization framework", "Stakeholder communication", "Results achieved"],
+              difficultyLevel: experienceLevel === "junior" ? "easy" : experienceLevel === "senior" ? "hard" : "medium",
+              estimatedTime: 10,
+              isActive: true,
+              createdAt: new Date().toISOString()
+            }
+          ];
+          res.json(demoQuestions);
+        } else {
+          res.json(questions);
+        }
+      }
     } catch (error) {
       console.error("Failed to fetch prompted questions:", error);
       res.status(500).json({ error: "Failed to fetch prompted questions" });
@@ -362,47 +397,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const caseStudy = await generateCaseStudy(topic, difficulty);
         res.json(caseStudy);
       } catch (error: any) {
-        console.log("OpenAI unavailable, using demo case study");
+        console.log("OpenAI unavailable, generating fresh randomized demo case study");
         
-        // Demo case study with variety for testing functionality
-        const companies = ["TechCorp Inc.", "InnovateLabs", "DataDriven Co.", "ScaleTech Solutions", "NextGen Systems"];
-        const industries = ["Technology", "FinTech", "E-commerce", "Healthcare Tech", "EdTech"];
-        const companySizes = ["100-500 employees", "500-1000 employees", "1000-5000 employees", "5000+ employees"];
-        const timeframes = ["3 months for MVP delivery", "6 months for full implementation", "9 months with phased rollout", "12 months comprehensive transformation"];
+        // Generate varied, fresh case studies with timestamp-based uniqueness
+        const timestamp = Date.now();
+        const companies = [
+          "TechFlow Dynamics", "DataSphere Ventures", "CloudVantage Systems", "InnovatePro Labs", 
+          "NextWave Technologies", "ScaleForward Inc.", "DigitalBridge Corp", "StreamTech Solutions",
+          "CoreLogic Industries", "EliteOps Platforms", "FlexScale Networks", "ProActive Systems"
+        ];
         
+        const industries = [
+          "Cloud Infrastructure", "AI/ML Platform", "Fintech Services", "E-commerce Platform", 
+          "HealthTech Solutions", "EdTech Platform", "Cybersecurity", "DevOps Tools",
+          "Data Analytics", "SaaS Platform", "Mobile Technologies", "IoT Solutions"
+        ];
+        
+        const companySizes = [
+          "200-500 employees, $75M-200M revenue", 
+          "500-1200 employees, $200M-600M revenue",
+          "1200-3000 employees, $600M-1.5B revenue", 
+          "3000+ employees, $1.5B+ revenue"
+        ];
+        
+        const challengeTypes = [
+          "rapid scaling infrastructure to support 5x user growth",
+          "modernizing legacy architecture while maintaining service reliability",
+          "implementing automation and AI across core business processes",
+          "building comprehensive data analytics and insights capabilities", 
+          "transforming customer experience through digital innovation",
+          "establishing market leadership in an increasingly competitive landscape"
+        ];
+        
+        const timeframes = [
+          "5 months for pilot program, 15 months for full enterprise rollout",
+          "7 months for core platform development, 12 months for market expansion", 
+          "4 months for proof of concept, 10 months for production deployment",
+          "9 months for infrastructure overhaul, 6 months for optimization phase"
+        ];
+        
+        // Ensure uniqueness with timestamp
         const randomCompany = companies[Math.floor(Math.random() * companies.length)];
         const randomIndustry = industries[Math.floor(Math.random() * industries.length)];
         const randomSize = companySizes[Math.floor(Math.random() * companySizes.length)];
+        const randomChallenge = challengeTypes[Math.floor(Math.random() * challengeTypes.length)];
         const randomTimeframe = timeframes[Math.floor(Math.random() * timeframes.length)];
         
         const demoCaseStudy = {
-          title: `${topic} Challenge at ${randomCompany}`,
+          title: `${topic} Transformation at ${randomCompany} - Initiative ${timestamp % 1000}`,
           company: randomCompany,
           industry: randomIndustry,
           companySize: randomSize,
-          challenge: `The company faces a critical ${topic.toLowerCase()} challenge that requires immediate strategic attention.`,
-          detailedChallenge: `${randomCompany} is experiencing significant challenges with their ${topic.toLowerCase()} strategy. Market pressures have intensified, customer expectations have evolved, and internal processes need optimization. The leadership team needs a comprehensive solution that addresses both immediate concerns and long-term sustainability while maintaining competitive advantage in the ${randomIndustry.toLowerCase()} sector.`,
+          challenge: `${randomCompany} must execute ${randomChallenge} to maintain competitive position and drive sustainable growth.`,
+          detailedChallenge: `${randomCompany}, a prominent ${randomIndustry.toLowerCase()} company, faces the strategic imperative of ${randomChallenge}. The organization has achieved strong market position but now confronts the challenge of scaling operations while maintaining quality and innovation pace. Current infrastructure and processes are approaching capacity limits, creating bottlenecks that affect both team productivity and customer experience. Market dynamics are shifting rapidly, with new competitors leveraging advanced technologies and changing customer expectations demanding faster, more reliable solutions. The leadership team recognizes that strategic transformation is essential to capture emerging opportunities while managing operational complexities. This initiative requires careful balance between innovation velocity and risk management, ensuring business continuity while building next-generation capabilities.`,
           stakeholders: [
-            "CEO and Executive Team",
-            "Product Management",
-            "Engineering Teams",
-            "Customer Success",
-            "Sales and Marketing",
-            "Operations Team"
+            "Executive Leadership Team",
+            "VP of Engineering & Technology",
+            "Product Management & Strategy", 
+            "Operations & Infrastructure Teams",
+            "Customer Success & Experience",
+            "Business Development & Partnerships",
+            "Quality Assurance & Security",
+            "HR & Organizational Development"
           ],
           constraints: [
-            `Limited budget of $${Math.floor(Math.random() * 3 + 1)}M for implementation`,
-            "Must maintain current service levels",
-            "Regulatory compliance requirements",
-            "Legacy system dependencies",
-            "Resource constraints during peak season"
+            `Approved budget of $${Math.floor(Math.random() * 5 + 3)}M allocated over ${Math.floor(Math.random() * 8 + 8)} months`,
+            "Zero tolerance for customer-impacting downtime during transitions",
+            "Full compliance with SOC2, GDPR, HIPAA, and industry regulations",
+            "Limited external hiring - optimize with existing talent pool",
+            "Complex integration requirements with 20+ existing systems",
+            "Phased deployment approach to minimize business risk"
           ],
           objectives: [
-            `Improve operational efficiency by ${Math.floor(Math.random() * 20 + 15)}%`,
-            "Enhance customer satisfaction scores",
-            "Reduce time-to-market for new features",
-            "Establish scalable processes for growth",
-            "Increase team productivity and collaboration"
+            `Achieve ${Math.floor(Math.random() * 25 + 20)}% improvement in system performance and reliability`,
+            `Reduce operational costs by ${Math.floor(Math.random() * 20 + 15)}% while expanding capabilities`,
+            `Increase customer satisfaction scores to 92%+ within 6 months`,
+            "Implement comprehensive monitoring and automated incident response",
+            `Scale platform capacity to handle ${Math.floor(Math.random() * 6 + 4)}x current traffic volume`,
+            "Establish center of excellence for continuous innovation and optimization"
           ],
           timeframe: randomTimeframe
         };
