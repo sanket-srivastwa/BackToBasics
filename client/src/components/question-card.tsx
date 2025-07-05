@@ -14,16 +14,16 @@ interface QuestionCardProps {
     timeLimit: number;
     createdAt?: Date;
   };
-  companyBadgeColor: string;
-  statusIcon: React.ReactNode;
+  companyBadgeColor?: string;
+  statusIcon?: React.ReactNode;
   onClick: () => void;
   showPractitioners?: boolean;
 }
 
 export default function QuestionCard({ 
   question, 
-  companyBadgeColor, 
-  statusIcon, 
+  companyBadgeColor = "bg-blue-100 text-blue-800", 
+  statusIcon = null, 
   onClick,
   showPractitioners = true 
 }: QuestionCardProps) {

@@ -239,15 +239,33 @@ export class DatabaseStorage implements IStorage {
     }
 
     if (conditions.length > 0) {
-      return await db.select().from(questions)
+      const results = await db.selectDistinct().from(questions)
         .where(and(...conditions))
-        .orderBy(desc(questions.createdAt))
-        .groupBy(questions.id); // Ensure unique results
+        .orderBy(desc(questions.createdAt));
+      
+      // Additional deduplication to ensure no duplicates
+      const uniqueResults = new Map();
+      results.forEach(question => {
+        if (!uniqueResults.has(question.id)) {
+          uniqueResults.set(question.id, question);
+        }
+      });
+      
+      return Array.from(uniqueResults.values());
     }
 
-    return await db.select().from(questions)
-      .orderBy(desc(questions.createdAt))
-      .groupBy(questions.id); // Ensure unique results
+    const results = await db.selectDistinct().from(questions)
+      .orderBy(desc(questions.createdAt));
+    
+    // Additional deduplication for popular questions too
+    const uniqueResults = new Map();
+    results.forEach(question => {
+      if (!uniqueResults.has(question.id)) {
+        uniqueResults.set(question.id, question);
+      }
+    });
+    
+    return Array.from(uniqueResults.values());
   }
 
   // Prompted Question operations

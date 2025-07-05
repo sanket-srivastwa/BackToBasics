@@ -51,7 +51,7 @@ export default function Practice() {
   }, [searchTerm]);
 
   // Questions query with proper deduplication
-  const { data: questionsData, isLoading } = useQuery({
+  const { data: questionsData, isLoading, error } = useQuery({
     queryKey: ["/api/questions/filtered", selectedTopic, selectedCompany, selectedDifficulty, debouncedSearchTerm],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -63,11 +63,18 @@ export default function Practice() {
       
       const hasFilters = params.toString().length > 0;
       const url = hasFilters ? `/api/questions/filtered?${params.toString()}` : "/api/questions/popular";
+      
       const response = await fetch(url);
-      return response.json();
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      
+      return data;
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: 2 * 60 * 1000, // Reduce stale time to 2 minutes
+    gcTime: 5 * 60 * 1000, // Reduce cache time to 5 minutes
+    retry: 1, // Reduce retries
   });
 
   // Deduplicate questions
@@ -336,6 +343,7 @@ export default function Practice() {
             isOpen={showAuthModal}
             onClose={() => setShowAuthModal(false)}
             questionsRemaining={questionsRemaining}
+            questionsViewed={questionsViewed}
           />
         )}
       </main>
