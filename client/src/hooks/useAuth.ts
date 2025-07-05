@@ -3,17 +3,56 @@ import { useEffect, useState } from "react";
 
 export function useAuth() {
   // Mock user for testing account management
-  const [mockUser] = useState(() => {
+  const [mockUser, setMockUser] = useState(() => {
     // Check if we should show mock authenticated state for testing
     const mockAuth = localStorage.getItem('mockAuth');
-    return mockAuth === 'true' ? {
-      id: "1",
-      firstName: "John",
-      lastName: "Doe",
-      email: "john.doe@example.com",
-      profileImageUrl: null
-    } : null;
+    if (mockAuth === 'true') {
+      const storedUser = localStorage.getItem('mockUser');
+      if (storedUser) {
+        try {
+          return JSON.parse(storedUser);
+        } catch {
+          // Fallback to default if JSON parse fails
+          return {
+            id: "1",
+            firstName: "User",
+            lastName: "",
+            email: "user@example.com",
+            profileImageUrl: null
+          };
+        }
+      }
+    }
+    return null;
   });
+
+  // Listen for storage changes to update auth state
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const mockAuth = localStorage.getItem('mockAuth');
+      if (mockAuth === 'true') {
+        const storedUser = localStorage.getItem('mockUser');
+        if (storedUser) {
+          try {
+            setMockUser(JSON.parse(storedUser));
+          } catch {
+            setMockUser({
+              id: "1",
+              firstName: "User",
+              lastName: "",
+              email: "user@example.com",
+              profileImageUrl: null
+            });
+          }
+        }
+      } else {
+        setMockUser(null);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Check for authentication status changes in URL and refresh
   useEffect(() => {

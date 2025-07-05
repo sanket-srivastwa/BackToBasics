@@ -53,12 +53,25 @@ export default function SignUp() {
       // Mock sign-up for now
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // Store user data and enable authentication
+      const userData = {
+        id: "1",
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        profileImageUrl: null
+      };
+      
+      localStorage.setItem('mockAuth', 'true');
+      localStorage.setItem('mockUser', JSON.stringify(userData));
+      
       toast({
         title: "Account created successfully",
-        description: "Welcome to BackToBasics! Please check your email to verify your account.",
+        description: "Welcome to BackToBasics!",
       });
       
-      setLocation("/signin");
+      setLocation("/");
+      window.location.reload();
     } catch (error) {
       toast({
         title: "Sign up failed",

@@ -23,8 +23,20 @@ export default function SignIn() {
       // Mock sign-in for now
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Enable mock authentication
+      // For demo purposes, create a user based on the email entered
+      // In real implementation, this would come from the server
+      const emailParts = email.split('@')[0].split('.');
+      const userData = {
+        id: "1",
+        firstName: emailParts[0] || "User",
+        lastName: emailParts[1] || "",
+        email: email,
+        profileImageUrl: null
+      };
+      
+      // Enable mock authentication and store user data
       localStorage.setItem('mockAuth', 'true');
+      localStorage.setItem('mockUser', JSON.stringify(userData));
       
       toast({
         title: "Sign in successful",

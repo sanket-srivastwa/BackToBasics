@@ -132,7 +132,12 @@ export default function Header() {
                             <span>Account Settings</span>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => window.location.href = "/api/logout"}>
+                          <DropdownMenuItem onClick={() => {
+                            // Clear mock authentication
+                            localStorage.removeItem('mockAuth');
+                            localStorage.removeItem('mockUser');
+                            window.location.href = "/";
+                          }}>
                             <LogOut className="mr-2 h-4 w-4" />
                             <span>Log out</span>
                           </DropdownMenuItem>
