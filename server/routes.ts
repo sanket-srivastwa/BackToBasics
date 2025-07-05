@@ -53,24 +53,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(); // Continue even if tracking fails
     }
   };
-  // Get popular questions
-  app.get("/api/questions/popular", async (req, res) => {
-    try {
-      const company = req.query.company as string;
-      const questions = await storage.getPopularQuestions(company);
-      res.json(questions);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch popular questions" });
-    }
-  });
-
   // Get popular questions with filters
   app.get("/api/questions/popular", async (req, res) => {
     try {
       const { company, topic, difficulty } = req.query;
       
-      // For now, use the existing getPopularQuestions method
-      // In a real implementation, you'd extend this to handle all filters
       let questions = await storage.getPopularQuestions(company as string);
       
       // Filter by topic if specified

@@ -176,15 +176,23 @@ export class DatabaseStorage implements IStorage {
   async getPopularQuestions(company?: string): Promise<Question[]> {
     const baseQuery = db.select().from(questions);
     
+    let results;
     if (company) {
-      return await baseQuery
+      results = await baseQuery
         .where(and(eq(questions.isPopular, true), eq(questions.company, company)))
+        .orderBy(desc(questions.createdAt));
+    } else {
+      results = await baseQuery
+        .where(eq(questions.isPopular, true))
         .orderBy(desc(questions.createdAt));
     }
     
-    return await baseQuery
-      .where(eq(questions.isPopular, true))
-      .orderBy(desc(questions.createdAt));
+    // Deduplicate based on ID to prevent duplicate results
+    const uniqueResults = results.filter((question, index, self) => 
+      index === self.findIndex((q) => q.id === question.id)
+    );
+    
+    return uniqueResults;
   }
 
   async createQuestion(insertQuestion: InsertQuestion): Promise<Question> {
@@ -196,11 +204,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchQuestions(query: string): Promise<Question[]> {
-    return await db
+    const searchPattern = `%${query.toLowerCase()}%`;
+    const results = await db
       .select()
       .from(questions)
-      .where(like(questions.title, `%${query}%`))
+      .where(
+        or(
+          sql`LOWER(${questions.title}) LIKE ${searchPattern}`,
+          sql`LOWER(${questions.description}) LIKE ${searchPattern}`,
+          sql`LOWER(${questions.company}) LIKE ${searchPattern}`,
+          sql`LOWER(${questions.topic}) LIKE ${searchPattern}`
+        )
+      )
       .orderBy(desc(questions.createdAt));
+    
+    // Deduplicate based on ID to prevent duplicate results
+    const uniqueResults = results.filter((question, index, self) => 
+      index === self.findIndex((q) => q.id === question.id)
+    );
+    
+    return uniqueResults;
   }
 
   async getFilteredQuestions(filters: {
@@ -246,14 +269,24 @@ export class DatabaseStorage implements IStorage {
         .where(and(...conditions))
         .orderBy(desc(questions.createdAt));
       
-      return results;
+      // Deduplicate based on ID to prevent duplicate results
+      const uniqueResults = results.filter((question, index, self) => 
+        index === self.findIndex((q) => q.id === question.id)
+      );
+      
+      return uniqueResults;
     }
 
     // Return all questions if no filters
     const results = await db.select().from(questions)
       .orderBy(desc(questions.createdAt));
     
-    return results;
+    // Deduplicate based on ID 
+    const uniqueResults = results.filter((question, index, self) => 
+      index === self.findIndex((q) => q.id === question.id)
+    );
+    
+    return uniqueResults;
   }
 
   // Prompted Question operations

@@ -294,15 +294,26 @@ export async function seedDatabase() {
       }
     ];
 
-    // Seed questions
-    for (const question of sampleQuestions) {
-      await storage.createQuestion(question);
+    // Check if questions already exist to prevent duplicates
+    const existingQuestions = await storage.getPopularQuestions();
+    
+    if (existingQuestions.length === 0) {
+      // Seed questions only if database is empty
+      for (const question of sampleQuestions) {
+        await storage.createQuestion(question);
+      }
+    } else {
+      console.log("Questions already exist, skipping seeding to prevent duplicates");
     }
 
-    // Seed prompted questions
+    // Seed prompted questions only if none exist
+    const existingPromptedQuestions = await storage.getPromptedQuestions("Program Management", "mid");
     const databaseStorage = storage as any;
-    if (databaseStorage.seedPromptedQuestions) {
+    
+    if (existingPromptedQuestions.length === 0 && databaseStorage.seedPromptedQuestions) {
       await databaseStorage.seedPromptedQuestions();
+    } else if (existingPromptedQuestions.length > 0) {
+      console.log("Prompted questions already exist, skipping seeding to prevent duplicates");
     }
 
     console.log("Database seeded successfully!");
