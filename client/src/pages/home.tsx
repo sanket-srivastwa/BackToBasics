@@ -274,15 +274,15 @@ export default function Home() {
           
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Case Studies Card */}
-            <Card className="card-hover border-2 cursor-pointer group scale-on-hover">
+            <Card className="card-hover border-2 border-gradient-to-r from-blue-200 to-purple-200 cursor-pointer group scale-on-hover bg-gradient-to-br from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 transition-all duration-300">
               <CardHeader>
                 <div className="flex items-center mb-4">
-                  <div className="bg-primary/10 p-3 rounded-lg mr-4">
-                    <ChartLine className="h-8 w-8 text-primary" />
+                  <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-lg mr-4 shadow-lg">
+                    <ChartLine className="h-8 w-8 text-white" />
                   </div>
-                  <CardTitle className="text-2xl">AI Case Studies</CardTitle>
+                  <CardTitle className="text-2xl text-gray-800">AI Case Studies</CardTitle>
                 </div>
-                <CardDescription className="text-base">
+                <CardDescription className="text-base text-gray-600">
                   Create custom interview questions or use AI-generated questions with personalized feedback. Perfect for targeted practice.
                 </CardDescription>
               </CardHeader>
@@ -303,54 +303,49 @@ export default function Home() {
                 </ul>
                 <div className="space-y-2">
                   <Button 
-                    className="w-full group-hover:bg-primary/90" 
-                    onClick={() => setLocation("/enhanced-case-study")}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-300" 
+                    onClick={() => setLocation("/custom-case-study?mode=ai-generated")}
                   >
-                    Enhanced AI Case Study
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    className="w-full" 
-                    onClick={() => setLocation("/custom-case-study")}
-                  >
-                    Simple Case Study
+                    <ChartLine className="mr-2 h-5 w-5" />
+                    AI Case Study
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
             {/* Practice Questions Card */}
-            <Card className="card-hover border-2 cursor-pointer group scale-on-hover">
+            <Card className="card-hover border-2 border-gradient-to-r from-emerald-200 to-teal-200 cursor-pointer group scale-on-hover bg-gradient-to-br from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 transition-all duration-300">
               <CardHeader>
                 <div className="flex items-center mb-4">
-                  <div className="bg-accent/10 p-3 rounded-lg mr-4">
-                    <Briefcase className="h-8 w-8 text-accent" />
+                  <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-3 rounded-lg mr-4 shadow-lg">
+                    <Briefcase className="h-8 w-8 text-white" />
                   </div>
-                  <CardTitle className="text-2xl">Practice Questions</CardTitle>
+                  <CardTitle className="text-2xl text-gray-800">Practice Questions</CardTitle>
                 </div>
-                <CardDescription className="text-base">
+                <CardDescription className="text-base text-gray-600">
                   Browse and practice with curated questions from top tech companies. Perfect for structured interview preparation.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 mb-6">
-                  <li className="flex items-center text-neutral-600">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                  <li className="flex items-center text-gray-600">
+                    <CheckCircle className="h-5 w-5 text-emerald-500 mr-3" />
                     Top tech company questions
                   </li>
-                  <li className="flex items-center text-neutral-600">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                  <li className="flex items-center text-gray-600">
+                    <CheckCircle className="h-5 w-5 text-emerald-500 mr-3" />
                     Timed practice sessions
                   </li>
-                  <li className="flex items-center text-neutral-600">
-                    <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                  <li className="flex items-center text-gray-600">
+                    <CheckCircle className="h-5 w-5 text-emerald-500 mr-3" />
                     Difficulty-based filtering
                   </li>
                 </ul>
                 <Button 
-                  className="w-full bg-accent hover:bg-accent/90" 
+                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-300" 
                   onClick={() => setLocation("/practice")}
                 >
+                  <Briefcase className="mr-2 h-5 w-5" />
                   Browse Questions
                 </Button>
               </CardContent>
@@ -362,11 +357,11 @@ export default function Home() {
 
 
       {/* Learning Materials */}
-      <section className="py-20 bg-blue-50">
+      <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-neutral-800 mb-4">Learning Materials</h2>
-            <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Learning Materials</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Comprehensive courses and frameworks for management roles at top tech companies
             </p>
           </div>
@@ -390,7 +385,7 @@ export default function Home() {
                   <li>• Risk Management</li>
                 </ul>
                 <div className="mt-6">
-                  <Button className="w-full group-hover:bg-blue-700">
+                  <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-2 shadow-lg hover:shadow-xl transition-all duration-300">
                     Start Learning
                   </Button>
                 </div>
@@ -415,7 +410,7 @@ export default function Home() {
                   <li>• A/B Testing & Metrics</li>
                 </ul>
                 <div className="mt-6">
-                  <Button className="w-full group-hover:bg-green-700">
+                  <Button className="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold py-2 shadow-lg hover:shadow-xl transition-all duration-300">
                     Start Learning
                   </Button>
                 </div>
@@ -440,7 +435,7 @@ export default function Home() {
                   <li>• Performance Coaching</li>
                 </ul>
                 <div className="mt-6">
-                  <Button className="w-full group-hover:bg-purple-700">
+                  <Button className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold py-2 shadow-lg hover:shadow-xl transition-all duration-300">
                     Start Learning
                   </Button>
                 </div>

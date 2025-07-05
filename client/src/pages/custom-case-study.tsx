@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -75,6 +75,16 @@ export default function CustomCaseStudy() {
   const [experienceLevel, setExperienceLevel] = useState("mid");
   const [caseStudy, setCaseStudy] = useState<CaseStudy | null>(null);
   const [difficulty, setDifficulty] = useState("medium");
+
+  // Handle URL parameter to auto-trigger AI case study mode
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const modeParam = urlParams.get('mode');
+    if (modeParam === 'ai-generated') {
+      setMode('ai-generated');
+      setStep('ai-config');
+    }
+  }, []);
 
   const topics = [
     "Technical Program Management",
