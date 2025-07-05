@@ -1,8 +1,8 @@
-# BackToBasics - AI-Powered Interview Practice Platform
+# Learn Lab Solution - AI-Powered Interview Practice Platform
 
 ## Overview
 
-BackToBasics is a full-stack web application designed to help users practice for technical interviews, particularly for Product Management (PM), Technical Program Management (TPM), and Engineering Management roles at top technology companies including Microsoft, Google, Amazon, Meta, Apple, Oracle, Cisco, Salesforce, Adobe, NVIDIA, and Netflix. The platform provides AI-powered feedback on mock interviews and case studies with comprehensive role-based filtering and difficulty categorization.
+Learn Lab Solution is a full-stack web application designed to help users practice for technical interviews, particularly for Product Management (PM), Technical Program Management (TPM), and Engineering Management roles at top technology companies including Microsoft, Google, Amazon, Meta, Apple, Oracle, Cisco, Salesforce, Adobe, NVIDIA, and Netflix. The platform provides AI-powered feedback on mock interviews and case studies with comprehensive role-based filtering and difficulty categorization.
 
 ## System Architecture
 
@@ -196,6 +196,7 @@ Changelog:
 - July 05, 2025. Major Platform Overhaul: Rebranded to "PrepMaster", expanded company coverage to top tech companies (Microsoft, Google, Amazon, Meta, Apple, Oracle, Cisco, Salesforce, Adobe, NVIDIA, Netflix), implemented comprehensive role-based filtering (Product Management, Program Management, Engineering Management, General Management), enhanced difficulty categorization (Easy, Medium, Hard), improved search functionality with advanced filtering API, updated UI with better company colors and enhanced search box styling
 - July 05, 2025. Final Rebranding & Comprehensive Account Management: Rebranded platform from "PrepMaster" to "BackToBasics", created beautiful Coursera-inspired sign-in/sign-up pages with professional design, implemented comprehensive account management system with four main sections: Personal Information (profile picture upload, contact details, demographics), Professional Information (company, education, social media links), Security Settings (password reset, multi-factor authentication with SMS and authenticator app, backup codes), and Privacy & Notifications (notification preferences, profile visibility, data sharing controls). Enhanced authentication flow to show Account option instead of Sign In/Sign Up when user is logged in.
 - July 05, 2025. Authentication Flow Fixes: Fixed sign-up process to automatically log in users after account creation, updated header to display actual signed-in user information instead of hardcoded "John Doe", implemented proper logout functionality to clear authentication state, and added localStorage synchronization for seamless authentication state management across page refreshes.
+- July 05, 2025. Brand Update to Learn Lab Solution: Renamed platform from "BackToBasics" to "Learn Lab Solution" across all pages (header, footer, about page, contact page), updated contact email to learnlabsolution@gmail.com, created comprehensive About Us and Contact pages with company information about IT sector operations in Bangalore, India, and updated HTML title and meta descriptions for better SEO.
 ```
 
 ## User Preferences

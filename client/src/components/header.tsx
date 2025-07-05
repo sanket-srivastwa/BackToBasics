@@ -49,7 +49,7 @@ export default function Header() {
                   className="text-2xl font-bold text-primary cursor-pointer" 
                   onClick={() => setLocation("/")}
                 >
-                  BackToBasics
+                  Learn Lab Solution
                 </h1>
               </div>
               <nav className="hidden md:ml-8 md:flex md:space-x-8">

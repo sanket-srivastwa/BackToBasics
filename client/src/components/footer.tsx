@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">BackToBasics</h3>
+            <h3 className="text-xl font-bold mb-4">Learn Lab Solution</h3>
             <p className="text-neutral-300 mb-4">
               Empowering IT professionals in Bangalore and beyond with AI-powered interview preparation and skill development.
             </p>
@@ -41,7 +41,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-neutral-700 mt-12 pt-8 text-center text-neutral-400">
-          <p>&copy; 2024 BackToBasics. All rights reserved.</p>
+          <p>&copy; 2024 Learn Lab Solution. All rights reserved.</p>
         </div>
       </div>
     </footer>
