@@ -301,12 +301,21 @@ export default function Home() {
                     Detailed feedback analysis
                   </li>
                 </ul>
-                <Button 
-                  className="w-full group-hover:bg-primary/90" 
-                  onClick={() => setLocation("/custom-case-study")}
-                >
-                  Create Custom Case Study
-                </Button>
+                <div className="space-y-2">
+                  <Button 
+                    className="w-full group-hover:bg-primary/90" 
+                    onClick={() => setLocation("/enhanced-case-study")}
+                  >
+                    Enhanced AI Case Study
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    className="w-full" 
+                    onClick={() => setLocation("/custom-case-study")}
+                  >
+                    Simple Case Study
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 

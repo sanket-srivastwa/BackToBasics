@@ -218,3 +218,149 @@ Respond with JSON:
     return { isValid: true }; // Default to allowing questions if validation fails
   }
 }
+
+export interface CaseStudy {
+  title: string;
+  company: string;
+  industry: string;
+  companySize: string;
+  challenge: string;
+  detailedChallenge: string;
+  stakeholders: string[];
+  constraints: string[];
+  objectives: string[];
+  timeframe: string;
+}
+
+export async function generateCaseStudy(topic: string, difficulty: string = "medium"): Promise<CaseStudy> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert case study creator for ${topic} interviews. Create realistic, challenging case studies following the PM Solutions format with proper company context, specific challenges, and measurable objectives. Focus on real-world business scenarios that test strategic thinking, problem-solving, and leadership skills.`
+        },
+        {
+          role: "user",
+          content: `Generate a ${difficulty} difficulty case study for ${topic}. Follow this structure and provide detailed, realistic information:
+
+1. Title: Create an engaging, specific title
+2. Company: Choose a realistic company (can be fictional but believable)
+3. Industry: Specify the industry sector
+4. Company Size: Employee count and revenue range
+5. Challenge: Brief 2-3 sentence summary
+6. Detailed Challenge: Comprehensive problem description with context
+7. Stakeholders: List key stakeholders involved
+8. Constraints: Budget, time, resource, or regulatory constraints
+9. Objectives: Specific, measurable goals
+10. Timeframe: Project timeline
+
+Make it realistic and challenging for a ${topic} professional. Output as JSON with these exact field names: title, company, industry, companySize, challenge, detailedChallenge, stakeholders, constraints, objectives, timeframe.`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    const caseStudy = JSON.parse(response.choices[0].message.content || "{}");
+    
+    return {
+      title: caseStudy.title || "Strategic Initiative Case Study",
+      company: caseStudy.company || "TechCorp Inc.",
+      industry: caseStudy.industry || "Technology",
+      companySize: caseStudy.companySize || "500-1000 employees, $100M-500M revenue",
+      challenge: caseStudy.challenge || "Complex organizational challenge requiring strategic solution",
+      detailedChallenge: caseStudy.detailedChallenge || "Detailed challenge description",
+      stakeholders: caseStudy.stakeholders || ["CEO", "CTO", "Engineering Teams"],
+      constraints: caseStudy.constraints || ["Limited budget", "Tight timeline"],
+      objectives: caseStudy.objectives || ["Improve efficiency", "Reduce costs"],
+      timeframe: caseStudy.timeframe || "6 months"
+    };
+  } catch (error: any) {
+    console.error("Error generating case study:", error);
+    if (error.status === 429) {
+      throw new Error("OpenAI API quota exceeded. Please check your API plan and billing details.");
+    }
+    throw new Error("Failed to generate case study");
+  }
+}
+
+export async function evaluateCaseStudyResponse(caseStudy: CaseStudy, userAnswer: string): Promise<QuestionAnalysis> {
+  try {
+    // Generate optimal answer
+    const optimalResponse = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        {
+          role: "system",
+          content: "You are a senior management consultant providing the optimal solution to a business case study. Provide a comprehensive, strategic response that demonstrates expert-level thinking."
+        },
+        {
+          role: "user",
+          content: `Case Study: ${caseStudy.title}
+          
+Company: ${caseStudy.company} (${caseStudy.industry}, ${caseStudy.companySize})
+
+Challenge: ${caseStudy.detailedChallenge}
+
+Stakeholders: ${caseStudy.stakeholders.join(", ")}
+Constraints: ${caseStudy.constraints.join(", ")}
+Objectives: ${caseStudy.objectives.join(", ")}
+Timeframe: ${caseStudy.timeframe}
+
+Provide a comprehensive, optimal solution that addresses all aspects of this case study. Structure your response with clear sections covering analysis, strategy, implementation plan, risk mitigation, and success metrics.`
+        }
+      ]
+    });
+
+    const optimalAnswer = optimalResponse.choices[0].message.content || "";
+
+    // Analyze user's answer
+    const analysisResponse = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert management consultant evaluating case study responses. Provide detailed, constructive feedback with specific recommendations for improvement."
+        },
+        {
+          role: "user",
+          content: `Case Study Context:
+${caseStudy.title} - ${caseStudy.company}
+Challenge: ${caseStudy.challenge}
+
+User's Answer: ${userAnswer}
+
+Optimal Answer: ${optimalAnswer}
+
+Evaluate the user's response and provide:
+1. userScore (1-10): Overall quality score
+2. strengths: Array of specific strengths in their response
+3. improvements: Array of specific areas needing improvement
+4. suggestions: Array of actionable suggestions for better responses
+5. detailedFeedback: Comprehensive feedback paragraph
+
+Respond in JSON format with these exact fields.`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    const analysis = JSON.parse(analysisResponse.choices[0].message.content || "{}");
+    
+    return {
+      optimalAnswer,
+      userScore: Math.max(1, Math.min(10, analysis.userScore || 5)),
+      strengths: analysis.strengths || ["Addressed the main challenge"],
+      improvements: analysis.improvements || ["Provide more specific implementation details"],
+      suggestions: analysis.suggestions || ["Use structured frameworks like SWOT or McKinsey 7S"],
+      detailedFeedback: analysis.detailedFeedback || "Consider providing more detailed analysis and implementation steps."
+    };
+  } catch (error: any) {
+    console.error("Error evaluating case study response:", error);
+    if (error.status === 429) {
+      throw new Error("OpenAI API quota exceeded. Please check your API plan and billing details.");
+    }
+    throw new Error("Failed to evaluate response");
+  }
+}

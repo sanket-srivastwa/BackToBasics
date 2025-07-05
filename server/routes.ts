@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertAnswerSchema, insertPracticeSessionSchema } from "@shared/schema";
-import { generateOptimalAnswer, analyzeAnswerComparison, validateQuestion, generateLearningContent, generateLearningResponse } from "./openai";
+import { generateOptimalAnswer, analyzeAnswerComparison, validateQuestion, generateLearningContent, generateLearningResponse, generateCaseStudy, evaluateCaseStudyResponse, type CaseStudy } from "./openai";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -348,6 +348,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Generate case study following PM Solutions format
+  app.post("/api/case-studies/generate", async (req, res) => {
+    try {
+      const { topic, difficulty = "medium" } = req.body;
+      
+      if (!topic) {
+        return res.status(400).json({ error: "Topic is required" });
+      }
+
+      const caseStudy = await generateCaseStudy(topic, difficulty);
+      res.json(caseStudy);
+    } catch (error: any) {
+      console.error("Failed to generate case study:", error);
+      if (error.message.includes("OpenAI API quota exceeded")) {
+        res.status(429).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: "Failed to generate case study" });
+      }
+    }
+  });
+
+  // Evaluate case study response
+  app.post("/api/case-studies/evaluate", async (req, res) => {
+    try {
+      const { caseStudy, userAnswer } = req.body;
+      
+      if (!caseStudy || !userAnswer) {
+        return res.status(400).json({ error: "Case study and user answer are required" });
+      }
+
+      if (userAnswer.trim().length < 100) {
+        return res.status(400).json({ error: "Answer must be at least 100 characters long for proper evaluation" });
+      }
+
+      const evaluation = await evaluateCaseStudyResponse(caseStudy, userAnswer);
+      res.json(evaluation);
+    } catch (error: any) {
+      console.error("Failed to evaluate case study:", error);
+      if (error.message.includes("OpenAI API quota exceeded")) {
+        res.status(429).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: "Failed to evaluate case study response" });
+      }
+    }
+  });
+
   // Get specific prompted question
   app.get("/api/prompted-questions/:id", async (req, res) => {
     try {
@@ -383,6 +429,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         res.status(500).json({ error: "Failed to generate learning content" });
       }
+    }
+  });
+
+  // Update user profile information
+  app.put('/api/users/profile', async (req, res) => {
+    try {
+      const { userId, profileData } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+
+      // For mock authentication, store in localStorage on client side
+      // In production, this would update the actual user in database
+      res.json({ success: true, message: "Profile updated successfully", profileData });
+    } catch (error) {
+      console.error("Profile update error:", error);
+      res.status(500).json({ error: "Failed to update profile" });
     }
   });
 

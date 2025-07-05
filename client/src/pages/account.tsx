@@ -136,11 +136,15 @@ export default function Account() {
 
   const handlePersonalUpdate = async () => {
     try {
+      // Save to localStorage for persistence
+      localStorage.setItem('userPersonalData', JSON.stringify(personalData));
+      
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
         title: "Personal information updated",
-        description: "Your personal details have been successfully updated.",
+        description: "Your personal details have been successfully saved.",
       });
       setIsEditing(false);
     } catch (error) {
@@ -154,11 +158,14 @@ export default function Account() {
 
   const handleProfessionalUpdate = async () => {
     try {
+      // Save to localStorage for persistence
+      localStorage.setItem('userProfessionalData', JSON.stringify(professionalData));
+      
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
         title: "Professional information updated",
-        description: "Your professional details have been successfully updated.",
+        description: "Your professional details have been successfully saved.",
       });
     } catch (error) {
       toast({

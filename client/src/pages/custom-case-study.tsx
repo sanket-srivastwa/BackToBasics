@@ -18,7 +18,6 @@ import {
   Lightbulb, 
   CheckCircle, 
   AlertTriangle, 
-  Target,
   Sparkles,
   MessageSquare,
   TrendingUp,
@@ -28,7 +27,11 @@ import {
   ChevronRight,
   Clock,
   Mic,
-  Keyboard
+  Keyboard,
+  Brain,
+  Building,
+  Users,
+  Target
 } from "lucide-react";
 
 interface AnalysisResult {
@@ -40,6 +43,19 @@ interface AnalysisResult {
   detailedFeedback: string;
 }
 
+interface CaseStudy {
+  title: string;
+  company: string;
+  industry: string;
+  companySize: string;
+  challenge: string;
+  detailedChallenge: string;
+  stakeholders: string[];
+  constraints: string[];
+  objectives: string[];
+  timeframe: string;
+}
+
 export default function CustomCaseStudy() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -48,10 +64,12 @@ export default function CustomCaseStudy() {
   const [selectedTopic, setSelectedTopic] = useState("Technical Program Management");
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [step, setStep] = useState<"mode" | "question" | "answer" | "feedback">("mode");
-  const [mode, setMode] = useState<"custom" | "prompted">("custom");
+  const [mode, setMode] = useState<"custom" | "prompted" | "ai-generated">("custom");
   const [promptedQuestions, setPromptedQuestions] = useState<any[]>([]);
   const [selectedPrompted, setSelectedPrompted] = useState<any>(null);
   const [experienceLevel, setExperienceLevel] = useState("mid");
+  const [caseStudy, setCaseStudy] = useState<CaseStudy | null>(null);
+  const [difficulty, setDifficulty] = useState("medium");
 
   const topics = [
     "Technical Program Management",
@@ -229,12 +247,88 @@ export default function CustomCaseStudy() {
     setStep("mode");
   };
 
-  const handleModeSelect = (selectedMode: "custom" | "prompted") => {
+  // Generate AI case study mutation
+  const generateCaseStudyMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/case-studies/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topic: selectedTopic,
+          difficulty: difficulty
+        }),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to generate case study");
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data: CaseStudy) => {
+      setCaseStudy(data);
+      setStep("answer");
+      toast({
+        title: "Case study generated!",
+        description: "Review the case study details and provide your solution.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Generation failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Evaluate case study response mutation
+  const evaluateCaseStudyMutation = useMutation({
+    mutationFn: async (answer: string) => {
+      const response = await fetch("/api/case-studies/evaluate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          caseStudy: caseStudy,
+          userAnswer: answer,
+        }),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to evaluate response");
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data: AnalysisResult) => {
+      setAnalysis(data);
+      setStep("feedback");
+      toast({
+        title: "Evaluation complete!",
+        description: "Your case study response has been analyzed.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Evaluation failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleModeSelect = (selectedMode: "custom" | "prompted" | "ai-generated") => {
     setMode(selectedMode);
     if (selectedMode === "prompted") {
       loadPromptedQuestions();
+      setStep("question");
+    } else if (selectedMode === "ai-generated") {
+      generateCaseStudyMutation.mutate();
+    } else {
+      setStep("question");
     }
-    setStep("question");
   };
 
   const handlePromptedQuestionSelect = (promptedQuestion: any) => {
@@ -317,7 +411,7 @@ export default function CustomCaseStudy() {
             <div className="bg-white rounded-lg shadow-md p-8">
               <h2 className="text-2xl font-bold mb-6 text-center">Choose Your Case Study Mode</h2>
               
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-3 gap-6">
                 <div 
                   className="border-2 border-gray-200 rounded-lg p-6 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
                   onClick={() => handleModeSelect("custom")}
@@ -331,6 +425,22 @@ export default function CustomCaseStudy() {
                     <li>• Create personalized scenarios</li>
                     <li>• Focus on specific challenges</li>
                     <li>• Tailored to your needs</li>
+                  </ul>
+                </div>
+
+                <div 
+                  className="border-2 border-gray-200 rounded-lg p-6 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
+                  onClick={() => handleModeSelect("ai-generated")}
+                >
+                  <div className="flex items-center mb-4">
+                    <Brain className="w-8 h-8 text-primary mr-3" />
+                    <h3 className="text-xl font-semibold">AI Case Study</h3>
+                  </div>
+                  <p className="text-gray-600 mb-4">Get a professionally structured case study following PM Solutions format with company context and challenges.</p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li>• Realistic business scenarios</li>
+                    <li>• Professional format</li>
+                    <li>• Company & stakeholder details</li>
                   </ul>
                 </div>
 
