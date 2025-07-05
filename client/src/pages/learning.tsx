@@ -395,6 +395,18 @@ export default function Learning() {
   const [selectedTopic, setSelectedTopic] = useState<LearningTopic | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Handle search parameter from URL
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const search = urlParams.get('search');
+    if (search) {
+      setSearchQuery(search);
+      // Clear URL parameters after extracting the search query
+      window.history.replaceState({}, '', '/learning');
+    }
+  }, []);
 
   const categories = [
     { id: "all", name: "All Courses", icon: BookOpen },
@@ -404,9 +416,21 @@ export default function Learning() {
     { id: "analytics", name: "Business Analytics", icon: BarChart3 }
   ];
 
-  const filteredModules = activeCategory === "all" 
-    ? learningModules 
-    : learningModules.filter(module => module.category === activeCategory);
+  const filteredModules = learningModules.filter(module => {
+    // Filter by category
+    const categoryMatch = activeCategory === "all" || module.category === activeCategory;
+    
+    // Filter by search query
+    const searchMatch = !searchQuery || 
+      module.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      module.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      module.topics.some(topic => 
+        topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        topic.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    
+    return categoryMatch && searchMatch;
+  });
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -731,11 +755,28 @@ export default function Learning() {
           <div className="max-w-6xl mx-auto">
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-[#263238] mb-2">
-                {activeCategory === "all" ? "All Learning Modules" : categories.find(c => c.id === activeCategory)?.name}
+                {searchQuery 
+                  ? `Search Results for "${searchQuery}"` 
+                  : activeCategory === "all" 
+                    ? "All Learning Modules" 
+                    : categories.find(c => c.id === activeCategory)?.name
+                }
               </h1>
               <p className="text-[#455A64]">
-                Comprehensive courses designed by industry experts to advance your career
+                {searchQuery 
+                  ? `Found ${filteredModules.length} module(s) matching your search`
+                  : "Comprehensive courses designed by industry experts to advance your career"
+                }
               </p>
+              {searchQuery && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => setSearchQuery("")}
+                  className="mt-3"
+                >
+                  Clear Search
+                </Button>
+              )}
             </div>
 
             <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">

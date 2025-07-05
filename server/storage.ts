@@ -213,7 +213,7 @@ export class DatabaseStorage implements IStorage {
     const conditions = [];
 
     if (filters.company && filters.company !== 'all') {
-      conditions.push(eq(questions.company, filters.company));
+      conditions.push(sql`LOWER(${questions.company}) = LOWER(${filters.company})`);
     }
     
     if (filters.difficulty && filters.difficulty !== 'all') {
