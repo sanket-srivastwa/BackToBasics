@@ -213,7 +213,7 @@ export class DatabaseStorage implements IStorage {
     const conditions = [];
 
     if (filters.company && filters.company !== 'all') {
-      conditions.push(sql`LOWER(${questions.company}) = LOWER(${filters.company})`);
+      conditions.push(eq(questions.company, filters.company.toLowerCase()));
     }
     
     if (filters.difficulty && filters.difficulty !== 'all') {
@@ -230,10 +230,13 @@ export class DatabaseStorage implements IStorage {
     }
     
     if (filters.search) {
+      const searchPattern = `%${filters.search.toLowerCase()}%`;
       conditions.push(
         or(
-          like(questions.title, `%${filters.search}%`),
-          like(questions.description, `%${filters.search}%`)
+          sql`LOWER(${questions.title}) LIKE ${searchPattern}`,
+          sql`LOWER(${questions.description}) LIKE ${searchPattern}`,
+          sql`LOWER(${questions.company}) LIKE ${searchPattern}`,
+          sql`LOWER(${questions.topic}) LIKE ${searchPattern}`
         )
       );
     }
@@ -243,29 +246,14 @@ export class DatabaseStorage implements IStorage {
         .where(and(...conditions))
         .orderBy(desc(questions.createdAt));
       
-      // Deduplication to ensure no duplicates
-      const uniqueResults = new Map();
-      results.forEach(question => {
-        if (!uniqueResults.has(question.id)) {
-          uniqueResults.set(question.id, question);
-        }
-      });
-      
-      return Array.from(uniqueResults.values());
+      return results;
     }
 
+    // Return all questions if no filters
     const results = await db.select().from(questions)
       .orderBy(desc(questions.createdAt));
     
-    // Deduplication for popular questions too
-    const uniqueResults = new Map();
-    results.forEach(question => {
-      if (!uniqueResults.has(question.id)) {
-        uniqueResults.set(question.id, question);
-      }
-    });
-    
-    return Array.from(uniqueResults.values());
+    return results;
   }
 
   // Prompted Question operations

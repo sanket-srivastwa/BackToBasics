@@ -77,20 +77,17 @@ export default function Practice() {
     retry: 1, // Reduce retries
   });
 
-  // Deduplicate questions by title and ID to handle database duplicates
+  // Process questions data - duplicates have been cleaned from database
   const questions = useMemo(() => {
     if (!questionsData || !Array.isArray(questionsData)) return [];
     
-    const uniqueQuestions = new Map();
-    questionsData.forEach((question: any) => {
-      // Use title as key to eliminate questions with same content but different IDs
-      const key = `${question.title?.toLowerCase()}-${question.company}-${question.difficulty}`;
-      if (question && question.id && !uniqueQuestions.has(key)) {
-        uniqueQuestions.set(key, question);
-      }
-    });
-    
-    return Array.from(uniqueQuestions.values());
+    // Simple validation to ensure we have valid questions with IDs
+    return questionsData.filter((question: any) => 
+      question && 
+      question.id && 
+      question.title && 
+      question.description
+    );
   }, [questionsData]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
