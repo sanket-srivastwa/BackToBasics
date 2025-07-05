@@ -54,14 +54,12 @@ export function useAuth() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Check for authentication status changes in URL and refresh
+  // Check for authentication status changes in URL and clean up
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('message') === 'signed-in' || urlParams.get('message') === 'logged-out') {
-      // Clean up URL and refresh auth state
+      // Clean up URL without refreshing
       window.history.replaceState({}, '', window.location.pathname);
-      // Refresh the page to update auth state
-      window.location.reload();
     }
   }, []);
 

@@ -69,7 +69,18 @@ export default function EnhancedCaseStudy() {
   // Generate case study mutation
   const generateCaseStudyMutation = useMutation({
     mutationFn: async ({ topic, difficulty }: { topic: string; difficulty: string }) => {
-      const response = await apiRequest("POST", "/api/case-studies/generate", { topic, difficulty });
+      const response = await fetch("/api/case-studies/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ topic, difficulty }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       return response.json();
     },
     onSuccess: (data: CaseStudy) => {
@@ -106,10 +117,21 @@ export default function EnhancedCaseStudy() {
         throw new Error("Please provide an answer before submitting");
       }
       
-      const response = await apiRequest("POST", "/api/case-studies/evaluate", { 
-        caseStudy, 
-        userAnswer: finalAnswer 
+      const response = await fetch("/api/case-studies/evaluate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          caseStudy, 
+          userAnswer: finalAnswer 
+        }),
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       return response.json();
     },
     onSuccess: (data: AnalysisResult) => {

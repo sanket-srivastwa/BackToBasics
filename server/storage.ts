@@ -238,13 +238,11 @@ export class DatabaseStorage implements IStorage {
       );
     }
 
-    let baseQuery = db.select().from(questions);
-    
     if (conditions.length > 0) {
-      baseQuery = baseQuery.where(and(...conditions));
+      return await db.select().from(questions).where(and(...conditions)).orderBy(desc(questions.createdAt));
     }
 
-    return await baseQuery.orderBy(desc(questions.createdAt));
+    return await db.select().from(questions).orderBy(desc(questions.createdAt));
   }
 
   // Prompted Question operations

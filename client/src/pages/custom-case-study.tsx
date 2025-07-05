@@ -275,10 +275,21 @@ export default function CustomCaseStudy() {
   // Generate AI case study mutation with enhanced PM Solutions format
   const generateCaseStudyMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/case-studies/generate", {
-        topic: selectedTopic,
-        difficulty: difficulty
+      const response = await fetch("/api/case-studies/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          topic: selectedTopic,
+          difficulty: difficulty
+        }),
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       return response.json();
     },
     onSuccess: (data: CaseStudy) => {
@@ -306,10 +317,21 @@ export default function CustomCaseStudy() {
         throw new Error("Please provide an answer before submitting");
       }
       
-      const response = await apiRequest("POST", "/api/case-studies/evaluate", { 
-        caseStudy, 
-        userAnswer: answer 
+      const response = await fetch("/api/case-studies/evaluate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          caseStudy, 
+          userAnswer: answer 
+        }),
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       return response.json();
     },
     onSuccess: (data: AnalysisResult) => {
