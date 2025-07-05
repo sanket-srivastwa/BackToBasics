@@ -92,14 +92,14 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center p-4" style={{ fontFamily: "'Source Sans Pro', 'Roboto', sans-serif" }}>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
           <Button
             variant="ghost"
             onClick={() => setLocation("/")}
-            className="mb-4 text-[#2962FF] hover:text-[#1976D2]"
+            className="mb-4 text-blue-600 hover:text-blue-700"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to AutoDiDact
@@ -279,7 +279,7 @@ export default function SignUp() {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-[#2962FF] hover:bg-[#1976D2] text-white font-medium"
+                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium"
                 disabled={isLoading}
               >
                 {isLoading ? "Creating account..." : "Create account"}
@@ -290,7 +290,7 @@ export default function SignUp() {
               Already have an account?{" "}
               <button
                 onClick={() => setLocation("/signin")}
-                className="text-[#2962FF] hover:text-[#1976D2] font-medium"
+                className="text-blue-600 hover:text-blue-500 font-medium"
               >
                 Sign in
               </button>
