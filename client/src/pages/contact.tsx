@@ -21,7 +21,7 @@ export default function Contact() {
     // Since this is a static contact page, we'll show a message with the email
     toast({
       title: "Thank you for your message!",
-      description: `Please send your inquiry directly to backtobasics@gmail.com or use the form details provided.`,
+      description: `Please send your inquiry directly to learnlabsolution@gmail.com or use the form details provided.`,
     });
   };
 
@@ -60,7 +60,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-800 mb-1">Email</h3>
-                      <p className="text-gray-600">backtobasics@gmail.com</p>
+                      <p className="text-gray-600">learnlabsolution@gmail.com</p>
                       <p className="text-sm text-gray-500 mt-1">We'll respond within 24 hours</p>
                     </div>
                   </div>
@@ -185,10 +185,10 @@ export default function Contact() {
                   <p className="text-sm text-gray-500 text-center">
                     Or email us directly at{" "}
                     <a 
-                      href="mailto:backtobasics@gmail.com" 
+                      href="mailto:learnlabsolution@gmail.com" 
                       className="text-purple-600 hover:text-purple-700 font-medium"
                     >
-                      backtobasics@gmail.com
+                      learnlabsolution@gmail.com
                     </a>
                   </p>
                 </form>

@@ -12,7 +12,7 @@ export default function Footer() {
               Empowering IT professionals in Bangalore and beyond with AI-powered interview preparation and skill development.
             </p>
             <div className="flex space-x-4">
-              <a href="mailto:backtobasics@gmail.com" className="text-neutral-400 hover:text-white transition-colors" title="Email us">
+              <a href="mailto:learnlabsolution@gmail.com" className="text-neutral-400 hover:text-white transition-colors" title="Email us">
                 <Mail className="h-5 w-5" />
               </a>
             </div>
