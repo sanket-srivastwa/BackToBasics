@@ -61,6 +61,16 @@ interface CaseStudy {
   timeframe: string;
 }
 
+type StepType = 'mode' | 'configure' | 'question' | 'answer' | 'feedback';
+
+const STEPS = [
+  { id: 'mode', label: 'Choose Mode', title: 'Select Case Study Mode' },
+  { id: 'configure', label: 'Configure', title: 'Configure Settings' },
+  { id: 'question', label: 'Question', title: 'Review Question' },
+  { id: 'answer', label: 'Answer', title: 'Provide Solution' },
+  { id: 'feedback', label: 'Feedback', title: 'Review Results' }
+] as const;
+
 export default function CustomCaseStudy() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -68,7 +78,7 @@ export default function CustomCaseStudy() {
   const [userAnswer, setUserAnswer] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("Technical Program Management");
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
-  const [step, setStep] = useState<"mode" | "ai-config" | "question" | "answer" | "feedback">("mode");
+  const [step, setStep] = useState<StepType>("mode");
   const [mode, setMode] = useState<"custom" | "prompted" | "ai-generated">("custom");
   const [promptedQuestions, setPromptedQuestions] = useState<any[]>([]);
   const [selectedPrompted, setSelectedPrompted] = useState<any>(null);
@@ -77,13 +87,86 @@ export default function CustomCaseStudy() {
   const [difficulty, setDifficulty] = useState("medium");
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
+  // Stepper navigation helpers - Track completed steps
+  const [completedSteps, setCompletedSteps] = useState<StepType[]>(['mode']);
+  
+  const getCurrentStepIndex = () => STEPS.findIndex(s => s.id === step);
+  
+  const markStepAsCompleted = (stepId: StepType) => {
+    setCompletedSteps(prev => {
+      if (!prev.includes(stepId)) {
+        return [...prev, stepId];
+      }
+      return prev;
+    });
+  };
+  
+  const isStepCompleted = (stepId: StepType) => completedSteps.includes(stepId);
+  
+  const canNavigateToStep = (targetStep: StepType) => {
+    return completedSteps.includes(targetStep) || targetStep === step;
+  };
+
+  // Stepper Component
+  const StepperNavigation = () => {
+    return (
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          {STEPS.map((stepItem, index) => {
+            const isActive = step === stepItem.id;
+            const isCompleted = isStepCompleted(stepItem.id) && !isActive;
+            const isAccessible = canNavigateToStep(stepItem.id);
+            
+            const handleStepClick = () => {
+              if (isAccessible && stepItem.id !== step) {
+                console.log(`Navigating to step: ${stepItem.id} (index ${index})`);
+                setStep(stepItem.id);
+              }
+            };
+            
+            return (
+              <div key={stepItem.id} className="flex items-center">
+                <div className="flex flex-col items-center">
+                  <button
+                    onClick={handleStepClick}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200 ${
+                      isActive 
+                        ? 'bg-blue-600 text-white shadow-lg' 
+                        : isCompleted 
+                        ? 'bg-green-600 text-white cursor-pointer hover:bg-green-700 hover:shadow-lg' 
+                        : isAccessible
+                        ? 'bg-gray-300 text-gray-700 cursor-pointer hover:bg-gray-400'
+                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    {isCompleted ? <CheckCircle className="h-5 w-5" /> : index + 1}
+                  </button>
+                  <span className={`mt-2 text-xs text-center max-w-16 ${isActive ? 'font-medium text-blue-600' : isCompleted ? 'text-green-600 font-medium' : 'text-gray-500'}`}>
+                    {stepItem.label}
+                  </span>
+                </div>
+                {index < STEPS.length - 1 && (
+                  <div className={`h-0.5 w-16 mx-2 transition-colors ${isCompleted ? 'bg-green-600' : 'bg-gray-200'}`} />
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="text-xs text-gray-500 mt-2 text-center">
+          Current: {step} | Completed: {completedSteps.join(', ')}
+        </div>
+      </div>
+    );
+  };
+
   // Handle URL parameter to auto-trigger AI case study mode
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const modeParam = urlParams.get('mode');
     if (modeParam === 'ai-generated') {
       setMode('ai-generated');
-      setStep('ai-config');
+      setStep('configure');
+      markStepAsCompleted('mode');
     }
   }, []);
 
@@ -186,6 +269,7 @@ export default function CustomCaseStudy() {
     },
     onSuccess: (data) => {
       if (data.isValid) {
+        markStepAsCompleted('question');
         setStep("answer");
         toast({
           title: "Great question!",
@@ -332,6 +416,7 @@ export default function CustomCaseStudy() {
     },
     onSuccess: (data: CaseStudy) => {
       setCaseStudy(data);
+      markStepAsCompleted('question');
       setStep("answer");
       toast({
         title: "Fresh case study generated!",
@@ -413,6 +498,7 @@ export default function CustomCaseStudy() {
   const handlePromptedQuestionSelect = (promptedQuestion: any) => {
     setSelectedPrompted(promptedQuestion);
     setQuestion(promptedQuestion.questionPrompt);
+    markStepAsCompleted('question');
     setStep("answer");
   };
 
@@ -451,45 +537,7 @@ export default function CustomCaseStudy() {
           </p>
         </div>
 
-        {/* Progress Steps */}
-        <div className="flex justify-center mb-12">
-          <div className="flex items-center space-x-4">
-            <div className={`flex items-center ${step === "mode" ? "text-primary" : (step === "ai-config" || step === "question" || step === "answer" || step === "feedback") ? "text-green-600" : "text-gray-400"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "mode" ? "bg-primary text-white" : (step === "ai-config" || step === "question" || step === "answer" || step === "feedback") ? "bg-green-600 text-white" : "bg-gray-200"}`}>
-                1
-              </div>
-              <span className="ml-2 font-medium">Choose Mode</span>
-            </div>
-            <div className="w-8 h-0.5 bg-gray-300"></div>
-            <div className={`flex items-center ${step === "ai-config" ? "text-primary" : (step === "question" || step === "answer" || step === "feedback") ? "text-green-600" : "text-gray-400"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "ai-config" ? "bg-primary text-white" : (step === "question" || step === "answer" || step === "feedback") ? "bg-green-600 text-white" : "bg-gray-200"}`}>
-                2
-              </div>
-              <span className="ml-2 font-medium">Configure</span>
-            </div>
-            <div className="w-8 h-0.5 bg-gray-300"></div>
-            <div className={`flex items-center ${step === "question" ? "text-primary" : (step === "answer" || step === "feedback") ? "text-green-600" : "text-gray-400"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "question" ? "bg-primary text-white" : (step === "answer" || step === "feedback") ? "bg-green-600 text-white" : "bg-gray-200"}`}>
-                3
-              </div>
-              <span className="ml-2 font-medium">Question</span>
-            </div>
-            <div className="w-8 h-0.5 bg-gray-300"></div>
-            <div className={`flex items-center ${step === "answer" ? "text-primary" : step === "feedback" ? "text-green-600" : "text-gray-400"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "answer" ? "bg-primary text-white" : step === "feedback" ? "bg-green-600 text-white" : "bg-gray-200"}`}>
-                4
-              </div>
-              <span className="ml-2 font-medium">Answer</span>
-            </div>
-            <div className="w-8 h-0.5 bg-gray-300"></div>
-            <div className={`flex items-center ${step === "feedback" ? "text-green-600" : "text-gray-400"}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "feedback" ? "bg-green-600 text-white" : "bg-gray-200"}`}>
-                5
-              </div>
-              <span className="ml-2 font-medium">Feedback</span>
-            </div>
-          </div>
-        </div>
+        <StepperNavigation />
 
         {/* Step 1: Mode Selection */}
         {step === "mode" && (
@@ -516,7 +564,10 @@ export default function CustomCaseStudy() {
 
                 <div 
                   className="border-2 border-gray-200 rounded-lg p-6 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
-                  onClick={() => setStep("ai-config")}
+                  onClick={() => {
+                    markStepAsCompleted('mode');
+                    setStep("configure");
+                  }}
                 >
                   <div className="flex items-center mb-4">
                     <Brain className="w-8 h-8 text-primary mr-3" />
@@ -551,7 +602,7 @@ export default function CustomCaseStudy() {
         )}
 
         {/* Step 2: AI Configuration */}
-        {step === "ai-config" && (
+        {step === "configure" && (
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-md p-8">
               <h2 className="text-2xl font-bold mb-6 text-center">Configure Your AI Case Study</h2>
@@ -633,6 +684,7 @@ export default function CustomCaseStudy() {
                   </Button>
                   <Button
                     onClick={() => {
+                      markStepAsCompleted('configure');
                       setMode("ai-generated");
                       generateCaseStudyMutation.mutate();
                     }}
@@ -1107,7 +1159,10 @@ Result: Share the outcome and impact..."
                   </div>
 
                   <Button
-                    onClick={handleAnswerSubmit}
+                    onClick={() => {
+                      markStepAsCompleted('answer');
+                      handleAnswerSubmit();
+                    }}
                     disabled={(analyzeAnswerMutation.isPending || evaluateCaseStudyMutation.isPending) || userAnswer.trim().length < 50}
                     className="w-full"
                     size="lg"
@@ -1249,7 +1304,7 @@ Result: Share the outcome and impact..."
                         setCaseStudy(null);
                         setUserAnswer("");
                         setAnalysis(null);
-                        setStep("ai-config");
+                        setStep("configure");
                       }}
                     >
                       <RefreshCw className="mr-2 h-4 w-4" />
