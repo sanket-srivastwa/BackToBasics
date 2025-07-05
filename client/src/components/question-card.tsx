@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, BookOpen, ArrowRight } from "lucide-react";
 
 interface QuestionCardProps {
   question: {
@@ -17,6 +18,7 @@ interface QuestionCardProps {
   companyBadgeColor?: string;
   statusIcon?: React.ReactNode;
   onClick: () => void;
+  onGetAnswer?: () => void;
   showPractitioners?: boolean;
 }
 
@@ -25,6 +27,7 @@ export default function QuestionCard({
   companyBadgeColor = "bg-blue-100 text-blue-800", 
   statusIcon = null, 
   onClick,
+  onGetAnswer,
   showPractitioners = true 
 }: QuestionCardProps) {
   const getTopicDisplay = (topic: string) => {
@@ -62,10 +65,7 @@ export default function QuestionCard({
   };
 
   return (
-    <Card 
-      className="border hover:shadow-md transition-shadow cursor-pointer"
-      onClick={onClick}
-    >
+    <Card className="border hover:shadow-md transition-shadow">
       <CardHeader>
         <div className="flex items-center justify-between mb-4">
           {question.company && (
@@ -101,19 +101,48 @@ export default function QuestionCard({
         )}
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="flex items-center justify-between">
+        <div className="space-y-3">
           {showPractitioners && (
-            <div className="flex items-center">
-              <Users className="w-4 h-4 text-neutral-400 mr-2" />
-              <span className="text-sm text-neutral-500">
-                {getPractitionerCount().toLocaleString()} practitioners
-              </span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Users className="w-4 h-4 text-neutral-400 mr-2" />
+                <span className="text-sm text-neutral-500">
+                  {getPractitionerCount().toLocaleString()} practitioners
+                </span>
+              </div>
+              <div className="flex items-center text-sm text-neutral-500">
+                <span>{question.timeLimit} min</span>
+              </div>
             </div>
           )}
-          <div className="flex items-center text-sm text-neutral-500">
-            <span>{question.timeLimit} min</span>
+          
+          <div className="flex gap-2">
+            <Button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick();
+              }}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+              size="sm"
+            >
+              <ArrowRight className="w-4 h-4 mr-2" />
+              Practice
+            </Button>
+            {onGetAnswer && (
+              <Button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onGetAnswer();
+                }}
+                variant="outline"
+                className="flex-1 border-green-300 text-green-700 hover:bg-green-50"
+                size="sm"
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
+                Get Answer
+              </Button>
+            )}
           </div>
-          <span className="text-sm font-medium text-primary ml-auto">Practice →</span>
         </div>
       </CardContent>
     </Card>

@@ -9,6 +9,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import QuestionCard from "@/components/question-card";
 import AuthPromptModal from "@/components/auth-prompt-modal";
+import AnswerModal from "@/components/answer-modal";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ArrowLeft, Users, Clock, Target, TrendingUp, Bookmark, Star, Flame, Search, Filter, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -21,6 +22,8 @@ export default function Practice() {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showAnswerModal, setShowAnswerModal] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
 
   const { canViewQuestions, shouldShowAuthPrompt, questionsRemaining, questionsViewed } = useAccessControl();
 
@@ -96,6 +99,11 @@ export default function Practice() {
 
   const handleQuestionClick = (questionId: number) => {
     setLocation(`/question/${questionId}`);
+  };
+
+  const handleGetAnswer = (question: any) => {
+    setSelectedQuestion(question);
+    setShowAnswerModal(true);
   };
 
   const clearAllFilters = () => {
@@ -330,6 +338,7 @@ export default function Practice() {
                   key={question.id}
                   question={question}
                   onClick={() => handleQuestionClick(question.id)}
+                  onGetAnswer={() => handleGetAnswer(question)}
                 />
               ))}
             </div>
@@ -343,6 +352,15 @@ export default function Practice() {
             onClose={() => setShowAuthModal(false)}
             questionsRemaining={questionsRemaining}
             questionsViewed={questionsViewed}
+          />
+        )}
+
+        {/* Answer Modal */}
+        {showAnswerModal && selectedQuestion && (
+          <AnswerModal
+            isOpen={showAnswerModal}
+            onClose={() => setShowAnswerModal(false)}
+            question={selectedQuestion}
           />
         )}
       </main>
