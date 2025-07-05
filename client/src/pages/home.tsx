@@ -146,11 +146,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50">
       <Header />
       
       {/* Hero Section */}
-      <section className="gradient-hero text-white py-20">
+      <section className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Search Bar - Top Center */}
           <div className="flex justify-center mb-8">
@@ -186,7 +186,7 @@ export default function Home() {
               </div>
 
               {/* Search Button */}
-              <Button type="submit" className="h-12 px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg">
+              <Button type="submit" className="h-12 px-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all">
                 Search
               </Button>
             </form>
@@ -194,7 +194,7 @@ export default function Home() {
           
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">Master Your Next Interview</h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl mb-8 text-orange-100 max-w-3xl mx-auto">
               Practice with real questions from top tech companies like Microsoft, Google, Amazon, and more. Get AI-powered feedback for product, program, and engineering management roles.
             </p>
             
@@ -209,10 +209,10 @@ export default function Home() {
                     <Play className="w-8 h-8 text-white mx-auto" />
                   </div>
                   <h3 className="text-2xl font-bold mb-4">Practice</h3>
-                  <p className="text-blue-100 mb-6">
+                  <p className="text-orange-100 mb-6">
                     Test yourself with real interview questions from top companies. Get AI-powered feedback and improve your answers.
                   </p>
-                  <div className="flex flex-col gap-2 text-sm text-blue-100">
+                  <div className="flex flex-col gap-2 text-sm text-orange-100">
                     <div className="flex items-center justify-center">
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Real top tech company questions
@@ -238,10 +238,10 @@ export default function Home() {
                     <Lightbulb className="w-8 h-8 text-white mx-auto" />
                   </div>
                   <h3 className="text-2xl font-bold mb-4">Learn</h3>
-                  <p className="text-blue-100 mb-6">
+                  <p className="text-orange-100 mb-6">
                     Master the fundamentals with comprehensive learning materials covering PM, TPM, and Engineering Management.
                   </p>
-                  <div className="flex flex-col gap-2 text-sm text-blue-100">
+                  <div className="flex flex-col gap-2 text-sm text-orange-100">
                     <div className="flex items-center justify-center">
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Comprehensive frameworks
@@ -263,7 +263,7 @@ export default function Home() {
       </section>
 
       {/* Main Options */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gradient-to-br from-yellow-50 to-orange-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-neutral-800 mb-4">Choose Your Practice Mode</h2>
@@ -274,10 +274,10 @@ export default function Home() {
           
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Case Studies Card */}
-            <Card className="card-hover border-2 border-gradient-to-r from-blue-200 to-purple-200 cursor-pointer group scale-on-hover bg-gradient-to-br from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 transition-all duration-300">
+            <Card className="card-hover border-2 border-gradient-to-r from-purple-200 to-pink-200 cursor-pointer group scale-on-hover bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 transition-all duration-300">
               <CardHeader>
                 <div className="flex items-center mb-4">
-                  <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-lg mr-4 shadow-lg">
+                  <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-3 rounded-lg mr-4 shadow-lg">
                     <ChartLine className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-2xl text-gray-800">AI Case Studies</CardTitle>
@@ -303,7 +303,7 @@ export default function Home() {
                 </ul>
                 <div className="space-y-2">
                   <Button 
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-300" 
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-300" 
                     onClick={() => setLocation("/custom-case-study?mode=ai-generated")}
                   >
                     <ChartLine className="mr-2 h-5 w-5" />
@@ -314,10 +314,10 @@ export default function Home() {
             </Card>
 
             {/* Practice Questions Card */}
-            <Card className="card-hover border-2 border-gradient-to-r from-emerald-200 to-teal-200 cursor-pointer group scale-on-hover bg-gradient-to-br from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 transition-all duration-300">
+            <Card className="card-hover border-2 border-gradient-to-r from-orange-200 to-yellow-200 cursor-pointer group scale-on-hover bg-gradient-to-br from-orange-50 to-yellow-50 hover:from-orange-100 hover:to-yellow-100 transition-all duration-300">
               <CardHeader>
                 <div className="flex items-center mb-4">
-                  <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-3 rounded-lg mr-4 shadow-lg">
+                  <div className="bg-gradient-to-r from-orange-600 to-yellow-600 p-3 rounded-lg mr-4 shadow-lg">
                     <Briefcase className="h-8 w-8 text-white" />
                   </div>
                   <CardTitle className="text-2xl text-gray-800">Practice Questions</CardTitle>
@@ -329,20 +329,20 @@ export default function Home() {
               <CardContent>
                 <ul className="space-y-2 mb-6">
                   <li className="flex items-center text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-500 mr-3" />
+                    <CheckCircle className="h-5 w-5 text-orange-500 mr-3" />
                     Top tech company questions
                   </li>
                   <li className="flex items-center text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-500 mr-3" />
+                    <CheckCircle className="h-5 w-5 text-orange-500 mr-3" />
                     Timed practice sessions
                   </li>
                   <li className="flex items-center text-gray-600">
-                    <CheckCircle className="h-5 w-5 text-emerald-500 mr-3" />
+                    <CheckCircle className="h-5 w-5 text-orange-500 mr-3" />
                     Difficulty-based filtering
                   </li>
                 </ul>
                 <Button 
-                  className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-300" 
+                  className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-700 hover:to-yellow-700 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-300" 
                   onClick={() => setLocation("/practice")}
                 >
                   <Briefcase className="mr-2 h-5 w-5" />
@@ -357,7 +357,7 @@ export default function Home() {
 
 
       {/* Learning Materials */}
-      <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
+      <section className="py-20 bg-gradient-to-br from-pink-50 to-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Learning Materials</h2>
@@ -369,10 +369,10 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <Card className="card-hover cursor-pointer group scale-on-hover" onClick={() => setLocation("/learning")}>
               <CardHeader className="text-center">
-                <div className="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center float-animation">
-                  <Target className="w-8 h-8 text-blue-600" />
+                <div className="mx-auto mb-4 w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center float-animation">
+                  <Target className="w-8 h-8 text-purple-600" />
                 </div>
-                <CardTitle className="text-xl text-blue-800">Technical Program Management</CardTitle>
+                <CardTitle className="text-xl text-purple-800">Technical Program Management</CardTitle>
                 <CardDescription className="text-gray-600">
                   Lead complex technical programs across engineering teams
                 </CardDescription>
@@ -385,7 +385,7 @@ export default function Home() {
                   <li>• Risk Management</li>
                 </ul>
                 <div className="mt-6">
-                  <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-2 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-2 shadow-lg hover:shadow-xl transition-all duration-300">
                     Start Learning
                   </Button>
                 </div>
@@ -394,10 +394,10 @@ export default function Home() {
 
             <Card className="card-hover cursor-pointer group scale-on-hover" onClick={() => setLocation("/learning")}>
               <CardHeader className="text-center">
-                <div className="mx-auto mb-4 w-16 h-16 bg-green-100 rounded-full flex items-center justify-center float-animation">
-                  <Lightbulb className="w-8 h-8 text-green-600" />
+                <div className="mx-auto mb-4 w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center float-animation">
+                  <Lightbulb className="w-8 h-8 text-orange-600" />
                 </div>
-                <CardTitle className="text-xl text-green-800">Product Management</CardTitle>
+                <CardTitle className="text-xl text-orange-800">Product Management</CardTitle>
                 <CardDescription className="text-gray-600">
                   Build products that customers love and drive business growth
                 </CardDescription>
@@ -410,7 +410,7 @@ export default function Home() {
                   <li>• A/B Testing & Metrics</li>
                 </ul>
                 <div className="mt-6">
-                  <Button className="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold py-2 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Button className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-700 hover:to-yellow-700 text-white font-semibold py-2 shadow-lg hover:shadow-xl transition-all duration-300">
                     Start Learning
                   </Button>
                 </div>
@@ -419,10 +419,10 @@ export default function Home() {
 
             <Card className="card-hover cursor-pointer group scale-on-hover" onClick={() => setLocation("/learning")}>
               <CardHeader className="text-center">
-                <div className="mx-auto mb-4 w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center float-animation">
-                  <Users className="w-8 h-8 text-purple-600" />
+                <div className="mx-auto mb-4 w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center float-animation">
+                  <Users className="w-8 h-8 text-pink-600" />
                 </div>
-                <CardTitle className="text-xl text-purple-800">Engineering Management</CardTitle>
+                <CardTitle className="text-xl text-pink-800">Engineering Management</CardTitle>
                 <CardDescription className="text-gray-600">
                   Lead engineering teams and drive technical excellence
                 </CardDescription>
@@ -435,7 +435,7 @@ export default function Home() {
                   <li>• Performance Coaching</li>
                 </ul>
                 <div className="mt-6">
-                  <Button className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold py-2 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Button className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold py-2 shadow-lg hover:shadow-xl transition-all duration-300">
                     Start Learning
                   </Button>
                 </div>
@@ -446,7 +446,7 @@ export default function Home() {
       </section>
 
       {/* Popular Questions */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gradient-to-br from-orange-50 to-yellow-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-neutral-800 mb-4">Popular Top Tech Company Questions</h2>
