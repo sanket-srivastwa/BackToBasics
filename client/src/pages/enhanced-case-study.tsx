@@ -69,8 +69,8 @@ export default function EnhancedCaseStudy() {
   // Generate case study mutation
   const generateCaseStudyMutation = useMutation({
     mutationFn: async ({ topic, difficulty }: { topic: string; difficulty: string }) => {
-      const response = await apiRequest("/api/case-studies/generate", "POST", { topic, difficulty });
-      return response as CaseStudy;
+      const response = await apiRequest("POST", "/api/case-studies/generate", { topic, difficulty });
+      return response.json();
     },
     onSuccess: (data: CaseStudy) => {
       setCaseStudy(data);
@@ -106,11 +106,11 @@ export default function EnhancedCaseStudy() {
         throw new Error("Please provide an answer before submitting");
       }
       
-      const response = await apiRequest("/api/case-studies/evaluate", "POST", { 
+      const response = await apiRequest("POST", "/api/case-studies/evaluate", { 
         caseStudy, 
         userAnswer: finalAnswer 
       });
-      return response as AnalysisResult;
+      return response.json();
     },
     onSuccess: (data: AnalysisResult) => {
       setAnalysisResult(data);
