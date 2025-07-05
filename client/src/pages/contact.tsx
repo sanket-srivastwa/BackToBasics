@@ -9,11 +9,11 @@ import Footer from "@/components/footer";
 
 export default function Contact() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+    <div className="min-h-screen bg-[#FAFAFA]" style={{ fontFamily: "'Source Sans Pro', 'Roboto', sans-serif" }}>
       <Header />
       
       {/* Header */}
-      <section className="py-20 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 text-white">
+      <section className="py-20 bg-[#2962FF] text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Contact Us</h1>
           <p className="text-xl md:text-2xl font-light opacity-90">
@@ -61,7 +61,7 @@ export default function Contact() {
                     className="min-h-[120px]"
                   />
                 </div>
-                <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                <Button className="w-full bg-[#2962FF] hover:bg-[#1976D2]">
                   Send Message
                 </Button>
               </CardContent>
