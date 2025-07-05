@@ -289,6 +289,23 @@ export default function CustomCaseStudy() {
     setStep("mode");
   };
 
+  const handleBackToModeSelection = () => {
+    // Clear any existing state for clean navigation
+    setQuestion("");
+    setUserAnswer("");
+    setAnalysis(null);
+    setSelectedPrompted(null);
+    setPromptedQuestions([]);
+    setCaseStudy(null);
+    setIsLoadingQuestions(false);
+    // Reset to default values
+    setSelectedTopic("Technical Program Management");
+    setExperienceLevel("mid");
+    setDifficulty("medium");
+    setMode("custom");
+    setStep("mode");
+  };
+
   // Generate AI case study mutation with enhanced PM Solutions format (always fresh)
   const generateCaseStudyMutation = useMutation({
     mutationFn: async () => {
@@ -703,19 +720,28 @@ export default function CustomCaseStudy() {
                   </ul>
                 </div>
 
-                <Button
-                  onClick={handleQuestionSubmit}
-                  disabled={validateQuestionMutation.isPending || question.trim().length < 10}
-                  className="w-full"
-                  size="lg"
-                >
-                  {validateQuestionMutation.isPending ? (
-                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
-                  ) : (
-                    <Sparkles className="mr-2 h-4 w-4" />
-                  )}
-                  Validate & Continue
-                </Button>
+                <div className="flex gap-4">
+                  <Button
+                    variant="outline"
+                    onClick={handleBackToModeSelection}
+                    className="flex-1"
+                  >
+                    Back to Mode Selection
+                  </Button>
+                  <Button
+                    onClick={handleQuestionSubmit}
+                    disabled={validateQuestionMutation.isPending || question.trim().length < 10}
+                    className="flex-1"
+                    size="lg"
+                  >
+                    {validateQuestionMutation.isPending ? (
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
+                    ) : (
+                      <Sparkles className="mr-2 h-4 w-4" />
+                    )}
+                    Validate & Continue
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -771,19 +797,28 @@ export default function CustomCaseStudy() {
                     </div>
                   </div>
 
-                  <Button
-                    onClick={loadPromptedQuestions}
-                    disabled={isLoadingQuestions}
-                    className="w-full"
-                    size="lg"
-                  >
-                    {isLoadingQuestions ? (
-                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
-                    ) : (
-                      <RefreshCw className="mr-2 h-4 w-4" />
-                    )}
-                    {isLoadingQuestions ? "Generating Fresh Questions..." : "Generate New Questions"}
-                  </Button>
+                  <div className="flex gap-4">
+                    <Button
+                      variant="outline"
+                      onClick={handleBackToModeSelection}
+                      className="flex-1"
+                    >
+                      Back to Mode Selection
+                    </Button>
+                    <Button
+                      onClick={loadPromptedQuestions}
+                      disabled={isLoadingQuestions}
+                      className="flex-1"
+                      size="lg"
+                    >
+                      {isLoadingQuestions ? (
+                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
+                      ) : (
+                        <RefreshCw className="mr-2 h-4 w-4" />
+                      )}
+                      {isLoadingQuestions ? "Generating Fresh Questions..." : "Generate New Questions"}
+                    </Button>
+                  </div>
 
                   {promptedQuestions.length > 0 && (
                     <div className="space-y-4">
