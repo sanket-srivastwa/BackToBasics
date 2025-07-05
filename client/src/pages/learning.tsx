@@ -402,6 +402,11 @@ export default function Learning() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filtersExpanded, setFiltersExpanded] = useState(false);
+  const [aiSearchQuery, setAiSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [loadingMaterials, setLoadingMaterials] = useState<{ [key: string]: boolean }>({});
+  const [generatedMaterials, setGeneratedMaterials] = useState<{ [key: string]: any }>({});
 
   // Handle URL parameters
   useEffect(() => {
@@ -448,6 +453,71 @@ export default function Learning() {
     
     return categoryMatch && searchMatch;
   });
+
+  const handleAiSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!aiSearchQuery.trim() || isSearching) return;
+
+    setIsSearching(true);
+    try {
+      const response = await fetch('/api/learning/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: aiSearchQuery,
+          topics: ["Product Management", "Program Management", "Engineering Management", "Business Analytics"]
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to search');
+      }
+
+      const result = await response.json();
+      setSearchResults(result);
+    } catch (error) {
+      console.error('Search failed:', error);
+      setSearchResults({
+        query: aiSearchQuery,
+        content: "Sorry, I couldn't search for that right now. Please try again later.",
+        timestamp: new Date().toISOString()
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const generateMaterials = async (topic: string) => {
+    const topicKey = topic.toLowerCase().replace(/\s+/g, '-');
+    if (loadingMaterials[topicKey] || generatedMaterials[topicKey]) return;
+
+    setLoadingMaterials(prev => ({ ...prev, [topicKey]: true }));
+    try {
+      const response = await fetch(`/api/learning/materials/${encodeURIComponent(topic)}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate materials');
+      }
+
+      const result = await response.json();
+      setGeneratedMaterials(prev => ({ ...prev, [topicKey]: result }));
+    } catch (error) {
+      console.error('Failed to generate materials:', error);
+      // Set fallback message
+      setGeneratedMaterials(prev => ({ 
+        ...prev, 
+        [topicKey]: { 
+          topic, 
+          modules: [], 
+          error: "Unable to generate materials. Please try again later." 
+        } 
+      }));
+    } finally {
+      setLoadingMaterials(prev => ({ ...prev, [topicKey]: false }));
+    }
+  };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -738,6 +808,110 @@ export default function Learning() {
   return (
     <div className="min-h-screen bg-[#FAFAFA]" style={{ fontFamily: "'Source Sans Pro', 'Roboto', sans-serif" }}>
       <Header />
+      
+      {/* AI Learning Search Section */}
+      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-b border-gray-200 px-6 py-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-800 mb-3">AI Learning Assistant</h1>
+            <p className="text-lg text-gray-600">Ask any question about Product Management, Program Management, Engineering Management, or Business Analytics</p>
+          </div>
+          
+          <form onSubmit={handleAiSearch} className="mb-8">
+            <div className="relative max-w-2xl mx-auto">
+              <Brain className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
+              <Input
+                type="text"
+                placeholder="e.g., How do I create a product roadmap? What are OKRs? How to manage stakeholders?"
+                value={aiSearchQuery}
+                onChange={(e) => setAiSearchQuery(e.target.value)}
+                className="pl-12 pr-20 w-full h-14 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 placeholder-gray-500 text-base"
+                disabled={isSearching}
+              />
+              <Button 
+                type="submit" 
+                disabled={isSearching || !aiSearchQuery.trim()}
+                className="absolute right-2 h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-all disabled:opacity-50"
+              >
+                {isSearching ? "Searching..." : "Ask AI"}
+              </Button>
+            </div>
+          </form>
+
+          {/* Quick Topic Buttons */}
+          <div className="flex flex-wrap justify-center gap-3 mb-6">
+            {["Product Management", "Program Management", "Engineering Management", "Business Analytics"].map((topic) => {
+              const topicKey = topic.toLowerCase().replace(/\s+/g, '-');
+              return (
+                <Button
+                  key={topic}
+                  variant="outline"
+                  onClick={() => generateMaterials(topic)}
+                  disabled={loadingMaterials[topicKey]}
+                  className="bg-white hover:bg-gray-50 text-gray-700 border-gray-200"
+                >
+                  {loadingMaterials[topicKey] ? "Generating..." : `${topic} Materials`}
+                  <Zap className="ml-2 h-4 w-4" />
+                </Button>
+              );
+            })}
+          </div>
+
+          {/* Search Results */}
+          {searchResults && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-left max-w-4xl mx-auto">
+              <div className="flex items-center gap-2 mb-4">
+                <MessageSquare className="h-5 w-5 text-blue-600" />
+                <h3 className="text-lg font-semibold text-gray-800">Search Results for: "{searchResults.query}"</h3>
+              </div>
+              <div className="prose prose-gray max-w-none">
+                <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                  {searchResults.content}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Generated Materials Display */}
+          {Object.entries(generatedMaterials).map(([topicKey, materials]) => (
+            <div key={topicKey} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-left max-w-4xl mx-auto mt-6">
+              <div className="flex items-center gap-2 mb-4">
+                <BookOpen className="h-5 w-5 text-purple-600" />
+                <h3 className="text-lg font-semibold text-gray-800">{materials.topic} Learning Materials</h3>
+              </div>
+              
+              {materials.error ? (
+                <p className="text-red-600">{materials.error}</p>
+              ) : materials.modules && materials.modules.length > 0 ? (
+                <div className="grid gap-4">
+                  {materials.modules.slice(0, 3).map((module: any, index: number) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-800 mb-2">{module.title}</h4>
+                      <p className="text-gray-600 text-sm mb-2">{module.description}</p>
+                      <div className="flex items-center gap-4 text-xs text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {module.duration}
+                        </span>
+                        <Badge variant="outline" className="text-xs">
+                          {module.level}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                  {materials.modules.length > 3 && (
+                    <p className="text-sm text-gray-500 text-center">
+                      ...and {materials.modules.length - 3} more modules
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-gray-600">Generating comprehensive learning materials...</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
       
       {/* Filter Section */}
       <div className="bg-white border-b border-gray-200 px-6 py-4">

@@ -182,6 +182,164 @@ export async function generateLearningResponse(query: string): Promise<string> {
   }
 }
 
+export interface LearningModule {
+  id: string;
+  title: string;
+  description: string;
+  duration: string;
+  level: string;
+  topics: string[];
+  content: {
+    overview: string;
+    objectives: string[];
+    sections: {
+      title: string;
+      content: string;
+      examples: string[];
+      exercises: string[];
+    }[];
+    resources: {
+      title: string;
+      type: string;
+      url?: string;
+      description: string;
+    }[];
+    assessment: {
+      question: string;
+      options?: string[];
+      answer: string;
+      explanation: string;
+    }[];
+  };
+}
+
+export async function generateComprehensiveLearningMaterials(topic: string): Promise<LearningModule[]> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert curriculum designer for ${topic} at top technology companies like Google, Meta, Amazon, Microsoft, and Apple. Create comprehensive, practical learning modules that prepare professionals for senior roles. Each module should include real-world frameworks, case studies, and actionable insights used at leading tech companies.`
+        },
+        {
+          role: "user",
+          content: `Generate 6-8 comprehensive learning modules for ${topic}. Each module should be detailed, practical, and suitable for professionals aiming for senior roles at top tech companies.
+
+Include modules covering:
+- Fundamentals and core concepts
+- Strategic thinking and planning
+- Execution and delivery
+- Leadership and team management
+- Analytics and data-driven decisions
+- Advanced topics and emerging trends
+- Industry best practices
+- Career development
+
+For each module, provide:
+1. Clear learning objectives
+2. Detailed content sections with explanations
+3. Real-world examples from tech companies
+4. Practical exercises and activities
+5. Recommended resources
+6. Assessment questions with explanations
+
+Respond in JSON format with this structure:
+{
+  "modules": [
+    {
+      "id": "unique-module-id",
+      "title": "Module Title",
+      "description": "Brief description",
+      "duration": "estimated hours",
+      "level": "beginner/intermediate/advanced",
+      "topics": ["topic1", "topic2"],
+      "content": {
+        "overview": "comprehensive overview",
+        "objectives": ["objective1", "objective2"],
+        "sections": [
+          {
+            "title": "Section Title",
+            "content": "detailed content",
+            "examples": ["example1", "example2"],
+            "exercises": ["exercise1", "exercise2"]
+          }
+        ],
+        "resources": [
+          {
+            "title": "Resource Title",
+            "type": "book/article/course/tool",
+            "description": "description"
+          }
+        ],
+        "assessment": [
+          {
+            "question": "Assessment question",
+            "options": ["option1", "option2", "option3", "option4"],
+            "answer": "correct answer",
+            "explanation": "why this is correct"
+          }
+        ]
+      }
+    }
+  ]
+}`
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    const result = JSON.parse(response.choices[0].message.content || "{}");
+    return result.modules || [];
+  } catch (error: any) {
+    console.error("Error generating comprehensive learning materials:", error);
+    if (error.status === 429) {
+      throw new Error("OpenAI API quota exceeded. Please check your API plan and billing details.");
+    }
+    throw new Error("Failed to generate learning materials");
+  }
+}
+
+export async function searchLearningContent(query: string, topics: string[] = ["Product Management", "Program Management", "Engineering Management", "Business Analytics"]): Promise<any> {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert learning search assistant for management topics. When users search for learning content, provide relevant, comprehensive information across ${topics.join(", ")}. Focus on practical frameworks, real-world applications, and actionable insights. Always structure your response with clear sections and examples.`
+        },
+        {
+          role: "user",
+          content: `Search query: "${query}"
+
+Provide comprehensive learning content related to this query. Include:
+1. Relevant topics and concepts
+2. Practical frameworks and methodologies
+3. Real-world examples from tech companies
+4. Step-by-step guidance
+5. Best practices and common pitfalls
+6. Related learning areas to explore further
+
+Structure your response in a clear, educational format with headings and bullet points.`
+        }
+      ],
+    });
+
+    return {
+      query,
+      content: response.choices[0].message.content || "No content found for this query.",
+      timestamp: new Date().toISOString()
+    };
+  } catch (error: any) {
+    console.error("Error searching learning content:", error);
+    if (error.status === 429) {
+      throw new Error("OpenAI API quota exceeded. Please check your API plan and billing details.");
+    }
+    throw new Error("Failed to search learning content");
+  }
+}
+
 export async function validateQuestion(question: string): Promise<{ isValid: boolean; feedback?: string }> {
   try {
     const response = await openai.chat.completions.create({

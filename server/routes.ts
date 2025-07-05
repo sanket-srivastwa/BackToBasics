@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertAnswerSchema, insertPracticeSessionSchema } from "@shared/schema";
-import { generateOptimalAnswer, analyzeAnswerComparison, validateQuestion, generateLearningContent, generateLearningResponse, generateCaseStudy, evaluateCaseStudyResponse, type CaseStudy } from "./openai";
+import { generateOptimalAnswer, analyzeAnswerComparison, validateQuestion, generateLearningContent, generateLearningResponse, generateCaseStudy, evaluateCaseStudyResponse, generateComprehensiveLearningMaterials, searchLearningContent, type CaseStudy } from "./openai";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -596,8 +596,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI Learning Search Assistant
+  // Generate comprehensive learning materials for a topic
+  app.get("/api/learning/materials/:topic", async (req, res) => {
+    try {
+      const { topic } = req.params;
+      
+      if (!topic) {
+        return res.status(400).json({ error: "Topic is required" });
+      }
+
+      const modules = await generateComprehensiveLearningMaterials(topic);
+      res.json({ topic, modules });
+    } catch (error: any) {
+      console.error("Failed to generate learning materials:", error);
+      if (error.message.includes("quota exceeded")) {
+        res.status(429).json({ error: "AI service temporarily unavailable. Please try again later." });
+      } else {
+        res.status(500).json({ error: "Failed to generate learning materials" });
+      }
+    }
+  });
+
+  // Search learning content with AI
   app.post("/api/learning/search", async (req, res) => {
+    try {
+      const { query, topics } = req.body;
+      
+      if (!query) {
+        return res.status(400).json({ error: "Search query is required" });
+      }
+
+      const result = await searchLearningContent(query, topics);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Failed to search learning content:", error);
+      if (error.message.includes("quota exceeded")) {
+        res.status(429).json({ error: "AI service temporarily unavailable. Please try again later." });
+      } else {
+        res.status(500).json({ error: "Failed to search learning content" });
+      }
+    }
+  });
+
+  // AI Learning Response Assistant
+  app.post("/api/learning/ask", async (req, res) => {
     try {
       const { query } = req.body;
       
