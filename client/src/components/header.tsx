@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
-import { Search, User, LogOut, Settings, Info, Mail } from "lucide-react";
+import { Search, User, LogOut, Settings, Info, Mail, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -79,7 +79,7 @@ export default function Header() {
               <nav className="hidden md:ml-8 md:flex md:space-x-8">
                 <button 
                   onClick={() => setLocation("/")}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-3 py-2 rounded-md text-sm font-bold transition-colors ${
                     location === "/" 
                       ? "text-primary bg-primary/10" 
                       : "text-neutral-600 hover:text-primary"
@@ -87,29 +87,78 @@ export default function Header() {
                 >
                   Home
                 </button>
-                <button 
-                  onClick={() => setLocation("/practice")}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    location === "/practice" 
-                      ? "text-primary bg-primary/10" 
-                      : "text-neutral-600 hover:text-primary"
-                  }`}
-                >
-                  Practice
-                </button>
-                <button 
-                  onClick={() => setLocation("/learning")}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    location === "/learning" 
-                      ? "text-primary bg-primary/10" 
-                      : "text-neutral-600 hover:text-primary"
-                  }`}
-                >
-                  Learning
-                </button>
+                
+                {/* Practice Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button 
+                      className={`px-3 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-1 ${
+                        location === "/practice" 
+                          ? "text-primary bg-primary/10" 
+                          : "text-neutral-600 hover:text-primary"
+                      }`}
+                    >
+                      Practice
+                      <ChevronDown className="h-3 w-3" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-56">
+                    <DropdownMenuItem onClick={() => setLocation("/practice?topic=product-management")}>
+                      Product Management
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLocation("/practice?topic=program-management")}>
+                      Program Management
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLocation("/practice?topic=engineering-management")}>
+                      Engineering Management
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLocation("/practice?topic=general-management")}>
+                      General Management
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setLocation("/practice")}>
+                      Browse All Questions
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* Learning Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button 
+                      className={`px-3 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-1 ${
+                        location === "/learning" 
+                          ? "text-primary bg-primary/10" 
+                          : "text-neutral-600 hover:text-primary"
+                      }`}
+                    >
+                      Learning
+                      <ChevronDown className="h-3 w-3" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-56">
+                    <DropdownMenuItem onClick={() => setLocation("/learning?track=product-management")}>
+                      Product Management
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLocation("/learning?track=program-management")}>
+                      Program Management
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLocation("/learning?track=engineering-management")}>
+                      Engineering Management
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLocation("/learning?track=business-analytics")}>
+                      Business Analytics
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setLocation("/learning")}>
+                      All Learning Materials
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                
                 <button 
                   onClick={() => setLocation("/custom-case-study")}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-3 py-2 rounded-md text-sm font-bold transition-colors ${
                     location === "/custom-case-study" 
                       ? "text-primary bg-primary/10" 
                       : "text-neutral-600 hover:text-primary"
