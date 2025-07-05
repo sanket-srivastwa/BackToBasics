@@ -31,13 +31,37 @@ export default function Practice() {
     const urlParams = new URLSearchParams(window.location.search);
     const search = urlParams.get('search');
     const company = urlParams.get('company');
+    const difficulty = urlParams.get('difficulty');
+    const role = urlParams.get('role');
+    const topic = urlParams.get('topic');
+    
     if (search) {
       setSearchQuery(search);
+      setLocalSearchQuery(search);
     }
     if (company) {
       setSelectedCompany(company);
     }
+    if (difficulty) {
+      setSelectedDifficulty(difficulty);
+    }
+    if (role) {
+      setSelectedRole(role);
+    }
+    if (topic) {
+      setSelectedTopic(topic);
+    }
   }, []);
+
+  // Listen for URL changes to update search parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const search = urlParams.get('search');
+    if (search && search !== searchQuery) {
+      setSearchQuery(search);
+      setLocalSearchQuery(search);
+    }
+  }, [window.location.search]);
 
   // Comprehensive questions query with all filters
   const { data: questions, isLoading } = useQuery({

@@ -50,11 +50,17 @@ export default function Home() {
 
   const companies = [
     { id: "all", name: "All Companies" },
-    { id: "meta", name: "Meta" },
-    { id: "amazon", name: "Amazon" },
-    { id: "apple", name: "Apple" },
-    { id: "netflix", name: "Netflix" },
+    { id: "microsoft", name: "Microsoft" },
     { id: "google", name: "Google" },
+    { id: "amazon", name: "Amazon" },
+    { id: "meta", name: "Meta" },
+    { id: "apple", name: "Apple" },
+    { id: "oracle", name: "Oracle" },
+    { id: "cisco", name: "Cisco" },
+    { id: "salesforce", name: "Salesforce" },
+    { id: "adobe", name: "Adobe" },
+    { id: "nvidia", name: "NVIDIA" },
+    { id: "netflix", name: "Netflix" },
   ];
 
   const topics = [
@@ -144,28 +150,64 @@ export default function Home() {
       <section className="gradient-hero text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Search Bar - Top Right */}
-          <div className="flex justify-end mb-8">
-            <form onSubmit={handleSearch} className="hidden lg:flex items-center">
-              <div className="relative flex items-center bg-white/20 backdrop-blur-md rounded-xl overflow-hidden border border-white/30 shadow-lg">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white w-5 h-5" />
+          <div className="flex justify-center mb-8">
+            <form onSubmit={handleSearch} className="hidden lg:flex items-center space-x-3">
+              {/* Practice Dropdown */}
+              <Select value={searchType} onValueChange={setSearchType}>
+                <SelectTrigger className="w-32 h-12 bg-white text-gray-800 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                  <SelectValue placeholder="Practice" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="practice">Practice</SelectItem>
+                  <SelectItem value="learning">Learning</SelectItem>
+                  <SelectItem value="companies">Companies</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Learning Dropdown */}
+              <Select>
+                <SelectTrigger className="w-32 h-12 bg-white text-gray-800 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                  <SelectValue placeholder="Learning" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pm">Product Management</SelectItem>
+                  <SelectItem value="tpm">Program Management</SelectItem>
+                  <SelectItem value="em">Engineering Management</SelectItem>
+                  <SelectItem value="analytics">Business Analytics</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Companies Dropdown */}
+              <Select>
+                <SelectTrigger className="w-36 h-12 bg-white text-gray-800 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                  <SelectValue placeholder="Companies" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="microsoft">Microsoft</SelectItem>
+                  <SelectItem value="google">Google</SelectItem>
+                  <SelectItem value="amazon">Amazon</SelectItem>
+                  <SelectItem value="meta">Meta</SelectItem>
+                  <SelectItem value="apple">Apple</SelectItem>
+                  <SelectItem value="oracle">Oracle</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Search Input */}
+              <div className="relative flex items-center">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                 <Input
                   type="text"
-                  placeholder="Search questions, topics, companies..."
+                  placeholder="Search interview questions, topics, and more..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 pr-32 w-96 h-12 border-0 rounded-none focus:ring-2 focus:ring-white/40 bg-transparent text-white placeholder-white/80 text-base font-medium"
+                  className="pl-12 pr-4 w-80 h-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 placeholder-gray-500 text-base font-medium"
                 />
-                <Select value={searchType} onValueChange={setSearchType}>
-                  <SelectTrigger className="w-28 h-12 border-0 border-l border-white/30 rounded-none bg-white/10 text-white font-medium hover:bg-white/20 transition-colors">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="practice">Practice</SelectItem>
-                    <SelectItem value="learning">Learning</SelectItem>
-                    <SelectItem value="companies">Companies</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
+
+              {/* Search Button */}
+              <Button type="submit" className="h-12 px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg">
+                Search
+              </Button>
             </form>
           </div>
           
@@ -192,7 +234,7 @@ export default function Home() {
                   <div className="flex flex-col gap-2 text-sm text-blue-100">
                     <div className="flex items-center justify-center">
                       <CheckCircle className="w-4 h-4 mr-2" />
-                      Real MAANG company questions
+                      Real top tech company questions
                     </div>
                     <div className="flex items-center justify-center">
                       <CheckCircle className="w-4 h-4 mr-2" />
@@ -304,7 +346,7 @@ export default function Home() {
                 <ul className="space-y-2 mb-6">
                   <li className="flex items-center text-neutral-600">
                     <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
-                    MAANG company questions
+                    Top tech company questions
                   </li>
                   <li className="flex items-center text-neutral-600">
                     <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
@@ -422,7 +464,7 @@ export default function Home() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-neutral-800 mb-4">Popular MAANG Questions</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-neutral-800 mb-4">Popular Top Tech Company Questions</h2>
             <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
               Practice with real questions asked by top tech companies
             </p>
