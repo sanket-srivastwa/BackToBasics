@@ -186,44 +186,38 @@ export default function EnhancedCaseStudy() {
     setCurrentStep('mode');
   };
 
-  // Stepper navigation helpers
+  // Stepper navigation helpers - Track completed steps
+  const [completedSteps, setCompletedSteps] = useState<StepType[]>(['mode']);
+  
   const getCurrentStepIndex = () => STEPS.findIndex(step => step.id === currentStep);
-  const getMaxCompletedStepIndex = () => {
-    // Determine the maximum step index the user has reached
-    if (analysisResult) return 4; // Feedback step (index 4)
-    if (caseStudy && userAnswer.length > 0) return 3; // Answer step (index 3)
-    if (caseStudy) return 2; // Question step (index 2)
-    if (selectedTopic && selectedDifficulty) return 1; // Configure step (index 1)
-    return 0; // Mode step (index 0)
+  
+  const markStepAsCompleted = (step: StepType) => {
+    setCompletedSteps(prev => {
+      if (!prev.includes(step)) {
+        return [...prev, step];
+      }
+      return prev;
+    });
   };
   
+  const isStepCompleted = (step: StepType) => completedSteps.includes(step);
+  
   const canNavigateToStep = (targetStep: StepType) => {
-    const targetIndex = STEPS.findIndex(step => step.id === targetStep);
-    const maxCompletedIndex = getMaxCompletedStepIndex();
-    return targetIndex <= maxCompletedIndex; // Allow navigation to any completed step
-  };
-
-  const navigateToStep = (targetStep: StepType) => {
-    if (canNavigateToStep(targetStep)) {
-      setCurrentStep(targetStep);
-    }
+    return completedSteps.includes(targetStep) || targetStep === currentStep;
   };
 
   // Stepper Component
   const StepperNavigation = () => {
-    const maxCompletedIndex = getMaxCompletedStepIndex();
-    const currentIndex = getCurrentStepIndex();
-    
     return (
       <div className="mb-8">
         <div className="flex items-center justify-between">
           {STEPS.map((step, index) => {
             const isActive = currentStep === step.id;
-            const isCompleted = index < currentIndex; // Previous steps are completed
-            const isAccessible = index <= maxCompletedIndex; // Can access any step up to max completed
+            const isCompleted = isStepCompleted(step.id) && !isActive;
+            const isAccessible = canNavigateToStep(step.id);
             
             const handleStepClick = () => {
-              if (isAccessible) {
+              if (isAccessible && step.id !== currentStep) {
                 console.log(`Navigating to step: ${step.id} (index ${index})`);
                 setCurrentStep(step.id);
               }
@@ -234,12 +228,11 @@ export default function EnhancedCaseStudy() {
                 <div className="flex flex-col items-center">
                   <button
                     onClick={handleStepClick}
-                    disabled={!isAccessible}
-                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200 ${
                       isActive 
-                        ? 'bg-blue-600 text-white shadow-md' 
+                        ? 'bg-blue-600 text-white shadow-lg' 
                         : isCompleted 
-                        ? 'bg-green-600 text-white cursor-pointer hover:bg-green-700 shadow-md' 
+                        ? 'bg-green-600 text-white cursor-pointer hover:bg-green-700 hover:shadow-lg' 
                         : isAccessible
                         ? 'bg-gray-300 text-gray-700 cursor-pointer hover:bg-gray-400'
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -259,7 +252,7 @@ export default function EnhancedCaseStudy() {
           })}
         </div>
         <div className="text-xs text-gray-500 mt-2 text-center">
-          Current: {currentStep} (Index: {currentIndex}) | Max Completed: {maxCompletedIndex}
+          Current: {currentStep} | Completed: {completedSteps.join(', ')}
         </div>
       </div>
     );
@@ -305,7 +298,10 @@ export default function EnhancedCaseStudy() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="cursor-pointer border-2 hover:border-blue-500 transition-colors" onClick={() => setCurrentStep('configure')}>
+                <Card className="cursor-pointer border-2 hover:border-blue-500 transition-colors" onClick={() => {
+                  markStepAsCompleted('mode');
+                  setCurrentStep('configure');
+                }}>
                   <CardContent className="p-6 text-center">
                     <Bot className="h-12 w-12 text-blue-600 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">AI-Generated Case Study</h3>
@@ -414,7 +410,10 @@ export default function EnhancedCaseStudy() {
 
               <div className="flex justify-end">
                 <Button
-                  onClick={() => handleGenerateCaseStudy(selectedTopic, selectedDifficulty)}
+                  onClick={() => {
+                    markStepAsCompleted('configure');
+                    handleGenerateCaseStudy(selectedTopic, selectedDifficulty);
+                  }}
                   disabled={generateCaseStudyMutation.isPending}
                   size="lg"
                 >
@@ -556,7 +555,10 @@ export default function EnhancedCaseStudy() {
 
               <div className="flex justify-end">
                 <Button 
-                  onClick={() => setCurrentStep('answer')} 
+                  onClick={() => {
+                    markStepAsCompleted('question');
+                    setCurrentStep('answer');
+                  }} 
                   size="lg"
                 >
                   Begin Solution
@@ -679,7 +681,10 @@ export default function EnhancedCaseStudy() {
 
                 <div className="flex justify-end">
                   <Button
-                    onClick={handleSubmitAnswer}
+                    onClick={() => {
+                      markStepAsCompleted('answer');
+                      handleSubmitAnswer();
+                    }}
                     disabled={evaluateAnswerMutation.isPending || userAnswer.trim().length < 10}
                     size="lg"
                   >
