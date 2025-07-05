@@ -11,7 +11,7 @@ import Footer from "@/components/footer";
 import QuestionCard from "@/components/question-card";
 import AuthPromptModal from "@/components/auth-prompt-modal";
 import { useAccessControl } from "@/hooks/useAccessControl";
-import { ArrowLeft, Users, Clock, Target, TrendingUp, Bookmark, Star, Flame, Search, Filter, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Users, Clock, Target, TrendingUp, Bookmark, Star, Flame, Search, Filter, ChevronDown, ChevronUp, Briefcase } from "lucide-react";
 
 export default function Practice() {
   const [, setLocation] = useLocation();
@@ -19,7 +19,7 @@ export default function Practice() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
-  const [selectedRole, setSelectedRole] = useState("all");
+
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -32,7 +32,6 @@ export default function Practice() {
     const search = urlParams.get('search');
     const company = urlParams.get('company');
     const difficulty = urlParams.get('difficulty');
-    const role = urlParams.get('role');
     const topic = urlParams.get('topic');
     
     if (search) {
@@ -44,9 +43,6 @@ export default function Practice() {
     }
     if (difficulty) {
       setSelectedDifficulty(difficulty);
-    }
-    if (role) {
-      setSelectedRole(role);
     }
     if (topic) {
       setSelectedTopic(topic);
@@ -65,14 +61,13 @@ export default function Practice() {
 
   // Comprehensive questions query with all filters
   const { data: questions, isLoading } = useQuery({
-    queryKey: ["/api/questions/filtered", selectedTopic, selectedCompany, selectedDifficulty, selectedRole, searchQuery || localSearchQuery],
+    queryKey: ["/api/questions/filtered", selectedTopic, selectedCompany, selectedDifficulty, searchQuery || localSearchQuery],
     queryFn: async () => {
       const params = new URLSearchParams();
       
       // Add all filters to params
       if (selectedCompany !== "all") params.append('company', selectedCompany);
       if (selectedDifficulty !== "all") params.append('difficulty', selectedDifficulty);
-      if (selectedRole !== "all") params.append('role', selectedRole);
       if (selectedTopic !== "all") params.append('topic', selectedTopic);
       if (searchQuery || localSearchQuery) params.append('search', searchQuery || localSearchQuery);
       
@@ -123,13 +118,7 @@ export default function Practice() {
     { id: "netflix", name: "Netflix" }
   ];
 
-  const roles = [
-    { id: "all", name: "All Roles" },
-    { id: "product-management", name: "Product Management" },
-    { id: "program-management", name: "Program Management" },
-    { id: "engineering-management", name: "Engineering Management" },
-    { id: "general", name: "General Management" }
-  ];
+
 
   const handleQuestionClick = (questionId: number) => {
     setLocation(`/question/${questionId}`);
@@ -235,77 +224,103 @@ export default function Practice() {
               </CardTitle>
             </CardHeader>
             {filtersExpanded && (
-              <CardContent className="space-y-6 pt-0">
-                {/* Difficulty Filter */}
-                <div>
-                  <h4 className="text-sm font-medium mb-3">Difficulty Level</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {difficulties.map((difficulty) => (
-                      <Button
-                        key={difficulty.id}
-                        variant={selectedDifficulty === difficulty.id ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedDifficulty(difficulty.id)}
-                        className="transition-colors"
-                      >
-                        {difficulty.name}
-                      </Button>
-                    ))}
+              <CardContent className="pt-0">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  {/* Difficulty Filter */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Target className="w-4 h-4 text-orange-600" />
+                      <h4 className="text-sm font-semibold text-gray-800">Difficulty Level</h4>
+                    </div>
+                    <div className="space-y-2">
+                      {difficulties.map((difficulty) => (
+                        <Button
+                          key={difficulty.id}
+                          variant={selectedDifficulty === difficulty.id ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedDifficulty(difficulty.id)}
+                          className={`w-full justify-start transition-all duration-200 ${
+                            selectedDifficulty === difficulty.id 
+                              ? "bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg" 
+                              : "hover:bg-orange-50 hover:border-orange-300"
+                          }`}
+                        >
+                          <div className={`w-2 h-2 rounded-full mr-3 ${
+                            difficulty.id === "easy" ? "bg-green-400" :
+                            difficulty.id === "medium" ? "bg-yellow-400" : "bg-red-400"
+                          }`}></div>
+                          {difficulty.name}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Topic Filter */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Users className="w-4 h-4 text-blue-600" />
+                      <h4 className="text-sm font-semibold text-gray-800">Management Area</h4>
+                    </div>
+                    <div className="space-y-2">
+                      {topics.map((topic) => (
+                        <Button
+                          key={topic.id}
+                          variant={selectedTopic === topic.id ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedTopic(topic.id)}
+                          className={`w-full justify-start transition-all duration-200 ${
+                            selectedTopic === topic.id 
+                              ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg" 
+                              : "hover:bg-blue-50 hover:border-blue-300"
+                          }`}
+                        >
+                          {topic.name}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Company Filter */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Star className="w-4 h-4 text-purple-600" />
+                      <h4 className="text-sm font-semibold text-gray-800">Company</h4>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {companies.map((company) => (
+                        <Button
+                          key={company.id}
+                          variant={selectedCompany === company.id ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedCompany(company.id)}
+                          className={`justify-start transition-all duration-200 text-xs ${
+                            selectedCompany === company.id 
+                              ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg" 
+                              : "hover:bg-purple-50 hover:border-purple-300"
+                          }`}
+                        >
+                          {company.name}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-
-                {/* Topic Filter */}
-                <div>
-                  <h4 className="text-sm font-medium mb-3">Management Area</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {topics.map((topic) => (
-                      <Button
-                        key={topic.id}
-                        variant={selectedTopic === topic.id ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedTopic(topic.id)}
-                        className="transition-colors"
-                      >
-                        {topic.name}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Role Filter */}
-                <div>
-                  <h4 className="text-sm font-medium mb-3">Role Focus</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {roles.map((role) => (
-                      <Button
-                        key={role.id}
-                        variant={selectedRole === role.id ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedRole(role.id)}
-                        className="transition-colors"
-                      >
-                        {role.name}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Company Filter */}
-                <div>
-                  <h4 className="text-sm font-medium mb-3">Company</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {companies.map((company) => (
-                      <Button
-                        key={company.id}
-                        variant={selectedCompany === company.id ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedCompany(company.id)}
-                        className="transition-colors"
-                      >
-                        {company.name}
-                      </Button>
-                    ))}
-                  </div>
+                
+                {/* Clear All Filters Button */}
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setSelectedDifficulty("all");
+                      setSelectedTopic("all");
+                      setSelectedCompany("all");
+                      setLocalSearchQuery("");
+                      setSearchQuery("");
+                    }}
+                    className="text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+                  >
+                    Clear All Filters
+                  </Button>
                 </div>
               </CardContent>
             )}
