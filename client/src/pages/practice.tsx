@@ -81,14 +81,23 @@ export default function Practice() {
   const questions = useMemo(() => {
     if (!questionsData || !Array.isArray(questionsData)) return [];
     
+    console.log('Raw questionsData:', questionsData);
+    console.log('questionsData length:', questionsData.length);
+    
     const uniqueQuestions = new Map();
-    questionsData.forEach((question: any) => {
+    questionsData.forEach((question: any, index: number) => {
+      console.log(`Question ${index}:`, question.id, question.title);
       if (question && question.id && !uniqueQuestions.has(question.id)) {
         uniqueQuestions.set(question.id, question);
+      } else if (question && question.id) {
+        console.log('Duplicate question found:', question.id);
       }
     });
     
-    return Array.from(uniqueQuestions.values());
+    const finalQuestions = Array.from(uniqueQuestions.values());
+    console.log('Final questions count:', finalQuestions.length);
+    
+    return finalQuestions;
   }, [questionsData]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {

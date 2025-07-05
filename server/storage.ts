@@ -238,12 +238,17 @@ export class DatabaseStorage implements IStorage {
       );
     }
 
+    console.log('Search filters:', filters);
+    console.log('Conditions:', conditions.length);
+
     if (conditions.length > 0) {
-      const results = await db.selectDistinct().from(questions)
+      const results = await db.select().from(questions)
         .where(and(...conditions))
         .orderBy(desc(questions.createdAt));
       
-      // Additional deduplication to ensure no duplicates
+      console.log('Raw results count:', results.length);
+      
+      // Deduplication to ensure no duplicates
       const uniqueResults = new Map();
       results.forEach(question => {
         if (!uniqueResults.has(question.id)) {
@@ -251,13 +256,16 @@ export class DatabaseStorage implements IStorage {
         }
       });
       
-      return Array.from(uniqueResults.values());
+      const finalResults = Array.from(uniqueResults.values());
+      console.log('Deduplicated results count:', finalResults.length);
+      
+      return finalResults;
     }
 
-    const results = await db.selectDistinct().from(questions)
+    const results = await db.select().from(questions)
       .orderBy(desc(questions.createdAt));
     
-    // Additional deduplication for popular questions too
+    // Deduplication for popular questions too
     const uniqueResults = new Map();
     results.forEach(question => {
       if (!uniqueResults.has(question.id)) {
