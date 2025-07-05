@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +19,6 @@ export default function Practice() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
-
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -59,9 +58,14 @@ export default function Practice() {
     }
   }, [window.location.search]);
 
+  // Create unified search term (prefer URL search over local search)
+  const activeSearchQuery = useMemo(() => {
+    return searchQuery || localSearchQuery;
+  }, [searchQuery, localSearchQuery]);
+
   // Comprehensive questions query with all filters
-  const { data: questions, isLoading } = useQuery({
-    queryKey: ["/api/questions/filtered", selectedTopic, selectedCompany, selectedDifficulty, searchQuery || localSearchQuery],
+  const { data: questionsData, isLoading } = useQuery({
+    queryKey: ["/api/questions/filtered", selectedTopic, selectedCompany, selectedDifficulty, activeSearchQuery],
     queryFn: async () => {
       const params = new URLSearchParams();
       
@@ -69,7 +73,7 @@ export default function Practice() {
       if (selectedCompany !== "all") params.append('company', selectedCompany);
       if (selectedDifficulty !== "all") params.append('difficulty', selectedDifficulty);
       if (selectedTopic !== "all") params.append('topic', selectedTopic);
-      if (searchQuery || localSearchQuery) params.append('search', searchQuery || localSearchQuery);
+      if (activeSearchQuery) params.append('search', activeSearchQuery);
       
       // Use filtered endpoint if any filters are applied, otherwise get popular questions
       const hasFilters = params.toString().length > 0;
@@ -77,15 +81,40 @@ export default function Practice() {
       const response = await fetch(url);
       return response.json();
     },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
   });
+
+  // Deduplicate questions by ID to prevent duplicates
+  const questions = useMemo(() => {
+    if (!questionsData || !Array.isArray(questionsData)) return [];
+    
+    const uniqueQuestions = new Map();
+    questionsData.forEach((question: any) => {
+      if (question && question.id && !uniqueQuestions.has(question.id)) {
+        uniqueQuestions.set(question.id, question);
+      }
+    });
+    
+    return Array.from(uniqueQuestions.values());
+  }, [questionsData]);
+
+  // Debounce search input to prevent too many API calls
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      // Only trigger search if there's actual content or clear if empty
+      if (localSearchQuery.trim() !== activeSearchQuery) {
+        setSearchQuery(""); // Clear URL search when using local search
+      }
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [localSearchQuery, activeSearchQuery]);
 
   // Handle local search
   const handleLocalSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (localSearchQuery.trim()) {
-      setSearchQuery(""); // Clear URL search
-      // The query will automatically refetch due to localSearchQuery change
-    }
+    // Search is handled by the debounced effect above
   };
 
   const topics = [
@@ -316,6 +345,8 @@ export default function Practice() {
                       setSelectedCompany("all");
                       setLocalSearchQuery("");
                       setSearchQuery("");
+                      // Clear URL parameters as well
+                      window.history.pushState({}, '', '/practice');
                     }}
                     className="text-gray-600 hover:text-gray-800 hover:bg-gray-100"
                   >

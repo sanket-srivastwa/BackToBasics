@@ -239,10 +239,15 @@ export class DatabaseStorage implements IStorage {
     }
 
     if (conditions.length > 0) {
-      return await db.select().from(questions).where(and(...conditions)).orderBy(desc(questions.createdAt));
+      return await db.select().from(questions)
+        .where(and(...conditions))
+        .orderBy(desc(questions.createdAt))
+        .groupBy(questions.id); // Ensure unique results
     }
 
-    return await db.select().from(questions).orderBy(desc(questions.createdAt));
+    return await db.select().from(questions)
+      .orderBy(desc(questions.createdAt))
+      .groupBy(questions.id); // Ensure unique results
   }
 
   // Prompted Question operations
