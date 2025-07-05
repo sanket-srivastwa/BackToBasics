@@ -67,15 +67,63 @@ interface LearningTopic {
 }
 
 const learningModules: LearningModule[] = [
-  // Product Management
+  // Product Management - Comprehensive Course
+  {
+    id: "pm-fundamentals",
+    title: "Product Management Fundamentals",
+    description: "Complete guide to product management from basics to advanced concepts",
+    icon: Target,
+    duration: "12 hours",
+    difficulty: "Beginner",
+    progress: 0,
+    category: "product",
+    topics: [
+      {
+        id: "pm-intro",
+        title: "Introduction to Product Management",
+        description: "What is product management and the PM role",
+        duration: "30 min",
+        type: "video",
+        completed: false,
+        content: "Product Management is the practice of strategically driving the development, market launch, and continual support and improvement of a company's products. Learn the core responsibilities, skills required, and how PMs collaborate with engineering, design, marketing, and sales teams."
+      },
+      {
+        id: "pm-mindset",
+        title: "Product Manager Mindset & Skills",
+        description: "Essential skills and mindset for successful PMs",
+        duration: "45 min",
+        type: "article",
+        completed: false,
+        content: "Develop the right mindset for product management including customer obsession, data-driven thinking, strategic planning, and effective communication. Learn about technical skills, business acumen, and design thinking."
+      },
+      {
+        id: "pm-roles",
+        title: "PM Roles Across Different Companies",
+        description: "How PM roles differ at startups vs big tech",
+        duration: "25 min",
+        type: "video",
+        completed: false,
+        content: "Understand how product management roles vary across different company sizes, industries, and stages. Compare PM responsibilities at FAANG companies vs startups vs enterprise software companies."
+      },
+      {
+        id: "pm-career-path",
+        title: "Product Management Career Paths",
+        description: "From APM to CPO: career progression in PM",
+        duration: "35 min",
+        type: "article",
+        completed: false,
+        content: "Explore career progression from Associate Product Manager to Chief Product Officer. Learn about different specializations like growth PM, platform PM, B2B PM, and the skills needed for each level."
+      }
+    ]
+  },
   {
     id: "product-strategy",
     title: "Product Strategy & Vision",
     description: "Learn to define product vision, strategy, and roadmaps that align with business goals",
     icon: Target,
-    duration: "6 hours",
+    duration: "10 hours",
     difficulty: "Intermediate",
-    progress: 65,
+    progress: 20,
     category: "product",
     topics: [
       {
@@ -93,60 +141,276 @@ const learningModules: LearningModule[] = [
         description: "Understanding business models and strategic positioning",
         duration: "60 min",
         type: "article",
-        completed: true,
+        completed: false,
         content: "Explore how to use strategy canvas to map out your product's value proposition, key partnerships, cost structure, and revenue streams. Learn to identify strategic opportunities and threats in your market."
       },
       {
-        id: "roadmap-planning",
-        title: "Roadmap Planning & Prioritization",
-        description: "Building effective product roadmaps with clear priorities",
+        id: "competitive-analysis",
+        title: "Competitive Analysis & Market Research",
+        description: "Analyzing competitors and market dynamics",
         duration: "50 min",
         type: "exercise",
         completed: false,
-        content: "Master the art of roadmap creation using frameworks like RICE, Value vs Effort, and OKRs. Learn to balance customer needs, business objectives, and technical constraints while maintaining flexibility."
+        content: "Master competitive analysis techniques including feature comparison, pricing analysis, and market positioning. Learn to identify competitive advantages and market gaps."
+      },
+      {
+        id: "north-star-metrics",
+        title: "North Star Metrics & OKRs",
+        description: "Setting and tracking strategic metrics",
+        duration: "40 min",
+        type: "video",
+        completed: false,
+        content: "Learn to define North Star metrics that align with business objectives. Understand how to cascade company OKRs into product and feature-level goals."
+      },
+      {
+        id: "go-to-market",
+        title: "Go-to-Market Strategy",
+        description: "Planning product launches and market entry",
+        duration: "55 min",
+        type: "article",
+        completed: false,
+        content: "Develop comprehensive go-to-market strategies including target customer identification, positioning, pricing, and launch planning. Learn from successful product launches."
       }
     ]
   },
   {
     id: "user-research",
-    title: "User Research & Analytics",
+    title: "User Research & Customer Discovery",
     description: "Master data-driven decision making through user research and analytics",
     icon: BarChart3,
-    duration: "5 hours",
+    duration: "8 hours",
     difficulty: "Intermediate",
-    progress: 40,
+    progress: 0,
     category: "product",
     topics: [
       {
-        id: "research-methods",
-        title: "Research Methods & User Interviews",
-        description: "Conducting effective user research to validate assumptions",
-        duration: "55 min",
+        id: "research-fundamentals",
+        title: "User Research Fundamentals",
+        description: "Introduction to user research methodologies",
+        duration: "40 min",
         type: "video",
-        completed: true,
-        content: "Learn qualitative and quantitative research methods including user interviews, surveys, usability testing, and A/B testing. Understand when to use each method and how to avoid common biases."
+        completed: false,
+        content: "Learn the basics of user research including qualitative vs quantitative methods, when to use each approach, and how to avoid common research biases."
       },
       {
-        id: "analytics-frameworks",
+        id: "customer-interviews",
+        title: "Customer Interviews & Surveys",
+        description: "Conducting effective customer interviews",
+        duration: "55 min",
+        type: "video",
+        completed: false,
+        content: "Master the art of customer interviews including crafting good questions, avoiding leading questions, and extracting actionable insights. Learn survey design best practices."
+      },
+      {
+        id: "usability-testing",
+        title: "Usability Testing & User Testing",
+        description: "Testing product usability with real users",
+        duration: "45 min",
+        type: "exercise",
+        completed: false,
+        content: "Learn to design and conduct usability tests, analyze user behavior, and identify friction points in your product experience."
+      },
+      {
+        id: "analytics-setup",
         title: "Product Analytics & Metrics",
         description: "Setting up analytics and defining success metrics",
         duration: "50 min",
         type: "article",
         completed: false,
         content: "Discover how to implement product analytics, define KPIs, and create dashboards that drive decision-making. Cover acquisition, activation, retention, referral, and revenue metrics."
+      },
+      {
+        id: "ab-testing",
+        title: "A/B Testing & Experimentation",
+        description: "Running experiments to validate hypotheses",
+        duration: "60 min",
+        type: "video",
+        completed: false,
+        content: "Learn experimental design, statistical significance, and how to run A/B tests. Understand common pitfalls and how to design experiments that provide clear insights."
+      }
+    ]
+  },
+  {
+    id: "product-design",
+    title: "Product Design & User Experience",
+    description: "Design thinking and UX principles for product managers",
+    icon: Monitor,
+    duration: "9 hours",
+    difficulty: "Intermediate",
+    progress: 0,
+    category: "product",
+    topics: [
+      {
+        id: "design-thinking",
+        title: "Design Thinking Process",
+        description: "Understanding the design thinking methodology",
+        duration: "45 min",
+        type: "video",
+        completed: false,
+        content: "Learn the five stages of design thinking: Empathize, Define, Ideate, Prototype, and Test. Understand how to apply this methodology to product development."
+      },
+      {
+        id: "user-personas",
+        title: "User Personas & Journey Mapping",
+        description: "Creating user personas and mapping customer journeys",
+        duration: "50 min",
+        type: "exercise",
+        completed: false,
+        content: "Learn to create data-driven user personas and map customer journeys to identify pain points and opportunities for improvement."
+      },
+      {
+        id: "wireframing",
+        title: "Wireframing & Prototyping",
+        description: "Creating wireframes and interactive prototypes",
+        duration: "60 min",
+        type: "video",
+        completed: false,
+        content: "Master wireframing tools and techniques. Learn to create low-fidelity and high-fidelity prototypes for testing ideas quickly."
+      },
+      {
+        id: "ux-principles",
+        title: "UX Design Principles",
+        description: "Core principles of user experience design",
+        duration: "40 min",
+        type: "article",
+        completed: false,
+        content: "Understand fundamental UX principles including usability, accessibility, information architecture, and interaction design."
+      },
+      {
+        id: "design-systems",
+        title: "Design Systems & Component Libraries",
+        description: "Building scalable design systems",
+        duration: "45 min",
+        type: "video",
+        completed: false,
+        content: "Learn about design systems, component libraries, and how they enable consistent user experiences at scale."
+      }
+    ]
+  },
+  {
+    id: "product-development",
+    title: "Product Development & Delivery",
+    description: "Agile development, working with engineering teams, and product delivery",
+    icon: Code,
+    duration: "11 hours",
+    difficulty: "Advanced",
+    progress: 0,
+    category: "product",
+    topics: [
+      {
+        id: "agile-scrum",
+        title: "Agile & Scrum Methodology",
+        description: "Working in agile environments and scrum processes",
+        duration: "50 min",
+        type: "video",
+        completed: false,
+        content: "Master agile principles and scrum framework. Learn about sprints, user stories, backlog management, and the product owner role in scrum teams."
+      },
+      {
+        id: "user-stories",
+        title: "Writing Effective User Stories",
+        description: "Creating clear and actionable user stories",
+        duration: "40 min",
+        type: "exercise",
+        completed: false,
+        content: "Learn the art of writing user stories using the 'As a... I want... So that...' format. Understand acceptance criteria and story estimation."
+      },
+      {
+        id: "backlog-management",
+        title: "Product Backlog Management",
+        description: "Prioritizing and managing the product backlog",
+        duration: "45 min",
+        type: "video",
+        completed: false,
+        content: "Master backlog prioritization techniques including MoSCoW method, Kano model, and RICE scoring. Learn to balance technical debt with feature development."
+      },
+      {
+        id: "engineering-collaboration",
+        title: "Working with Engineering Teams",
+        description: "Effective collaboration with developers",
+        duration: "55 min",
+        type: "article",
+        completed: false,
+        content: "Learn how to effectively communicate with engineering teams, understand technical constraints, and make informed trade-off decisions."
+      },
+      {
+        id: "technical-debt",
+        title: "Managing Technical Debt",
+        description: "Balancing feature development with technical health",
+        duration: "35 min",
+        type: "video",
+        completed: false,
+        content: "Understand technical debt, its impact on product velocity, and how to advocate for technical improvements within business constraints."
+      },
+      {
+        id: "release-management",
+        title: "Release Management & Deployment",
+        description: "Managing product releases and deployments",
+        duration: "40 min",
+        type: "article",
+        completed: false,
+        content: "Learn about release planning, feature flags, gradual rollouts, and monitoring product releases for issues."
       }
     ]
   },
   
-  // Program Management
+  // Program Management - Comprehensive Course
+  {
+    id: "tpm-fundamentals",
+    title: "Technical Program Management Fundamentals",
+    description: "Complete guide to technical program management from basics to advanced",
+    icon: Network,
+    duration: "10 hours",
+    difficulty: "Beginner",
+    progress: 0,
+    category: "program",
+    topics: [
+      {
+        id: "tpm-intro",
+        title: "Introduction to Technical Program Management",
+        description: "What is TPM and how it differs from PM and engineering management",
+        duration: "35 min",
+        type: "video",
+        completed: false,
+        content: "Technical Program Management bridges the gap between technical execution and business strategy. Learn the core responsibilities of TPMs including cross-functional coordination, technical decision-making, and risk management across large-scale technical programs."
+      },
+      {
+        id: "tpm-skills",
+        title: "Essential TPM Skills & Competencies",
+        description: "Technical and soft skills required for TPMs",
+        duration: "45 min",
+        type: "article",
+        completed: false,
+        content: "Develop technical depth, system thinking, communication skills, and leadership capabilities. Learn how to balance technical constraints with business requirements."
+      },
+      {
+        id: "tpm-vs-pm",
+        title: "TPM vs PM vs Engineering Manager",
+        description: "Understanding role boundaries and collaboration",
+        duration: "30 min",
+        type: "video",
+        completed: false,
+        content: "Clear distinctions between TPM, PM, and EM roles. Learn how these roles collaborate and when organizations need each type of leadership."
+      },
+      {
+        id: "tpm-career",
+        title: "TPM Career Paths & Growth",
+        description: "Career progression and specialization areas",
+        duration: "25 min",
+        type: "article",
+        completed: false,
+        content: "Explore career paths from senior engineer to senior TPM to director level roles. Learn about specializations in platform, infrastructure, mobile, or AI/ML programs."
+      }
+    ]
+  },
   {
     id: "program-execution",
     title: "Program Execution & Delivery",
     description: "Execute complex programs with multiple stakeholders and dependencies",
     icon: Network,
-    duration: "7 hours",
+    duration: "12 hours",
     difficulty: "Advanced",
-    progress: 25,
+    progress: 0,
     category: "program",
     topics: [
       {
@@ -155,7 +419,7 @@ const learningModules: LearningModule[] = [
         description: "Breaking down complex programs into manageable workstreams",
         duration: "60 min",
         type: "video",
-        completed: true,
+        completed: false,
         content: "Learn to decompose large-scale programs into workstreams, identify dependencies, and create execution plans. Cover work breakdown structures, critical path analysis, and risk assessment."
       },
       {
@@ -166,6 +430,33 @@ const learningModules: LearningModule[] = [
         type: "article",
         completed: false,
         content: "Master stakeholder mapping, influence strategies, and communication frameworks. Learn to build consensus, manage conflicts, and keep programs on track through effective relationship management."
+      },
+      {
+        id: "dependency-management",
+        title: "Dependency Management & Critical Path",
+        description: "Managing cross-team dependencies and blockers",
+        duration: "55 min",
+        type: "video",
+        completed: false,
+        content: "Learn to identify, track, and resolve dependencies between teams. Master critical path analysis, dependency mapping, and strategies for unblocking teams."
+      },
+      {
+        id: "risk-mitigation",
+        title: "Risk Management & Contingency Planning",
+        description: "Proactive risk identification and mitigation strategies",
+        duration: "50 min",
+        type: "exercise",
+        completed: false,
+        content: "Develop skills in risk assessment, impact analysis, and contingency planning. Learn to create risk registers and implement mitigation strategies."
+      },
+      {
+        id: "program-metrics",
+        title: "Program Metrics & Health Monitoring",
+        description: "Defining and tracking program success metrics",
+        duration: "40 min",
+        type: "article",
+        completed: false,
+        content: "Learn to define program-level metrics, create health dashboards, and establish regular reporting cadences. Cover velocity metrics, quality indicators, and business impact measures."
       }
     ]
   },
@@ -200,15 +491,63 @@ const learningModules: LearningModule[] = [
     ]
   },
 
-  // Engineering Management
+  // Engineering Management - Comprehensive Course
+  {
+    id: "em-fundamentals",
+    title: "Engineering Management Fundamentals",
+    description: "Complete guide to engineering management from first-time manager to senior leader",
+    icon: Code,
+    duration: "14 hours",
+    difficulty: "Beginner",
+    progress: 0,
+    category: "engineering",
+    topics: [
+      {
+        id: "em-transition",
+        title: "Transition from Engineer to Manager",
+        description: "Making the shift from individual contributor to manager",
+        duration: "45 min",
+        type: "video",
+        completed: false,
+        content: "Navigate the challenging transition from writing code to managing people. Learn about changing mindsets, new responsibilities, and common pitfalls in the first 90 days as a new engineering manager."
+      },
+      {
+        id: "em-responsibilities",
+        title: "Core Engineering Manager Responsibilities",
+        description: "Understanding the full scope of EM responsibilities",
+        duration: "40 min",
+        type: "article",
+        completed: false,
+        content: "Master the key responsibilities including people management, technical strategy, process improvement, and business alignment. Learn how to balance technical leadership with people leadership."
+      },
+      {
+        id: "em-skills",
+        title: "Essential Management Skills for Engineers",
+        description: "Developing soft skills and leadership capabilities",
+        duration: "50 min",
+        type: "video",
+        completed: false,
+        content: "Develop crucial skills including communication, delegation, conflict resolution, and strategic thinking. Learn how technical background enhances management effectiveness."
+      },
+      {
+        id: "em-career-path",
+        title: "Engineering Management Career Paths",
+        description: "Understanding growth trajectories and specializations",
+        duration: "30 min",
+        type: "article",
+        completed: false,
+        content: "Explore career paths from team lead to VP of Engineering. Learn about different tracks including people management, technical leadership, and hybrid roles."
+      }
+    ]
+  },
   {
     id: "team-leadership",
     title: "Engineering Team Leadership",
     description: "Building and leading high-performing engineering teams",
     icon: Users,
-    duration: "6 hours",
+    duration: "10 hours",
     difficulty: "Intermediate",
-    progress: 55,
+    progress: 0,
     category: "engineering",
     topics: [
       {
@@ -217,7 +556,7 @@ const learningModules: LearningModule[] = [
         description: "Creating psychological safety and team dynamics",
         duration: "50 min",
         type: "video",
-        completed: true,
+        completed: false,
         content: "Learn the fundamentals of team formation, establishing psychological safety, and creating an environment where engineers can do their best work. Cover team topology and communication patterns."
       },
       {
@@ -228,6 +567,33 @@ const learningModules: LearningModule[] = [
         type: "article",
         completed: false,
         content: "Master one-on-one meetings, goal setting, performance reviews, and career development conversations. Learn to provide constructive feedback and support engineer growth."
+      },
+      {
+        id: "hiring-interviewing",
+        title: "Technical Hiring & Interviewing",
+        description: "Building effective hiring processes for engineers",
+        duration: "60 min",
+        type: "video",
+        completed: false,
+        content: "Design inclusive hiring processes, conduct effective technical interviews, and make sound hiring decisions. Learn to assess both technical skills and cultural fit."
+      },
+      {
+        id: "team-scaling",
+        title: "Scaling Engineering Teams",
+        description: "Growing teams while maintaining productivity",
+        duration: "45 min",
+        type: "exercise",
+        completed: false,
+        content: "Navigate the challenges of team growth including onboarding, knowledge sharing, and maintaining team culture as you scale from 5 to 50+ engineers."
+      },
+      {
+        id: "eng-culture",
+        title: "Engineering Culture & Values",
+        description: "Building and maintaining strong engineering culture",
+        duration: "40 min",
+        type: "article",
+        completed: false,
+        content: "Create and maintain engineering culture that promotes innovation, quality, and collaboration. Learn about code review culture, learning culture, and diversity & inclusion."
       }
     ]
   },
@@ -279,7 +645,7 @@ const learningModules: LearningModule[] = [
         description: "Basic probability concepts and distributions",
         duration: "90 min",
         type: "video",
-        completed: true,
+        completed: false,
         content: "Master probability theory including conditional probability, Bayes' theorem, and common probability distributions. Learn applications in business decision-making and risk assessment."
       },
       {
@@ -288,8 +654,26 @@ const learningModules: LearningModule[] = [
         description: "Drawing conclusions from data using statistical methods",
         duration: "75 min",
         type: "article",
-        completed: true,
+        completed: false,
         content: "Learn hypothesis testing, confidence intervals, p-values, and statistical significance. Understand how to design experiments and interpret results in business contexts."
+      },
+      {
+        id: "descriptive-stats",
+        title: "Descriptive Statistics & Data Exploration",
+        description: "Summarizing and exploring datasets",
+        duration: "60 min",
+        type: "video",
+        completed: false,
+        content: "Master measures of central tendency, variability, and distribution shape. Learn to create meaningful data visualizations and identify patterns in business data."
+      },
+      {
+        id: "regression-analysis",
+        title: "Regression Analysis & Correlation",
+        description: "Understanding relationships between variables",
+        duration: "85 min",
+        type: "exercise",
+        completed: false,
+        content: "Learn linear and multiple regression, correlation analysis, and how to interpret coefficients. Understand assumptions and limitations of regression models."
       },
       {
         id: "stats-practice",
@@ -333,23 +717,119 @@ const learningModules: LearningModule[] = [
     ]
   },
   {
+    id: "data-visualization",
+    title: "Data Visualization & Storytelling",
+    description: "Creating compelling visualizations and communicating insights",
+    icon: BarChart3,
+    duration: "8 hours",
+    difficulty: "Intermediate",
+    progress: 0,
+    category: "analytics",
+    topics: [
+      {
+        id: "viz-principles",
+        title: "Data Visualization Principles",
+        description: "Design principles for effective data visualization",
+        duration: "45 min",
+        type: "video",
+        completed: false,
+        content: "Learn fundamental principles of data visualization including choosing the right chart type, color theory, and visual hierarchy. Understand how to avoid common visualization mistakes."
+      },
+      {
+        id: "dashboard-design",
+        title: "Dashboard Design & KPI Tracking",
+        description: "Building executive dashboards and KPI systems",
+        duration: "60 min",
+        type: "exercise",
+        completed: false,
+        content: "Master dashboard design principles, KPI selection, and real-time monitoring systems. Learn to create dashboards that drive business decisions."
+      },
+      {
+        id: "storytelling",
+        title: "Data Storytelling & Presentation",
+        description: "Communicating insights to stakeholders",
+        duration: "50 min",
+        type: "article",
+        completed: false,
+        content: "Learn to structure data presentations, create compelling narratives, and influence decision-making through effective data storytelling."
+      }
+    ]
+  },
+  {
+    id: "business-intelligence",
+    title: "Business Intelligence & Analytics",
+    description: "Enterprise BI systems and advanced analytics",
+    icon: Database,
+    duration: "12 hours",
+    difficulty: "Advanced",
+    progress: 0,
+    category: "analytics",
+    topics: [
+      {
+        id: "bi-fundamentals",
+        title: "Business Intelligence Fundamentals",
+        description: "Introduction to BI systems and data warehousing",
+        duration: "65 min",
+        type: "video",
+        completed: false,
+        content: "Understand BI architecture, data warehouses, ETL processes, and OLAP systems. Learn how BI systems support business decision-making."
+      },
+      {
+        id: "sql-analytics",
+        title: "SQL for Advanced Analytics",
+        description: "Complex SQL queries for business analysis",
+        duration: "80 min",
+        type: "exercise",
+        completed: false,
+        content: "Master window functions, CTEs, subqueries, and advanced SQL techniques for business analytics. Learn to write complex analytical queries."
+      },
+      {
+        id: "predictive-analytics",
+        title: "Predictive Analytics & Forecasting",
+        description: "Predicting future trends and business outcomes",
+        duration: "70 min",
+        type: "video",
+        completed: false,
+        content: "Learn time series analysis, forecasting models, and predictive analytics techniques. Understand how to build models that predict business metrics."
+      },
+      {
+        id: "customer-analytics",
+        title: "Customer Analytics & Segmentation",
+        description: "Analyzing customer behavior and segmentation",
+        duration: "55 min",
+        type: "article",
+        completed: false,
+        content: "Master customer lifetime value, churn analysis, RFM segmentation, and cohort analysis. Learn to understand and predict customer behavior."
+      }
+    ]
+  },
+  {
     id: "machine-learning",
-    title: "Machine Learning Fundamentals",
-    description: "Introduction to machine learning concepts and applications",
+    title: "Machine Learning for Business",
+    description: "Practical machine learning applications in business",
     icon: Brain,
     duration: "15 hours",
-    difficulty: "Intermediate",
-    progress: 20,
+    difficulty: "Advanced",
+    progress: 0,
     category: "analytics",
     topics: [
       {
         id: "ml-concepts",
-        title: "Machine Learning Concepts",
+        title: "Machine Learning Fundamentals",
         description: "Understanding different types of ML algorithms",
         duration: "75 min",
         type: "video",
-        completed: true,
+        completed: false,
         content: "Explore supervised, unsupervised, and reinforcement learning. Understand when to use classification, regression, clustering, and recommendation systems."
+      },
+      {
+        id: "feature-engineering",
+        title: "Feature Engineering & Selection",
+        description: "Preparing data for machine learning models",
+        duration: "60 min",
+        type: "exercise",
+        completed: false,
+        content: "Learn feature selection, transformation, and engineering techniques. Understand how to prepare high-quality features for ML models."
       },
       {
         id: "model-evaluation",
@@ -359,6 +839,54 @@ const learningModules: LearningModule[] = [
         type: "article",
         completed: false,
         content: "Learn cross-validation, performance metrics, and techniques to ensure your models generalize well to new data."
+      },
+      {
+        id: "ml-deployment",
+        title: "Model Deployment & Monitoring",
+        description: "Deploying ML models to production",
+        duration: "65 min",
+        type: "video",
+        completed: false,
+        content: "Learn how to deploy ML models, monitor performance, and handle model drift. Understand MLOps principles and production considerations."
+      }
+    ]
+  },
+  {
+    id: "marketing-analytics",
+    title: "Marketing Analytics & Attribution",
+    description: "Measuring and optimizing marketing performance",
+    icon: TrendingUp,
+    duration: "9 hours",
+    difficulty: "Intermediate",
+    progress: 0,
+    category: "analytics",
+    topics: [
+      {
+        id: "marketing-metrics",
+        title: "Marketing Metrics & KPIs",
+        description: "Essential marketing performance indicators",
+        duration: "45 min",
+        type: "video",
+        completed: false,
+        content: "Learn key marketing metrics including CAC, LTV, ROAS, conversion rates, and attribution models. Understand how to measure marketing effectiveness."
+      },
+      {
+        id: "attribution-modeling",
+        title: "Attribution Modeling & Multi-touch Analysis",
+        description: "Understanding customer journey and touchpoint impact",
+        duration: "60 min",
+        type: "article",
+        completed: false,
+        content: "Master first-touch, last-touch, and multi-touch attribution models. Learn to analyze customer journeys and optimize marketing spend."
+      },
+      {
+        id: "campaign-optimization",
+        title: "Campaign Optimization & A/B Testing",
+        description: "Optimizing marketing campaigns through experimentation",
+        duration: "55 min",
+        type: "exercise",
+        completed: false,
+        content: "Learn to design and analyze marketing experiments, optimize campaigns, and use data to improve marketing performance."
       }
     ]
   },
