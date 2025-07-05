@@ -149,8 +149,8 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50">
       <Header />
       
-      {/* Hero Section - edX.org inspired with warm colors */}
-      <section className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white py-20">
+      {/* Hero Section - light colors */}
+      <section className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 text-gray-800 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Search Bar - Top Center */}
           <div className="flex justify-center mb-8">
@@ -167,7 +167,7 @@ export default function Home() {
                 </SelectContent>
               </Select>
 
-              {/* Search Input */}
+              {/* Search Input with Button Inside */}
               <div className="relative flex items-center">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
                 <Input
@@ -181,38 +181,40 @@ export default function Home() {
                   }
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 pr-4 w-96 h-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 placeholder-gray-500 text-base font-medium"
+                  className="pl-12 pr-20 w-96 h-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 placeholder-gray-500 text-base font-medium"
                 />
+                {/* Search Button Inside Input */}
+                <Button 
+                  type="submit" 
+                  className="absolute right-2 h-8 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md shadow-sm transition-all"
+                >
+                  Search
+                </Button>
               </div>
-
-              {/* Search Button - edX.org inspired */}
-              <Button type="submit" className="h-12 px-8 bg-white text-blue-900 hover:bg-gray-50 font-bold rounded-lg shadow-lg hover:shadow-xl transition-all border-2 border-white">
-                Search
-              </Button>
             </form>
           </div>
           
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">No hacks. No magic. Just practice. Always.</h1>
-            <p className="text-lg md:text-xl mb-8 text-white/90 max-w-4xl mx-auto leading-relaxed font-light">
+            <h1 className="text-2xl md:text-3xl font-bold mb-6">No hacks. No magic. Just practice. Always.</h1>
+            <p className="text-lg md:text-xl mb-8 text-gray-600 max-w-4xl mx-auto leading-relaxed font-light">
               Practice with real questions from top tech companies like Microsoft, Google, Amazon, and more. Get AI-powered feedback for product, program, and engineering management roles.
             </p>
             
             {/* Practice and Learn Options */}
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mt-12">
               <div 
-                className="glass-card rounded-xl p-8 hover:bg-white/20 transition-all duration-300 cursor-pointer group scale-on-hover"
+                className="bg-white rounded-xl p-8 hover:bg-gray-50 transition-all duration-300 cursor-pointer group scale-on-hover shadow-lg"
                 onClick={() => setLocation("/practice")}
               >
                 <div className="text-center">
-                  <div className="bg-white/20 rounded-full p-6 w-20 h-20 mx-auto mb-6 group-hover:bg-white/30 transition-all">
-                    <Play className="w-8 h-8 text-white mx-auto" />
+                  <div className="bg-blue-100 rounded-full p-6 w-20 h-20 mx-auto mb-6 group-hover:bg-blue-200 transition-all">
+                    <Play className="w-8 h-8 text-blue-600 mx-auto" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-4">Practice</h3>
-                  <p className="text-orange-100 mb-6">
+                  <h3 className="text-2xl font-bold mb-4 text-gray-800">Practice</h3>
+                  <p className="text-gray-600 mb-6">
                     Test yourself with real interview questions from top companies. Get AI-powered feedback and improve your answers.
                   </p>
-                  <div className="flex flex-col gap-2 text-sm text-orange-100">
+                  <div className="flex flex-col gap-2 text-sm text-gray-600">
                     <div className="flex items-center justify-center">
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Real top tech company questions
@@ -230,18 +232,18 @@ export default function Home() {
               </div>
               
               <div 
-                className="glass-card rounded-xl p-8 hover:bg-white/20 transition-all duration-300 cursor-pointer group scale-on-hover"
+                className="bg-white rounded-xl p-8 hover:bg-gray-50 transition-all duration-300 cursor-pointer group scale-on-hover shadow-lg"
                 onClick={() => setLocation("/learning")}
               >
                 <div className="text-center">
-                  <div className="bg-white/20 rounded-full p-6 w-20 h-20 mx-auto mb-6 group-hover:bg-white/30 transition-all">
-                    <Lightbulb className="w-8 h-8 text-white mx-auto" />
+                  <div className="bg-purple-100 rounded-full p-6 w-20 h-20 mx-auto mb-6 group-hover:bg-purple-200 transition-all">
+                    <Lightbulb className="w-8 h-8 text-purple-600 mx-auto" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-4">Learn</h3>
-                  <p className="text-orange-100 mb-6">
+                  <h3 className="text-2xl font-bold mb-4 text-gray-800">Learn</h3>
+                  <p className="text-gray-600 mb-6">
                     Master the fundamentals with comprehensive learning materials covering PM, TPM, and Engineering Management.
                   </p>
-                  <div className="flex flex-col gap-2 text-sm text-orange-100">
+                  <div className="flex flex-col gap-2 text-sm text-gray-600">
                     <div className="flex items-center justify-center">
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Comprehensive frameworks
