@@ -149,7 +149,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50">
       <Header />
       
-      {/* Hero Section */}
+      {/* Hero Section - edX.org inspired with warm colors */}
       <section className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Search Bar - Top Center */}
@@ -185,16 +185,16 @@ export default function Home() {
                 />
               </div>
 
-              {/* Search Button */}
-              <Button type="submit" className="h-12 px-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all">
+              {/* Search Button - edX.org inspired */}
+              <Button type="submit" className="h-12 px-8 bg-white text-blue-900 hover:bg-gray-50 font-bold rounded-lg shadow-lg hover:shadow-xl transition-all border-2 border-white">
                 Search
               </Button>
             </form>
           </div>
           
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">Master Your Next Interview</h1>
-            <p className="text-xl md:text-2xl mb-8 text-orange-100 max-w-3xl mx-auto">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">No hacks. No magic. Just practice. Always.</h1>
+            <p className="text-lg md:text-xl mb-8 text-white/90 max-w-4xl mx-auto leading-relaxed font-light">
               Practice with real questions from top tech companies like Microsoft, Google, Amazon, and more. Get AI-powered feedback for product, program, and engineering management roles.
             </p>
             

@@ -159,40 +159,18 @@ export default function Header() {
                   </DropdownMenuContent>
                 </DropdownMenu>
                 
-                {/* AI Case Study Dropdown */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button 
-                      className={`px-4 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-1 ${
-                        location === "/custom-case-study" 
-                          ? "text-primary bg-primary/10" 
-                          : "text-slate-700 hover:text-primary"
-                      }`}
-                      style={{ fontWeight: '700', fontSize: '15px' }}
-                    >
-                      AI Case Study
-                      <ChevronDown className="h-3 w-3" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56">
-                    <DropdownMenuItem onClick={() => setLocation("/custom-case-study?topic=product-management")}>
-                      Product Management Cases
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setLocation("/custom-case-study?topic=program-management")}>
-                      Program Management Cases
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setLocation("/custom-case-study?topic=engineering-management")}>
-                      Engineering Management Cases
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setLocation("/custom-case-study?topic=business-strategy")}>
-                      Business Strategy Cases
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setLocation("/custom-case-study")}>
-                      Custom Case Generator
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                {/* AI Case Study */}
+                <button 
+                  onClick={() => setLocation("/custom-case-study")}
+                  className={`px-4 py-2 rounded-md text-sm font-bold transition-colors ${
+                    location === "/custom-case-study" 
+                      ? "text-primary bg-primary/10" 
+                      : "text-slate-700 hover:text-primary"
+                  }`}
+                  style={{ fontWeight: '700', fontSize: '15px' }}
+                >
+                  AI Case Study
+                </button>
               </nav>
             </div>
             
