@@ -152,6 +152,9 @@ Respond in JSON format with this structure:
     if (error.status === 429) {
       throw new Error("OpenAI API quota exceeded. Please check your API plan and billing details.");
     }
+    if (error.status === 401) {
+      throw new Error("OpenAI API authentication failed. Please check your API key configuration.");
+    }
     throw new Error("Failed to generate learning content");
   }
 }

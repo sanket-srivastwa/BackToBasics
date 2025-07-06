@@ -563,6 +563,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Failed to generate learning content:", error);
       if (error.message.includes("quota exceeded") || error.status === 429) {
         res.status(429).json({ error: "AI service temporarily unavailable due to high demand. Please explore our pre-built learning materials below or try again in a few minutes." });
+      } else if (error.message.includes("authentication failed") || error.status === 401) {
+        res.status(503).json({ error: "AI service temporarily unavailable due to configuration issues. Please explore our comprehensive pre-built learning materials below." });
       } else {
         res.status(500).json({ error: "Failed to generate learning content" });
       }

@@ -1014,6 +1014,9 @@ export default function Learning() {
         if (response.status === 429 || errorData.error?.includes('temporarily unavailable')) {
           throw new Error('quota_exceeded');
         }
+        if (response.status === 503 || errorData.error?.includes('configuration issues')) {
+          throw new Error('service_unavailable');
+        }
         throw new Error('Failed to search');
       }
 
@@ -1026,6 +1029,8 @@ export default function Learning() {
       
       if (error instanceof Error && error.message === 'quota_exceeded') {
         errorContent = "🤖 Our AI assistant is currently at capacity. Please explore our comprehensive learning materials below, or try the search again in a few minutes.";
+      } else if (error instanceof Error && error.message === 'service_unavailable') {
+        errorContent = "🔧 AI search is temporarily unavailable. Please explore our comprehensive learning materials below while we resolve this.";
       }
       
       setSearchResults({
@@ -1052,6 +1057,9 @@ export default function Learning() {
         if (response.status === 429 || errorData.error?.includes('temporarily unavailable')) {
           throw new Error('quota_exceeded');
         }
+        if (response.status === 503 || errorData.error?.includes('configuration issues')) {
+          throw new Error('service_unavailable');
+        }
         throw new Error('Failed to generate materials');
       }
 
@@ -1064,6 +1072,8 @@ export default function Learning() {
       
       if (error instanceof Error && error.message === 'quota_exceeded') {
         errorMessage = "🤖 Our AI assistant is currently at capacity. Please explore our comprehensive pre-built learning materials below, or try again in a few minutes.";
+      } else if (error instanceof Error && error.message === 'service_unavailable') {
+        errorMessage = "🔧 AI features are temporarily unavailable. Please explore our comprehensive pre-built learning materials below while we resolve this.";
       }
       
       // Set fallback message
