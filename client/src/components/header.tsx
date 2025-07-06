@@ -8,6 +8,7 @@ import { useLocation } from "wouter";
 import { Search, User, LogOut, Settings, Info, Mail, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import TourButton from "@/components/TourButton";
 
 export default function Header() {
   const [location, setLocation] = useLocation();
@@ -93,6 +94,7 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button 
+                      data-tour="tour-practice-tab"
                       className={`px-4 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-1 ${
                         location === "/practice" 
                           ? "text-primary bg-primary/10" 
@@ -128,6 +130,7 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button 
+                      data-tour="tour-learning-tab"
                       className={`px-4 py-2 rounded-md text-sm font-bold transition-colors flex items-center gap-1 ${
                         location === "/learning" 
                           ? "text-primary bg-primary/10" 
@@ -161,6 +164,7 @@ export default function Header() {
                 
                 {/* AI Case Study */}
                 <button 
+                  data-tour="tour-case-study-tab"
                   onClick={() => setLocation("/custom-case-study")}
                   className={`px-4 py-2 rounded-md text-sm font-bold transition-colors ${
                     location === "/custom-case-study" 
@@ -175,6 +179,9 @@ export default function Header() {
             </div>
             
             <div className="flex items-center space-x-4">
+              {/* Tour Button */}
+              <TourButton />
+              
               {!isLoading && (
                 <>
                   {isAuthenticated ? (

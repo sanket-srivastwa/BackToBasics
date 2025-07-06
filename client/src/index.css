@@ -224,3 +224,50 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Onboarding Tour Styles */
+.tour-highlight {
+  position: relative;
+  z-index: 9997 !important;
+  box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.3), 0 0 30px rgba(147, 51, 234, 0.4) !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.tour-bounce {
+  animation: tour-bounce 1s ease-in-out infinite;
+}
+
+.tour-pulse {
+  animation: tour-pulse 2s ease-in-out infinite;
+}
+
+.tour-shake {
+  animation: tour-shake 0.5s ease-in-out;
+}
+
+.tour-float {
+  animation: tour-float 3s ease-in-out infinite;
+}
+
+@keyframes tour-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes tour-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.3), 0 0 30px rgba(147, 51, 234, 0.4) !important; }
+  50% { box-shadow: 0 0 0 8px rgba(147, 51, 234, 0.5), 0 0 40px rgba(147, 51, 234, 0.6) !important; }
+}
+
+@keyframes tour-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes tour-float {
+  0%, 100% { transform: translateY(0); }
+  33% { transform: translateY(-5px); }
+  66% { transform: translateY(5px); }
+}

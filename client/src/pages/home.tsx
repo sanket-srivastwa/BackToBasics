@@ -9,6 +9,8 @@ import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import QuestionCard from "@/components/question-card";
+import OnboardingTour from "@/components/OnboardingTour";
+import { useTour } from "@/hooks/useTour";
 import { 
   Mic, 
   ChartLine, 
@@ -34,6 +36,7 @@ export default function Home() {
   const [selectedCompany, setSelectedCompany] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("practice");
+  const { isTourOpen, closeTour, completeTour } = useTour();
 
   const { data: popularQuestions, isLoading } = useQuery({
     queryKey: ["/api/questions/popular", selectedCompany !== "all" ? selectedCompany : undefined],
@@ -150,11 +153,11 @@ export default function Home() {
       <Header />
       
       {/* Hero Section - light colors */}
-      <section className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 text-gray-800 py-20">
+      <section data-tour="tour-hero-section" className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 text-gray-800 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Search Bar - Top Center */}
           <div className="flex justify-center mb-8">
-            <form onSubmit={handleSearch} className="hidden lg:flex items-center space-x-3">
+            <form onSubmit={handleSearch} className="hidden lg:flex items-center space-x-3" data-tour="tour-search-bar">
               {/* Single Dropdown for Search Type */}
               <Select value={searchType} onValueChange={setSearchType}>
                 <SelectTrigger className="w-36 h-12 bg-white text-gray-800 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors">
@@ -511,6 +514,13 @@ export default function Home() {
       </section>
 
       <Footer />
+      
+      {/* Onboarding Tour */}
+      <OnboardingTour 
+        isOpen={isTourOpen}
+        onClose={closeTour}
+        onComplete={completeTour}
+      />
     </div>
   );
 }
