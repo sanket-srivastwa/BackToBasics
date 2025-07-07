@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, BookOpen, ArrowRight } from "lucide-react";
+import { Users, BookOpen, ArrowRight, Clock, Target, Zap, Shield, AlertTriangle } from "lucide-react";
 
 interface QuestionCardProps {
   question: {
@@ -68,24 +68,43 @@ export default function QuestionCard({
     <Card className="border hover:shadow-md transition-shadow">
       <CardHeader>
         <div className="flex items-center justify-between mb-4">
-          {question.company && (
-            <Badge className={`text-xs font-semibold ${companyBadgeColor}`}>
-              {question.company.charAt(0).toUpperCase() + question.company.slice(1)}
+          <div className="flex items-center gap-2">
+            {question.company && (
+              <Badge className={`text-xs font-semibold ${companyBadgeColor}`}>
+                {question.company.charAt(0).toUpperCase() + question.company.slice(1)}
+              </Badge>
+            )}
+            <Badge variant="outline" className="text-xs font-medium bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200 text-purple-700">
+              <Target className="w-3 h-3 mr-1" />
+              {getTopicDisplay(question.topic)}
             </Badge>
-          )}
-          <div className="flex items-center text-sm text-neutral-500">
-            {statusIcon}
-            <span className="ml-1">
+          </div>
+          <div className="flex items-center">
+            <Badge 
+              className={`text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 ${
+                question.difficulty === "easy" 
+                  ? "bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border border-green-200" 
+                  : question.difficulty === "medium" 
+                  ? "bg-gradient-to-r from-yellow-100 to-amber-100 text-amber-700 border border-yellow-200" 
+                  : "bg-gradient-to-r from-red-100 to-rose-100 text-red-700 border border-red-200"
+              }`}
+            >
+              {question.difficulty === "easy" && <Zap className="w-3 h-3" />}
+              {question.difficulty === "medium" && <Shield className="w-3 h-3" />}
+              {question.difficulty === "hard" && <AlertTriangle className="w-3 h-3" />}
               {question.difficulty === "hard" ? "Hard" : 
                question.difficulty === "medium" ? "Medium" : "Easy"}
-            </span>
+            </Badge>
           </div>
         </div>
         <CardTitle className="text-lg line-clamp-2 mb-3">
           {question.title}
         </CardTitle>
         <div className="flex items-center justify-between text-sm text-neutral-500 mb-4">
-          <span>{getTopicDisplay(question.topic)}</span>
+          <div className="flex items-center gap-1">
+            <Clock className="w-4 h-4" />
+            <span>{question.timeLimit} min</span>
+          </div>
           {question.createdAt && (
             <span>{getTimeAgo(question.createdAt)}</span>
           )}

@@ -389,8 +389,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/questions/search", async (req, res) => {
     try {
       const { q: query } = req.query;
+      
+      // Handle empty or missing query parameter
       if (!query || typeof query !== 'string' || query.trim() === '') {
-        // Return empty array for empty queries instead of error
         return res.json([]);
       }
       

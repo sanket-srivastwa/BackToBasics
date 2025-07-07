@@ -263,10 +263,12 @@ export default function Practice() {
                               : "hover:bg-orange-50 hover:border-orange-300"
                           }`}
                         >
-                          <div className={`w-2 h-2 rounded-full mr-3 ${
+                          <div className={`w-3 h-3 rounded-full mr-3 flex items-center justify-center ${
                             difficulty.id === "easy" ? "bg-green-400" :
                             difficulty.id === "medium" ? "bg-yellow-400" : "bg-red-400"
-                          }`}></div>
+                          }`}>
+                            <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                          </div>
                           {difficulty.name}
                         </Button>
                       ))}
@@ -301,8 +303,8 @@ export default function Practice() {
                   {/* Topic Filter */}
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
-                      <Target className="w-4 h-4 text-green-600" />
-                      <h4 className="text-sm font-semibold text-gray-800">Topic</h4>
+                      <Target className="w-4 h-4 text-purple-600" />
+                      <h4 className="text-sm font-semibold text-gray-800">Topic Category</h4>
                     </div>
                     <div className="space-y-2 max-h-40 overflow-y-auto">
                       <Button
@@ -311,10 +313,11 @@ export default function Practice() {
                         onClick={() => setSelectedTopic("all")}
                         className={`w-full justify-start transition-all duration-200 ${
                           selectedTopic === "all" 
-                            ? "bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg" 
-                            : "hover:bg-green-50 hover:border-green-300"
+                            ? "bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-lg" 
+                            : "hover:bg-purple-50 hover:border-purple-300"
                         }`}
                       >
+                        <div className="w-2 h-2 rounded-full mr-3 bg-gradient-to-r from-purple-400 to-pink-400"></div>
                         All Topics
                       </Button>
                       {availableTopics.map((topic) => (
@@ -325,10 +328,11 @@ export default function Practice() {
                           onClick={() => setSelectedTopic(topic)}
                           className={`w-full justify-start transition-all duration-200 text-xs ${
                             selectedTopic === topic 
-                              ? "bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg" 
-                              : "hover:bg-green-50 hover:border-green-300"
+                              ? "bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-lg" 
+                              : "hover:bg-purple-50 hover:border-purple-300"
                           }`}
                         >
+                          <div className="w-2 h-2 rounded-full mr-3 bg-gradient-to-r from-purple-400 to-pink-400"></div>
                           {topic}
                         </Button>
                       ))}
