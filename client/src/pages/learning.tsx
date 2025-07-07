@@ -41,7 +41,8 @@ import {
   Filter,
   Search,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  X
 } from "lucide-react";
 
 interface LearningModule {
@@ -64,6 +65,25 @@ interface LearningTopic {
   type: "video" | "article" | "exercise" | "quiz";
   completed: boolean;
   content?: string;
+  assessment?: Assessment;
+}
+
+interface Assessment {
+  id: string;
+  title: string;
+  questions: Question[];
+  passingScore: number;
+  userScore?: number;
+  completed: boolean;
+}
+
+interface Question {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+  userAnswer?: number;
 }
 
 const learningModules: LearningModule[] = [
@@ -85,7 +105,51 @@ const learningModules: LearningModule[] = [
         duration: "30 min",
         type: "video",
         completed: false,
-        content: "Product Management is the practice of strategically driving the development, market launch, and continual support and improvement of a company's products. Learn the core responsibilities, skills required, and how PMs collaborate with engineering, design, marketing, and sales teams."
+        content: "Product Management is the practice of strategically driving the development, market launch, and continual support and improvement of a company's products. Learn the core responsibilities, skills required, and how PMs collaborate with engineering, design, marketing, and sales teams.",
+        assessment: {
+          id: "pm-intro-assessment",
+          title: "Product Management Fundamentals Quiz",
+          passingScore: 80,
+          completed: false,
+          questions: [
+            {
+              id: "q1",
+              question: "What is the primary goal of product management?",
+              options: [
+                "To write detailed technical specifications",
+                "To create products that customers love and drive business value",
+                "To manage the development team",
+                "To handle customer support"
+              ],
+              correctAnswer: 1,
+              explanation: "Product management focuses on creating products that solve customer problems while achieving business objectives."
+            },
+            {
+              id: "q2",
+              question: "Which framework is commonly used for product prioritization?",
+              options: [
+                "RICE (Reach, Impact, Confidence, Effort)",
+                "SWOT Analysis",
+                "5 Forces Model",
+                "BCG Matrix"
+              ],
+              correctAnswer: 0,
+              explanation: "RICE framework helps product managers prioritize features based on Reach, Impact, Confidence, and Effort."
+            },
+            {
+              id: "q3",
+              question: "What is an MVP in product management?",
+              options: [
+                "Most Valuable Player",
+                "Maximum Viable Product",
+                "Minimum Viable Product",
+                "Most Valuable Process"
+              ],
+              correctAnswer: 2,
+              explanation: "MVP (Minimum Viable Product) is a version of a product with just enough features to satisfy early customers and provide feedback."
+            }
+          ]
+        }
       },
       {
         id: "pm-mindset",
@@ -944,6 +1008,11 @@ export default function Learning() {
   const [isSearching, setIsSearching] = useState(false);
   const [loadingMaterials, setLoadingMaterials] = useState<{ [key: string]: boolean }>({});
   const [generatedMaterials, setGeneratedMaterials] = useState<{ [key: string]: any }>({});
+  const [moduleProgress, setModuleProgress] = useState<{ [key: string]: number }>({});
+  const [topicProgress, setTopicProgress] = useState<{ [key: string]: boolean }>({});
+  const [showAssessment, setShowAssessment] = useState<string | null>(null);
+  const [assessmentAnswers, setAssessmentAnswers] = useState<{ [key: string]: number }>({});
+  const [assessmentResults, setAssessmentResults] = useState<{ [key: string]: { score: number; passed: boolean } }>({});
 
   // Handle URL parameters
   useEffect(() => {
@@ -966,6 +1035,56 @@ export default function Learning() {
       setActiveCategory(category);
     }
   }, []);
+
+  // Progress tracking functions
+  const calculateModuleProgress = (module: LearningModule) => {
+    const completedTopics = module.topics.filter(topic => topicProgress[topic.id] || topic.completed).length;
+    return Math.round((completedTopics / module.topics.length) * 100);
+  };
+
+  const markTopicComplete = (topicId: string) => {
+    setTopicProgress(prev => ({ ...prev, [topicId]: true }));
+  };
+
+  // Assessment functions
+  const startAssessment = (topicId: string) => {
+    setShowAssessment(topicId);
+    setAssessmentAnswers({});
+  };
+
+  const submitAssessment = (topic: LearningTopic) => {
+    if (!topic.assessment) return;
+    
+    let score = 0;
+    const totalQuestions = topic.assessment.questions.length;
+    
+    topic.assessment.questions.forEach((question, index) => {
+      if (assessmentAnswers[question.id] === question.correctAnswer) {
+        score++;
+      }
+    });
+    
+    const percentage = Math.round((score / totalQuestions) * 100);
+    const passed = percentage >= topic.assessment.passingScore;
+    
+    setAssessmentResults(prev => ({
+      ...prev,
+      [topic.id]: { score: percentage, passed }
+    }));
+    
+    if (passed) {
+      markTopicComplete(topic.id);
+    }
+    
+    setShowAssessment(null);
+  };
+
+  const selectAssessmentAnswer = (questionId: string, answerIndex: number) => {
+    setAssessmentAnswers(prev => ({
+      ...prev,
+      [questionId]: answerIndex
+    }));
+  };
 
   const categories = [
     { id: "all", name: "All Courses", icon: BookOpen },
@@ -1232,9 +1351,19 @@ export default function Learning() {
                   </div>
                   
                   <div className="flex gap-3">
-                    {!selectedTopic.completed && (
+                    {selectedTopic.assessment && (
                       <Button
-                        onClick={completeCurrentTopic}
+                        onClick={() => startAssessment(selectedTopic.id)}
+                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                      >
+                        <Award className="mr-2 h-4 w-4" />
+                        {assessmentResults[selectedTopic.id]?.passed ? "View Results" : "Take Assessment"}
+                      </Button>
+                    )}
+                    
+                    {!selectedTopic.completed && !(topicProgress[selectedTopic.id]) && (
+                      <Button
+                        onClick={() => markTopicComplete(selectedTopic.id)}
                         className="bg-[#00BFA5] hover:bg-[#00ACC1] text-white"
                       >
                         <CheckCircle className="mr-2 h-4 w-4" />
@@ -1623,7 +1752,8 @@ export default function Learning() {
             <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredModules.map((module) => {
                 const ModuleIcon = module.icon;
-                const completedTopics = module.topics.filter(t => t.completed).length;
+                const completedTopics = module.topics.filter(t => topicProgress[t.id] || t.completed).length;
+                const moduleProgressPercent = calculateModuleProgress(module);
                 
                 return (
                   <Card 
@@ -1660,9 +1790,9 @@ export default function Learning() {
                         <div>
                           <div className="flex justify-between text-xs text-[#455A64] mb-1">
                             <span>Progress</span>
-                            <span>{module.progress}%</span>
+                            <span>{moduleProgressPercent}%</span>
                           </div>
-                          <Progress value={module.progress} className="h-2" />
+                          <Progress value={moduleProgressPercent} className="h-2" />
                         </div>
                       </div>
                       
@@ -1673,7 +1803,7 @@ export default function Learning() {
                           setSelectedModule(module);
                         }}
                       >
-                        {module.progress > 0 ? "Continue Learning" : "Start Course"}
+                        {moduleProgressPercent > 0 ? "Continue Learning" : "Start Course"}
                         <ChevronRight className="ml-2 h-4 w-4" />
                       </Button>
                     </CardContent>
@@ -1686,6 +1816,147 @@ export default function Learning() {
       </div>
       
       <Footer />
+      
+      {/* Assessment Modal */}
+      {showAssessment && selectedTopic && selectedTopic.assessment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">{selectedTopic.assessment.title}</h3>
+                  <p className="text-gray-600 mt-1">Pass with {selectedTopic.assessment.passingScore}% or higher</p>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setShowAssessment(null)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </Button>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <div className="space-y-6">
+                {selectedTopic.assessment.questions.map((question, questionIndex) => (
+                  <div key={question.id} className="border border-gray-200 rounded-lg p-4">
+                    <h4 className="font-semibold text-gray-900 mb-4">
+                      {questionIndex + 1}. {question.question}
+                    </h4>
+                    
+                    <div className="space-y-2">
+                      {question.options.map((option, optionIndex) => (
+                        <label 
+                          key={optionIndex}
+                          className={`flex items-center p-3 rounded-lg border cursor-pointer transition-colors ${
+                            assessmentAnswers[question.id] === optionIndex
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-200 hover:bg-gray-50"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name={question.id}
+                            value={optionIndex}
+                            checked={assessmentAnswers[question.id] === optionIndex}
+                            onChange={() => selectAssessmentAnswer(question.id, optionIndex)}
+                            className="sr-only"
+                          />
+                          <div className={`w-4 h-4 rounded-full border-2 mr-3 flex items-center justify-center ${
+                            assessmentAnswers[question.id] === optionIndex
+                              ? "border-blue-500 bg-blue-500"
+                              : "border-gray-300"
+                          }`}>
+                            {assessmentAnswers[question.id] === optionIndex && (
+                              <div className="w-2 h-2 rounded-full bg-white"></div>
+                            )}
+                          </div>
+                          <span className="text-gray-700">{option}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+                <div className="text-sm text-gray-600">
+                  {Object.keys(assessmentAnswers).length} of {selectedTopic.assessment.questions.length} questions answered
+                </div>
+                <div className="flex gap-3">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowAssessment(null)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={() => submitAssessment(selectedTopic)}
+                    disabled={Object.keys(assessmentAnswers).length !== selectedTopic.assessment.questions.length}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Submit Assessment
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Assessment Results Modal */}
+      {assessmentResults[selectedTopic?.id] && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6 text-center">
+              <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${
+                assessmentResults[selectedTopic.id].passed 
+                  ? "bg-green-100 text-green-600" 
+                  : "bg-red-100 text-red-600"
+              }`}>
+                {assessmentResults[selectedTopic.id].passed ? (
+                  <CheckCircle className="w-8 h-8" />
+                ) : (
+                  <X className="w-8 h-8" />
+                )}
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                {assessmentResults[selectedTopic.id].passed ? "Congratulations!" : "Try Again"}
+              </h3>
+              
+              <p className="text-gray-600 mb-4">
+                You scored {assessmentResults[selectedTopic.id].score}%
+                {assessmentResults[selectedTopic.id].passed 
+                  ? " and passed the assessment!" 
+                  : ` - you need ${selectedTopic?.assessment?.passingScore}% to pass.`
+                }
+              </p>
+              
+              <div className="flex gap-3 justify-center">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setAssessmentResults(prev => ({ ...prev, [selectedTopic.id]: undefined }))}
+                >
+                  Close
+                </Button>
+                {!assessmentResults[selectedTopic.id].passed && (
+                  <Button 
+                    onClick={() => {
+                      setAssessmentResults(prev => ({ ...prev, [selectedTopic.id]: undefined }));
+                      startAssessment(selectedTopic.id);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Retake Assessment
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
