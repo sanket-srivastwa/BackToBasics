@@ -5,6 +5,11 @@ import {
   practiceSession,
   promptedQuestions,
   userProfiles,
+  communityAnswers,
+  answerVotes,
+  answerLikes,
+  answerComments,
+  commentLikes,
   type User,
   type UpsertUser,
   type Question,
@@ -17,6 +22,16 @@ import {
   type InsertPromptedQuestion,
   type UserProfile,
   type InsertUserProfile,
+  type CommunityAnswer,
+  type InsertCommunityAnswer,
+  type AnswerVote,
+  type InsertAnswerVote,
+  type AnswerLike,
+  type InsertAnswerLike,
+  type AnswerComment,
+  type InsertAnswerComment,
+  type CommentLike,
+  type InsertCommentLike,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, like, desc, and, or, sql } from "drizzle-orm";
@@ -68,6 +83,34 @@ export interface IStorage {
   createPracticeSession(session: InsertPracticeSession): Promise<PracticeSession>;
   updatePracticeSession(id: number, updates: Partial<PracticeSession>): Promise<PracticeSession>;
   getUserPracticeSessions(userId: string): Promise<PracticeSession[]>;
+
+  // Community Answer operations
+  getCommunityAnswers(questionId: number, sortBy?: string): Promise<(CommunityAnswer & { author: { firstName: string; lastName: string; profileImageUrl: string | null } })[]>;
+  getCommunityAnswer(id: number): Promise<CommunityAnswer | undefined>;
+  createCommunityAnswer(answer: InsertCommunityAnswer): Promise<CommunityAnswer>;
+  updateCommunityAnswer(id: number, updates: Partial<CommunityAnswer>): Promise<CommunityAnswer>;
+  deleteCommunityAnswer(id: number, userId: string): Promise<boolean>;
+
+  // Vote operations
+  voteOnAnswer(vote: InsertAnswerVote): Promise<AnswerVote>;
+  removeVoteFromAnswer(answerId: number, userId: string): Promise<boolean>;
+  getUserVoteOnAnswer(answerId: number, userId: string): Promise<AnswerVote | undefined>;
+
+  // Like operations
+  likeAnswer(like: InsertAnswerLike): Promise<AnswerLike>;
+  unlikeAnswer(answerId: number, userId: string): Promise<boolean>;
+  getUserLikeOnAnswer(answerId: number, userId: string): Promise<AnswerLike | undefined>;
+
+  // Comment operations
+  getAnswerComments(answerId: number): Promise<(AnswerComment & { author: { firstName: string; lastName: string; profileImageUrl: string | null } })[]>;
+  createAnswerComment(comment: InsertAnswerComment): Promise<AnswerComment>;
+  updateAnswerComment(id: number, updates: Partial<AnswerComment>): Promise<AnswerComment>;
+  deleteAnswerComment(id: number, userId: string): Promise<boolean>;
+
+  // Comment like operations
+  likeComment(like: InsertCommentLike): Promise<CommentLike>;
+  unlikeComment(commentId: number, userId: string): Promise<boolean>;
+  getUserLikeOnComment(commentId: number, userId: string): Promise<CommentLike | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -380,6 +423,312 @@ export class DatabaseStorage implements IStorage {
       .from(practiceSession)
       .where(eq(practiceSession.userId, userId))
       .orderBy(desc(practiceSession.createdAt));
+  }
+
+  // Community Answer operations
+  async getCommunityAnswers(questionId: number, sortBy: string = "recent"): Promise<(CommunityAnswer & { author: { firstName: string; lastName: string; profileImageUrl: string | null } })[]> {
+    let orderBy;
+    
+    switch (sortBy) {
+      case "most_liked":
+        orderBy = desc(communityAnswers.likesCount);
+        break;
+      case "most_voted":
+        orderBy = desc(communityAnswers.votesCount);
+        break;
+      case "most_relevant":
+        orderBy = desc(communityAnswers.relevanceScore);
+        break;
+      case "most_commented":
+        orderBy = desc(communityAnswers.commentsCount);
+        break;
+      default:
+        orderBy = desc(communityAnswers.createdAt);
+    }
+
+    const results = await db
+      .select({
+        id: communityAnswers.id,
+        questionId: communityAnswers.questionId,
+        userId: communityAnswers.userId,
+        title: communityAnswers.title,
+        content: communityAnswers.content,
+        isAnonymous: communityAnswers.isAnonymous,
+        experienceLevel: communityAnswers.experienceLevel,
+        currentRole: communityAnswers.currentRole,
+        company: communityAnswers.company,
+        likesCount: communityAnswers.likesCount,
+        votesCount: communityAnswers.votesCount,
+        commentsCount: communityAnswers.commentsCount,
+        relevanceScore: communityAnswers.relevanceScore,
+        isHelpful: communityAnswers.isHelpful,
+        isFeatured: communityAnswers.isFeatured,
+        tags: communityAnswers.tags,
+        createdAt: communityAnswers.createdAt,
+        updatedAt: communityAnswers.updatedAt,
+        author: {
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+        },
+      })
+      .from(communityAnswers)
+      .leftJoin(users, eq(communityAnswers.userId, users.id))
+      .where(eq(communityAnswers.questionId, questionId))
+      .orderBy(orderBy);
+
+    return results;
+  }
+
+  async getCommunityAnswer(id: number): Promise<CommunityAnswer | undefined> {
+    const [answer] = await db
+      .select()
+      .from(communityAnswers)
+      .where(eq(communityAnswers.id, id));
+    return answer;
+  }
+
+  async createCommunityAnswer(insertAnswer: InsertCommunityAnswer): Promise<CommunityAnswer> {
+    const [answer] = await db
+      .insert(communityAnswers)
+      .values(insertAnswer)
+      .returning();
+    return answer;
+  }
+
+  async updateCommunityAnswer(id: number, updates: Partial<CommunityAnswer>): Promise<CommunityAnswer> {
+    const [answer] = await db
+      .update(communityAnswers)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(communityAnswers.id, id))
+      .returning();
+    return answer;
+  }
+
+  async deleteCommunityAnswer(id: number, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(communityAnswers)
+      .where(and(eq(communityAnswers.id, id), eq(communityAnswers.userId, userId)));
+    return result.rowCount > 0;
+  }
+
+  // Vote operations
+  async voteOnAnswer(vote: InsertAnswerVote): Promise<AnswerVote> {
+    // Remove existing vote first
+    await this.removeVoteFromAnswer(vote.answerId, vote.userId);
+    
+    const [newVote] = await db
+      .insert(answerVotes)
+      .values(vote)
+      .returning();
+
+    // Update answer vote count
+    await this.updateAnswerCounts(vote.answerId);
+    
+    return newVote;
+  }
+
+  async removeVoteFromAnswer(answerId: number, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(answerVotes)
+      .where(and(eq(answerVotes.answerId, answerId), eq(answerVotes.userId, userId)));
+    
+    // Update answer vote count
+    await this.updateAnswerCounts(answerId);
+    
+    return result.rowCount > 0;
+  }
+
+  async getUserVoteOnAnswer(answerId: number, userId: string): Promise<AnswerVote | undefined> {
+    const [vote] = await db
+      .select()
+      .from(answerVotes)
+      .where(and(eq(answerVotes.answerId, answerId), eq(answerVotes.userId, userId)));
+    return vote;
+  }
+
+  // Like operations
+  async likeAnswer(like: InsertAnswerLike): Promise<AnswerLike> {
+    const [newLike] = await db
+      .insert(answerLikes)
+      .values(like)
+      .onConflictDoNothing()
+      .returning();
+
+    // Update answer like count
+    await this.updateAnswerCounts(like.answerId);
+    
+    return newLike;
+  }
+
+  async unlikeAnswer(answerId: number, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(answerLikes)
+      .where(and(eq(answerLikes.answerId, answerId), eq(answerLikes.userId, userId)));
+    
+    // Update answer like count
+    await this.updateAnswerCounts(answerId);
+    
+    return result.rowCount > 0;
+  }
+
+  async getUserLikeOnAnswer(answerId: number, userId: string): Promise<AnswerLike | undefined> {
+    const [like] = await db
+      .select()
+      .from(answerLikes)
+      .where(and(eq(answerLikes.answerId, answerId), eq(answerLikes.userId, userId)));
+    return like;
+  }
+
+  // Comment operations
+  async getAnswerComments(answerId: number): Promise<(AnswerComment & { author: { firstName: string; lastName: string; profileImageUrl: string | null } })[]> {
+    const results = await db
+      .select({
+        id: answerComments.id,
+        answerId: answerComments.answerId,
+        userId: answerComments.userId,
+        content: answerComments.content,
+        isAnonymous: answerComments.isAnonymous,
+        parentCommentId: answerComments.parentCommentId,
+        likesCount: answerComments.likesCount,
+        createdAt: answerComments.createdAt,
+        updatedAt: answerComments.updatedAt,
+        author: {
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+        },
+      })
+      .from(answerComments)
+      .leftJoin(users, eq(answerComments.userId, users.id))
+      .where(eq(answerComments.answerId, answerId))
+      .orderBy(answerComments.createdAt);
+
+    return results;
+  }
+
+  async createAnswerComment(insertComment: InsertAnswerComment): Promise<AnswerComment> {
+    const [comment] = await db
+      .insert(answerComments)
+      .values(insertComment)
+      .returning();
+
+    // Update answer comment count
+    await this.updateAnswerCounts(insertComment.answerId);
+    
+    return comment;
+  }
+
+  async updateAnswerComment(id: number, updates: Partial<AnswerComment>): Promise<AnswerComment> {
+    const [comment] = await db
+      .update(answerComments)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(answerComments.id, id))
+      .returning();
+    return comment;
+  }
+
+  async deleteAnswerComment(id: number, userId: string): Promise<boolean> {
+    const comment = await db
+      .select()
+      .from(answerComments)
+      .where(eq(answerComments.id, id));
+    
+    if (comment.length === 0) return false;
+    
+    const result = await db
+      .delete(answerComments)
+      .where(and(eq(answerComments.id, id), eq(answerComments.userId, userId)));
+    
+    // Update answer comment count
+    if (result.rowCount > 0) {
+      await this.updateAnswerCounts(comment[0].answerId);
+    }
+    
+    return result.rowCount > 0;
+  }
+
+  // Comment like operations
+  async likeComment(like: InsertCommentLike): Promise<CommentLike> {
+    const [newLike] = await db
+      .insert(commentLikes)
+      .values(like)
+      .onConflictDoNothing()
+      .returning();
+
+    // Update comment like count
+    await this.updateCommentLikeCount(like.commentId);
+    
+    return newLike;
+  }
+
+  async unlikeComment(commentId: number, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(commentLikes)
+      .where(and(eq(commentLikes.commentId, commentId), eq(commentLikes.userId, userId)));
+    
+    // Update comment like count
+    if (result.rowCount > 0) {
+      await this.updateCommentLikeCount(commentId);
+    }
+    
+    return result.rowCount > 0;
+  }
+
+  async getUserLikeOnComment(commentId: number, userId: string): Promise<CommentLike | undefined> {
+    const [like] = await db
+      .select()
+      .from(commentLikes)
+      .where(and(eq(commentLikes.commentId, commentId), eq(commentLikes.userId, userId)));
+    return like;
+  }
+
+  // Helper methods
+  private async updateAnswerCounts(answerId: number): Promise<void> {
+    const [likesCount] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(answerLikes)
+      .where(eq(answerLikes.answerId, answerId));
+
+    const [votesCount] = await db
+      .select({ 
+        upVotes: sql<number>`count(case when vote_type = 'up' then 1 end)::int`,
+        downVotes: sql<number>`count(case when vote_type = 'down' then 1 end)::int`
+      })
+      .from(answerVotes)
+      .where(eq(answerVotes.answerId, answerId));
+
+    const [commentsCount] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(answerComments)
+      .where(eq(answerComments.answerId, answerId));
+
+    const netVotes = (votesCount?.upVotes || 0) - (votesCount?.downVotes || 0);
+
+    await db
+      .update(communityAnswers)
+      .set({
+        likesCount: likesCount?.count || 0,
+        votesCount: netVotes,
+        commentsCount: commentsCount?.count || 0,
+        updatedAt: new Date(),
+      })
+      .where(eq(communityAnswers.id, answerId));
+  }
+
+  private async updateCommentLikeCount(commentId: number): Promise<void> {
+    const [likesCount] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(commentLikes)
+      .where(eq(commentLikes.commentId, commentId));
+
+    await db
+      .update(answerComments)
+      .set({
+        likesCount: likesCount?.count || 0,
+        updatedAt: new Date(),
+      })
+      .where(eq(answerComments.id, commentId));
   }
 }
 

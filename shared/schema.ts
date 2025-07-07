@@ -104,6 +104,62 @@ export const userProfiles = pgTable("user_profiles", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Community answer sharing system
+export const communityAnswers = pgTable("community_answers", {
+  id: serial("id").primaryKey(),
+  questionId: integer("question_id").notNull(),
+  userId: varchar("user_id").notNull(), // Replit user ID
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  isAnonymous: boolean("is_anonymous").default(false),
+  experienceLevel: text("experience_level"), // "junior", "mid", "senior", "principal"
+  currentRole: text("current_role"),
+  company: text("company"),
+  likesCount: integer("likes_count").default(0),
+  votesCount: integer("votes_count").default(0),
+  commentsCount: integer("comments_count").default(0),
+  relevanceScore: integer("relevance_score").default(0), // Algorithm-based relevance
+  isHelpful: boolean("is_helpful").default(false), // Moderator flag
+  isFeatured: boolean("is_featured").default(false),
+  tags: text("tags").array(), // ["framework", "detailed", "concise", "creative"]
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const answerVotes = pgTable("answer_votes", {
+  id: serial("id").primaryKey(),
+  answerId: integer("answer_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  voteType: text("vote_type").notNull(), // "up" or "down"
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const answerLikes = pgTable("answer_likes", {
+  id: serial("id").primaryKey(),
+  answerId: integer("answer_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const answerComments = pgTable("answer_comments", {
+  id: serial("id").primaryKey(),
+  answerId: integer("answer_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  content: text("content").notNull(),
+  isAnonymous: boolean("is_anonymous").default(false),
+  parentCommentId: integer("parent_comment_id"), // For threaded comments
+  likesCount: integer("likes_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const commentLikes = pgTable("comment_likes", {
+  id: serial("id").primaryKey(),
+  commentId: integer("comment_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Replit Auth user upsert schema
 export const upsertUserSchema = createInsertSchema(users).pick({
   id: true,
@@ -155,6 +211,39 @@ export const insertPracticeSessionSchema = createInsertSchema(practiceSession).o
   createdAt: true,
 });
 
+// Community schemas
+export const insertCommunityAnswerSchema = createInsertSchema(communityAnswers).omit({
+  id: true,
+  likesCount: true,
+  votesCount: true,
+  commentsCount: true,
+  relevanceScore: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAnswerVoteSchema = createInsertSchema(answerVotes).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAnswerLikeSchema = createInsertSchema(answerLikes).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAnswerCommentSchema = createInsertSchema(answerComments).omit({
+  id: true,
+  likesCount: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCommentLikeSchema = createInsertSchema(commentLikes).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Type definitions
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -168,3 +257,15 @@ export type InsertPromptedQuestion = z.infer<typeof insertPromptedQuestionSchema
 export type PromptedQuestion = typeof promptedQuestions.$inferSelect;
 export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;
 export type UserProfile = typeof userProfiles.$inferSelect;
+
+// Community types
+export type InsertCommunityAnswer = z.infer<typeof insertCommunityAnswerSchema>;
+export type CommunityAnswer = typeof communityAnswers.$inferSelect;
+export type InsertAnswerVote = z.infer<typeof insertAnswerVoteSchema>;
+export type AnswerVote = typeof answerVotes.$inferSelect;
+export type InsertAnswerLike = z.infer<typeof insertAnswerLikeSchema>;
+export type AnswerLike = typeof answerLikes.$inferSelect;
+export type InsertAnswerComment = z.infer<typeof insertAnswerCommentSchema>;
+export type AnswerComment = typeof answerComments.$inferSelect;
+export type InsertCommentLike = z.infer<typeof insertCommentLikeSchema>;
+export type CommentLike = typeof commentLikes.$inferSelect;

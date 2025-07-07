@@ -12,6 +12,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import VoiceInput from "@/components/voice-input";
 import { ArrowLeft, Save, Send, Clock, Lightbulb, Mic, Keyboard } from "lucide-react";
+import { CommunityAnswers } from "@/components/CommunityAnswers";
 
 export default function Question() {
   const [, setLocation] = useLocation();
@@ -337,6 +338,16 @@ export default function Question() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Community Answers Section */}
+        {question && (
+          <div className="mt-8">
+            <CommunityAnswers 
+              questionId={questionId} 
+              questionTitle={question.title} 
+            />
+          </div>
+        )}
       </div>
 
       <Footer />
