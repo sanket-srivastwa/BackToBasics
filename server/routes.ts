@@ -74,6 +74,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Community Questions API
+  app.get("/api/community/questions", async (req, res) => {
+    try {
+      const filters = {
+        search: req.query.search as string,
+        company: req.query.company as string,
+        difficulty: req.query.difficulty as string,
+        role: req.query.role as string,
+        topic: req.query.topic as string,
+        sortBy: req.query.sortBy as string || "most-active"
+      };
+
+      // For now, return regular questions with mock community data
+      // In a real implementation, this would query a community_questions table
+      const questions = await storage.getFilteredQuestions(filters);
+      
+      // Add mock community data for demonstration
+      const communityQuestions = questions.map(question => ({
+        ...question,
+        communityAnswersCount: Math.floor(Math.random() * 10),
+        communityLikesCount: Math.floor(Math.random() * 25),
+        communityVotesCount: Math.floor(Math.random() * 15),
+        lastActivityAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+        topContributors: []
+      }));
+
+      res.json(communityQuestions);
+    } catch (error) {
+      console.error("Failed to fetch community questions:", error);
+      res.status(500).json({ error: "Failed to fetch community questions" });
+    }
+  });
+
   app.get("/api/questions/search", async (req, res) => {
     try {
       const query = req.query.q as string;

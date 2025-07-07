@@ -11,6 +11,7 @@ import Feedback from "@/pages/feedback";
 import CustomCaseStudy from "@/pages/custom-case-study";
 import EnhancedCaseStudy from "@/pages/enhanced-case-study";
 import Learning from "@/pages/learning";
+import Community from "@/pages/community";
 import Account from "@/pages/account";
 import SignIn from "@/pages/signin";
 import SignUp from "@/pages/signup";
@@ -40,6 +41,7 @@ function Router() {
         <Route path="/custom-case-study" component={CustomCaseStudy} />
         <Route path="/enhanced-case-study" component={EnhancedCaseStudy} />
         <Route path="/learning" component={Learning} />
+        <Route path="/community" component={Community} />
         <Route path="/account" component={Account} />
         <Route path="/signin" component={SignIn} />
         <Route path="/signup" component={SignUp} />

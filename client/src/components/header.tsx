@@ -161,6 +161,19 @@ export default function Header() {
                   </DropdownMenuContent>
                 </DropdownMenu>
                 
+                {/* Community */}
+                <button 
+                  onClick={() => setLocation("/community")}
+                  className={`px-4 py-2 rounded-md text-sm font-bold transition-colors ${
+                    location === "/community" 
+                      ? "text-primary bg-primary/10" 
+                      : "text-slate-700 hover:text-primary"
+                  }`}
+                  style={{ fontWeight: '700', fontSize: '15px' }}
+                >
+                  Community
+                </button>
+                
                 {/* AI Case Study */}
                 <button 
                   onClick={() => setLocation("/custom-case-study")}

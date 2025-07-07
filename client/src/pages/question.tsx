@@ -11,7 +11,8 @@ import { type Question } from "@/lib/api";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import VoiceInput from "@/components/voice-input";
-import { ArrowLeft, Save, Send, Clock, Lightbulb, Mic, Keyboard } from "lucide-react";
+import { ArrowLeft, Save, Send, Clock, Lightbulb, Mic, Keyboard, Users, Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { CommunityAnswers } from "@/components/CommunityAnswers";
 
 export default function Question() {
@@ -314,7 +315,7 @@ export default function Question() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               <Button
                 variant="outline"
                 className="flex-1"
@@ -323,6 +324,34 @@ export default function Question() {
                 <Save className="mr-2 h-4 w-4" />
                 Save Progress
               </Button>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="flex-1 border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300"
+                    onClick={() => {
+                      // Save current answer first if there's content
+                      if (answer.trim()) {
+                        localStorage.setItem(`draft_answer_${questionId}`, answer);
+                      }
+                      // Scroll to community section
+                      const communitySection = document.getElementById('community');
+                      if (communitySection) {
+                        communitySection.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }}
+                  >
+                    <Users className="mr-2 h-4 w-4" />
+                    Share Your Answer to Community
+                    <Info className="ml-2 h-3 w-3 opacity-60" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-sm">
+                  <p>Contribute your answer to the community to share your perspective on this topic. Engage in thoughtful discussion and receive constructive feedback.</p>
+                </TooltipContent>
+              </Tooltip>
+              
               <Button
                 className="flex-1"
                 onClick={handleSubmit}
@@ -341,7 +370,7 @@ export default function Question() {
 
         {/* Community Answers Section */}
         {question && (
-          <div className="mt-8">
+          <div className="mt-8" id="community">
             <CommunityAnswers 
               questionId={questionId} 
               questionTitle={question.title} 
