@@ -118,6 +118,8 @@ export interface IStorage {
   // Community Question operations
   createCommunityQuestion(question: InsertCommunityQuestion): Promise<CommunityQuestion>;
   getCommunityQuestions(filters?: { role?: string; topic?: string; company?: string; search?: string }): Promise<CommunityQuestion[]>;
+  getRecentCommunityQuestions(limit: number): Promise<CommunityQuestion[]>;
+  getRecentCommunityAnswers(limit: number): Promise<CommunityAnswer[]>;
   getCommunityQuestion(id: number): Promise<CommunityQuestion | undefined>;
   updateCommunityQuestion(id: number, updates: Partial<CommunityQuestion>): Promise<CommunityQuestion>;
   deleteCommunityQuestion(id: number, userId: string): Promise<boolean>;
@@ -812,6 +814,23 @@ export class DatabaseStorage implements IStorage {
         eq(communityQuestions.userId, userId)
       ));
     return result.rowCount > 0;
+  }
+
+  async getRecentCommunityQuestions(limit: number): Promise<CommunityQuestion[]> {
+    return await db
+      .select()
+      .from(communityQuestions)
+      .where(eq(communityQuestions.isApproved, true))
+      .orderBy(desc(communityQuestions.createdAt))
+      .limit(limit);
+  }
+
+  async getRecentCommunityAnswers(limit: number): Promise<CommunityAnswer[]> {
+    return await db
+      .select()
+      .from(communityAnswers)
+      .orderBy(desc(communityAnswers.createdAt))
+      .limit(limit);
   }
 }
 

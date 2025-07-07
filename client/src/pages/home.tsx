@@ -36,7 +36,6 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("practice");
 
-
   const { data: popularQuestions, isLoading } = useQuery({
     queryKey: ["/api/questions/popular", selectedCompany !== "all" ? selectedCompany : undefined],
     queryFn: async () => {
@@ -44,6 +43,22 @@ export default function Home() {
         ? `/api/questions/popular?company=${selectedCompany}`
         : "/api/questions/popular";
       const response = await fetch(url);
+      return response.json();
+    },
+  });
+
+  const { data: recentCommunityQuestions, isLoading: loadingCommunityQuestions } = useQuery({
+    queryKey: ["/api/community/questions/recent"],
+    queryFn: async () => {
+      const response = await fetch("/api/community/questions/recent?limit=5");
+      return response.json();
+    },
+  });
+
+  const { data: recentCommunityAnswers, isLoading: loadingCommunityAnswers } = useQuery({
+    queryKey: ["/api/community/answers/recent"],
+    queryFn: async () => {
+      const response = await fetch("/api/community/answers/recent?limit=5");
       return response.json();
     },
   });
@@ -488,7 +503,7 @@ export default function Home() {
                   question={question}
                   companyBadgeColor={getCompanyBadgeColor(question.company)}
                   statusIcon={getStatusIcon(question.company, index)}
-                  onClick={() => setLocation(`/question/${question.id}`)}
+                  onClick={() => setLocation(`/practice?search=${encodeURIComponent(question.title)}`)}
                 />
               ))}
             </div>
@@ -508,6 +523,117 @@ export default function Home() {
                 Showing 20 of {popularQuestions.length} questions
               </p>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* Recent Community Activity */}
+      <section className="py-20 bg-gradient-to-br from-purple-50 to-indigo-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Latest Community Activity</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              See what the community is asking and sharing
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {/* Recent Questions */}
+            <Card className="border-2 border-purple-200">
+              <CardHeader>
+                <CardTitle className="flex items-center text-purple-800">
+                  <Users className="mr-2 h-5 w-5" />
+                  Recent Questions
+                </CardTitle>
+                <CardDescription>
+                  Latest questions from the community
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loadingCommunityQuestions ? (
+                  <div className="text-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                  </div>
+                ) : recentCommunityQuestions && recentCommunityQuestions.length > 0 ? (
+                  <div className="space-y-4">
+                    {recentCommunityQuestions.slice(0, 3).map((question: any) => (
+                      <div key={question.id} className="border-l-4 border-purple-400 pl-4 py-2 hover:bg-purple-50 transition-colors cursor-pointer" onClick={() => setLocation(`/community?questionId=${question.id}`)}>
+                        <h4 className="font-semibold text-gray-800 line-clamp-2 mb-1">{question.title}</h4>
+                        <div className="flex items-center justify-between text-sm text-gray-600">
+                          <Badge variant="outline" className="text-xs">
+                            {question.role}
+                          </Badge>
+                          <span>{new Date(question.createdAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    ))}
+                    <Button 
+                      variant="outline" 
+                      className="w-full mt-4 border-purple-300 text-purple-700 hover:bg-purple-50"
+                      onClick={() => setLocation("/community")}
+                    >
+                      View All Questions
+                    </Button>
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-center py-4">No community questions yet</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Recent Answers */}
+            <Card className="border-2 border-indigo-200">
+              <CardHeader>
+                <CardTitle className="flex items-center text-indigo-800">
+                  <Lightbulb className="mr-2 h-5 w-5" />
+                  Recent Answers
+                </CardTitle>
+                <CardDescription>
+                  Latest answers shared by the community
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loadingCommunityAnswers ? (
+                  <div className="text-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
+                  </div>
+                ) : recentCommunityAnswers && recentCommunityAnswers.length > 0 ? (
+                  <div className="space-y-4">
+                    {recentCommunityAnswers.slice(0, 3).map((answer: any) => (
+                      <div key={answer.id} className="border-l-4 border-indigo-400 pl-4 py-2 hover:bg-indigo-50 transition-colors cursor-pointer" onClick={() => setLocation(`/community?answerId=${answer.id}`)}>
+                        <h4 className="font-semibold text-gray-800 line-clamp-2 mb-1">{answer.title}</h4>
+                        <div className="flex items-center justify-between text-sm text-gray-600">
+                          <div className="flex items-center space-x-2">
+                            <Badge variant="outline" className="text-xs">
+                              {answer.experienceLevel}
+                            </Badge>
+                            {answer.company && (
+                              <span className="text-xs">{answer.company}</span>
+                            )}
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="flex items-center">
+                              <Star className="w-3 h-3 mr-1" />
+                              {answer.likesCount || 0}
+                            </span>
+                            <span>{new Date(answer.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <Button 
+                      variant="outline" 
+                      className="w-full mt-4 border-indigo-300 text-indigo-700 hover:bg-indigo-50"
+                      onClick={() => setLocation("/community")}
+                    >
+                      View All Answers
+                    </Button>
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-center py-4">No community answers yet</p>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

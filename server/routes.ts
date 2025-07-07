@@ -121,11 +121,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get recent community questions for dashboard
+  app.get("/api/community/questions/recent", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 5;
+      const communityQuestions = await storage.getRecentCommunityQuestions(limit);
+      res.json(communityQuestions);
+    } catch (error) {
+      console.error("Error fetching recent community questions:", error);
+      res.status(500).json({ error: "Failed to fetch recent community questions" });
+    }
+  });
+
+  // Get recent community answers for dashboard
+  app.get("/api/community/answers/recent", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 5;
+      const communityAnswers = await storage.getRecentCommunityAnswers(limit);
+      res.json(communityAnswers);
+    } catch (error) {
+      console.error("Error fetching recent community answers:", error);
+      res.status(500).json({ error: "Failed to fetch recent community answers" });
+    }
+  });
+
   app.get("/api/questions/search", async (req, res) => {
     try {
       const query = req.query.q as string;
-      if (!query) {
-        return res.status(400).json({ error: "Search query is required" });
+      if (!query || query.trim() === '') {
+        return res.json([]);
       }
 
       const filters = {
