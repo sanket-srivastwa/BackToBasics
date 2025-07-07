@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertAnswerSchema, insertPracticeSessionSchema } from "@shared/schema";
+import { insertAnswerSchema, insertPracticeSessionSchema, insertCommunityQuestionSchema } from "@shared/schema";
 import { generateOptimalAnswer, analyzeAnswerComparison, validateQuestion, generateLearningContent, generateLearningResponse, generateCaseStudy, evaluateCaseStudyResponse, generateComprehensiveLearningMaterials, searchLearningContent, type CaseStudy } from "./openai";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 
@@ -320,6 +320,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Community Questions API
+  app.get("/api/community-questions", async (req, res) => {
+    try {
+      const { role, topic, company, search } = req.query;
+      const filters = {
+        role: role as string,
+        topic: topic as string,
+        company: company as string,
+        search: search as string,
+      };
+      
+      const questions = await storage.getCommunityQuestions(filters);
+      res.json(questions);
+    } catch (error) {
+      console.error("Error fetching community questions:", error);
+      res.status(500).json({ message: "Error fetching community questions" });
+    }
+  });
+
+  app.post("/api/community-questions", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const questionData = { ...req.body, userId };
+      const question = await storage.createCommunityQuestion(questionData);
+      res.json(question);
+    } catch (error) {
+      console.error("Error creating community question:", error);
+      res.status(500).json({ message: "Error creating community question" });
+    }
+  });
+
+  app.get("/api/community-questions/:id", async (req, res) => {
+    try {
+      const questionId = parseInt(req.params.id);
+      const question = await storage.getCommunityQuestion(questionId);
+      
+      if (!question) {
+        return res.status(404).json({ message: "Question not found" });
+      }
+      
+      res.json(question);
+    } catch (error) {
+      console.error("Error fetching community question:", error);
+      res.status(500).json({ message: "Error fetching community question" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
@@ -372,3 +423,4 @@ async function generateFeedback(userAnswer: string, optimalAnswer: string) {
     suggestions: suggestions
   };
 }
+

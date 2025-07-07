@@ -160,6 +160,25 @@ export const commentLikes = pgTable("comment_likes", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Community Questions - User-submitted questions
+export const communityQuestions = pgTable("community_questions", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  role: text("role").notNull(), // "Product Management", "Program Management", etc.
+  topic: text("topic").notNull(), // Dynamic topic based on role
+  company: text("company"), // Optional target company
+  difficulty: text("difficulty").notNull(), // "easy", "medium", "hard"
+  isAnonymous: boolean("is_anonymous").default(false),
+  likesCount: integer("likes_count").default(0),
+  answersCount: integer("answers_count").default(0),
+  viewsCount: integer("views_count").default(0),
+  isApproved: boolean("is_approved").default(true), // For moderation
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Replit Auth user upsert schema
 export const upsertUserSchema = createInsertSchema(users).pick({
   id: true,
@@ -244,6 +263,15 @@ export const insertCommentLikeSchema = createInsertSchema(commentLikes).omit({
   createdAt: true,
 });
 
+export const insertCommunityQuestionSchema = createInsertSchema(communityQuestions).omit({
+  id: true,
+  likesCount: true,
+  answersCount: true,
+  viewsCount: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Type definitions
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -269,3 +297,5 @@ export type InsertAnswerComment = z.infer<typeof insertAnswerCommentSchema>;
 export type AnswerComment = typeof answerComments.$inferSelect;
 export type InsertCommentLike = z.infer<typeof insertCommentLikeSchema>;
 export type CommentLike = typeof commentLikes.$inferSelect;
+export type InsertCommunityQuestion = z.infer<typeof insertCommunityQuestionSchema>;
+export type CommunityQuestion = typeof communityQuestions.$inferSelect;

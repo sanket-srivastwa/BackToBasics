@@ -28,7 +28,7 @@ export const roleTopicMapping = {
     "Team Leadership",
     "Technical Architecture",
     "Code Review Process",
-    "Performance Management",
+    "Engineering Performance",
     "Technical Hiring",
     "Engineering Culture",
     "System Design",

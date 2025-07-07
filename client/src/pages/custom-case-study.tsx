@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import VoiceInput from "@/components/voice-input";
+import PostQuestionModal from "@/components/PostQuestionModal";
 import { apiRequest } from "@/lib/queryClient";
 import { 
   ArrowLeft, 
@@ -86,6 +87,7 @@ export default function CustomCaseStudy() {
   const [caseStudy, setCaseStudy] = useState<CaseStudy | null>(null);
   const [difficulty, setDifficulty] = useState("medium");
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+  const [showPostModal, setShowPostModal] = useState(false);
 
   // Handle URL parameters for topic filtering
   useEffect(() => {
@@ -950,26 +952,36 @@ export default function CustomCaseStudy() {
                   </ul>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="space-y-3">
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowPostModal(true)}
+                      className="flex-1"
+                    >
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Post Question to Community
+                    </Button>
+                    <Button
+                      onClick={handleQuestionSubmit}
+                      disabled={validateQuestionMutation.isPending || question.trim().length < 10}
+                      className="flex-1"
+                      size="lg"
+                    >
+                      {validateQuestionMutation.isPending ? (
+                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
+                      ) : (
+                        <Sparkles className="mr-2 h-4 w-4" />
+                      )}
+                      Validate & Continue
+                    </Button>
+                  </div>
                   <Button
                     variant="outline"
                     onClick={handleBackToModeSelection}
-                    className="flex-1"
+                    className="w-full"
                   >
                     Back to Mode Selection
-                  </Button>
-                  <Button
-                    onClick={handleQuestionSubmit}
-                    disabled={validateQuestionMutation.isPending || question.trim().length < 10}
-                    className="flex-1"
-                    size="lg"
-                  >
-                    {validateQuestionMutation.isPending ? (
-                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white" />
-                    ) : (
-                      <Sparkles className="mr-2 h-4 w-4" />
-                    )}
-                    Validate & Continue
                   </Button>
                 </div>
               </div>
@@ -1503,6 +1515,12 @@ Result: Share the outcome and impact..."
       </div>
 
       <Footer />
+      
+      <PostQuestionModal 
+        open={showPostModal}
+        onOpenChange={setShowPostModal}
+        initialTopic={selectedTopic}
+      />
     </div>
   );
 }

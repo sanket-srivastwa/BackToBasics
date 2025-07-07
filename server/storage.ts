@@ -10,6 +10,7 @@ import {
   answerLikes,
   answerComments,
   commentLikes,
+  communityQuestions,
   type User,
   type UpsertUser,
   type Question,
@@ -32,6 +33,8 @@ import {
   type InsertAnswerComment,
   type CommentLike,
   type InsertCommentLike,
+  type CommunityQuestion,
+  type InsertCommunityQuestion,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, like, desc, and, or, sql } from "drizzle-orm";
@@ -111,6 +114,13 @@ export interface IStorage {
   likeComment(like: InsertCommentLike): Promise<CommentLike>;
   unlikeComment(commentId: number, userId: string): Promise<boolean>;
   getUserLikeOnComment(commentId: number, userId: string): Promise<CommentLike | undefined>;
+
+  // Community Question operations
+  createCommunityQuestion(question: InsertCommunityQuestion): Promise<CommunityQuestion>;
+  getCommunityQuestions(filters?: { role?: string; topic?: string; company?: string; search?: string }): Promise<CommunityQuestion[]>;
+  getCommunityQuestion(id: number): Promise<CommunityQuestion | undefined>;
+  updateCommunityQuestion(id: number, updates: Partial<CommunityQuestion>): Promise<CommunityQuestion>;
+  deleteCommunityQuestion(id: number, userId: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -729,6 +739,79 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date(),
       })
       .where(eq(answerComments.id, commentId));
+  }
+
+  // Community Question operations
+  async createCommunityQuestion(insertQuestion: InsertCommunityQuestion): Promise<CommunityQuestion> {
+    const [question] = await db
+      .insert(communityQuestions)
+      .values(insertQuestion)
+      .returning();
+    return question;
+  }
+
+  async getCommunityQuestions(filters?: { role?: string; topic?: string; company?: string; search?: string }): Promise<CommunityQuestion[]> {
+    let query = db.select().from(communityQuestions);
+    
+    if (filters) {
+      const conditions = [];
+      
+      if (filters.role && filters.role !== "all") {
+        conditions.push(eq(communityQuestions.role, filters.role));
+      }
+      
+      if (filters.topic && filters.topic !== "all") {
+        conditions.push(eq(communityQuestions.topic, filters.topic));
+      }
+      
+      if (filters.company && filters.company !== "all") {
+        conditions.push(eq(communityQuestions.company, filters.company));
+      }
+      
+      if (filters.search) {
+        conditions.push(
+          or(
+            like(communityQuestions.title, `%${filters.search}%`),
+            like(communityQuestions.description, `%${filters.search}%`)
+          )
+        );
+      }
+      
+      if (conditions.length > 0) {
+        query = query.where(and(...conditions));
+      }
+    }
+    
+    return await query
+      .where(eq(communityQuestions.isApproved, true))
+      .orderBy(desc(communityQuestions.createdAt));
+  }
+
+  async getCommunityQuestion(id: number): Promise<CommunityQuestion | undefined> {
+    const [question] = await db
+      .select()
+      .from(communityQuestions)
+      .where(eq(communityQuestions.id, id));
+    return question;
+  }
+
+  async updateCommunityQuestion(id: number, updates: Partial<CommunityQuestion>): Promise<CommunityQuestion> {
+    const [question] = await db
+      .update(communityQuestions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(communityQuestions.id, id))
+      .returning();
+    return question;
+  }
+
+  async deleteCommunityQuestion(id: number, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(communityQuestions)
+      .where(and(
+        eq(communityQuestions.id, id),
+        eq(communityQuestions.userId, userId)
+      ));
+    return result.rowCount > 0;
   }
 }
 

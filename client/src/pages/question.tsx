@@ -325,30 +325,6 @@ export default function Question() {
                 Save Progress
               </Button>
               
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="flex-1 border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300"
-                    onClick={() => {
-                      // Save current answer first if there's content
-                      if (answer.trim()) {
-                        localStorage.setItem(`draft_answer_${questionId}`, answer);
-                      }
-                      // Navigate to community page for this question
-                      window.open(`/community?question=${questionId}`, '_blank');
-                    }}
-                  >
-                    <Users className="mr-2 h-4 w-4" />
-                    Share Your Answer to Community
-                    <Info className="ml-2 h-3 w-3 opacity-60" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-sm">
-                  <p>Contribute your answer to the community to share your perspective on this topic. Engage in thoughtful discussion and receive constructive feedback.</p>
-                </TooltipContent>
-              </Tooltip>
-              
               <Button
                 className="flex-1"
                 onClick={handleSubmit}

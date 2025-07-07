@@ -16,7 +16,8 @@ import {
   Building,
   Clock,
   TrendingUp,
-  Star
+  Star,
+  Plus
 } from "lucide-react";
 import { type Question } from "@/lib/api";
 import Header from "@/components/header";
@@ -24,6 +25,7 @@ import Footer from "@/components/footer";
 import { formatDistanceToNow } from "date-fns";
 import { Link } from "wouter";
 import { getTopicsForRole, getAllTopics } from "@/lib/topicFilters";
+import PostQuestionModal from "@/components/PostQuestionModal";
 
 interface CommunityQuestion extends Question {
   communityAnswersCount: number;
@@ -47,6 +49,7 @@ export default function Community() {
   const [selectedTopic, setSelectedTopic] = useState("all");
   const [sortBy, setSortBy] = useState("most-active");
   const [filtersExpanded, setFiltersExpanded] = useState(false);
+  const [showPostModal, setShowPostModal] = useState(false);
 
   // Get filters from URL parameters
   useEffect(() => {
@@ -159,16 +162,26 @@ export default function Community() {
                 />
               </div>
 
-              {/* Filter Toggle */}
+              {/* Filter Toggle and Post Question */}
               <div className="flex items-center justify-between">
-                <Button
-                  variant="outline"
-                  onClick={() => setFiltersExpanded(!filtersExpanded)}
-                  className="flex items-center gap-2"
-                >
-                  <Filter className="h-4 w-4" />
-                  {filtersExpanded ? "Hide Filters" : "Show Filters"}
-                </Button>
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => setFiltersExpanded(!filtersExpanded)}
+                    className="flex items-center gap-2"
+                  >
+                    <Filter className="h-4 w-4" />
+                    {filtersExpanded ? "Hide Filters" : "Show Filters"}
+                  </Button>
+
+                  <Button
+                    onClick={() => setShowPostModal(true)}
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white flex items-center gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Post Question
+                  </Button>
+                </div>
 
                 <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="w-48">
@@ -451,6 +464,13 @@ export default function Community() {
       </div>
 
       <Footer />
+      
+      <PostQuestionModal 
+        open={showPostModal}
+        onOpenChange={setShowPostModal}
+        initialRole={selectedRole !== "all" ? selectedRole : ""}
+        initialTopic={selectedTopic !== "all" ? selectedTopic : ""}
+      />
     </div>
   );
 }

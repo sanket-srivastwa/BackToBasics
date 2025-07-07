@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { 
@@ -14,7 +15,9 @@ import {
   AlertTriangle, 
   Lightbulb,
   Target,
-  TrendingUp
+  TrendingUp,
+  Users,
+  Info
 } from "lucide-react";
 
 export default function Feedback() {
@@ -234,22 +237,44 @@ export default function Feedback() {
               </div>
             )}
 
-            <div className="flex gap-4 mt-8">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => setLocation(`/question/${question.id}`)}
-              >
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Try Another Question
-              </Button>
-              <Button
-                className="flex-1"
-                onClick={() => setLocation("/practice")}
-              >
-                <ArrowRight className="mr-2 h-4 w-4" />
-                Continue Practice
-              </Button>
+            <div className="space-y-3 mt-8">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300"
+                    onClick={() => {
+                      // Navigate to community page for this question
+                      window.open(`/community?question=${question.id}`, '_blank');
+                    }}
+                  >
+                    <Users className="mr-2 h-4 w-4" />
+                    Share Your Answer to Community
+                    <Info className="ml-2 h-3 w-3 opacity-60" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-sm">
+                  <p>Share your answer with the community to get diverse perspectives and engage in thoughtful discussions about this question.</p>
+                </TooltipContent>
+              </Tooltip>
+              
+              <div className="flex gap-4">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setLocation(`/question/${question.id}`)}
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Try Another Question
+                </Button>
+                <Button
+                  className="flex-1"
+                  onClick={() => setLocation("/practice")}
+                >
+                  <ArrowRight className="mr-2 h-4 w-4" />
+                  Continue Practice
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
