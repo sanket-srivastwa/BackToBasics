@@ -51,6 +51,7 @@ export default function Home() {
     queryKey: ["/api/community/questions/recent"],
     queryFn: async () => {
       const response = await fetch("/api/community/questions/recent?limit=5");
+      if (!response.ok) throw new Error('Failed to fetch');
       return response.json();
     },
   });
@@ -59,6 +60,7 @@ export default function Home() {
     queryKey: ["/api/community/answers/recent"],
     queryFn: async () => {
       const response = await fetch("/api/community/answers/recent?limit=5");
+      if (!response.ok) throw new Error('Failed to fetch');
       return response.json();
     },
   });
@@ -554,7 +556,7 @@ export default function Home() {
                   <div className="text-center py-4">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
                   </div>
-                ) : recentCommunityQuestions && recentCommunityQuestions.length > 0 ? (
+                ) : recentCommunityQuestions && Array.isArray(recentCommunityQuestions) && recentCommunityQuestions.length > 0 ? (
                   <div className="space-y-4">
                     {recentCommunityQuestions.slice(0, 3).map((question: any) => (
                       <div key={question.id} className="border-l-4 border-purple-400 pl-4 py-2 hover:bg-purple-50 transition-colors cursor-pointer" onClick={() => setLocation(`/community?questionId=${question.id}`)}>
@@ -597,7 +599,7 @@ export default function Home() {
                   <div className="text-center py-4">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
                   </div>
-                ) : recentCommunityAnswers && recentCommunityAnswers.length > 0 ? (
+                ) : recentCommunityAnswers && Array.isArray(recentCommunityAnswers) && recentCommunityAnswers.length > 0 ? (
                   <div className="space-y-4">
                     {recentCommunityAnswers.slice(0, 3).map((answer: any) => (
                       <div key={answer.id} className="border-l-4 border-indigo-400 pl-4 py-2 hover:bg-indigo-50 transition-colors cursor-pointer" onClick={() => setLocation(`/community?answerId=${answer.id}`)}>

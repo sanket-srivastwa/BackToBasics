@@ -97,7 +97,10 @@ export default function QuestionCard({
             </Badge>
           </div>
         </div>
-        <CardTitle className="text-lg line-clamp-2 mb-3">
+        <CardTitle 
+          className="text-lg line-clamp-2 mb-3 cursor-pointer hover:text-blue-600 transition-colors"
+          onClick={onClick}
+        >
           {question.title}
         </CardTitle>
         <div className="flex items-center justify-between text-sm text-neutral-500 mb-4">
