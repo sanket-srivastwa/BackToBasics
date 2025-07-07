@@ -12,12 +12,14 @@ import AuthPromptModal from "@/components/auth-prompt-modal";
 import AnswerModal from "@/components/answer-modal";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { ArrowLeft, Users, Clock, Target, TrendingUp, Bookmark, Star, Flame, Search, Filter, ChevronDown, ChevronUp } from "lucide-react";
+import { getTopicsForRole, getAllTopics } from "@/lib/topicFilters";
 
 export default function Practice() {
   const [, setLocation] = useLocation();
   const [selectedTopic, setSelectedTopic] = useState("all");
   const [selectedCompany, setSelectedCompany] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
+  const [selectedRole, setSelectedRole] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [filtersExpanded, setFiltersExpanded] = useState(false);
@@ -33,6 +35,7 @@ export default function Practice() {
     const search = urlParams.get('search');
     const company = urlParams.get('company');
     const difficulty = urlParams.get('difficulty');
+    const role = urlParams.get('role');
     const topic = urlParams.get('topic');
     
     if (search) {
@@ -41,8 +44,22 @@ export default function Practice() {
     }
     if (company) setSelectedCompany(company);
     if (difficulty) setSelectedDifficulty(difficulty);
+    if (role) setSelectedRole(role);
     if (topic) setSelectedTopic(topic);
   }, []);
+
+  // Dynamic topics based on selected role
+  const availableTopics = selectedRole === "all" ? getAllTopics() : getTopicsForRole(selectedRole);
+  
+  // Reset topic if current selection is not available for the new role
+  useEffect(() => {
+    if (selectedRole !== "all" && selectedTopic !== "all") {
+      const roleTopics = getTopicsForRole(selectedRole);
+      if (!roleTopics.includes(selectedTopic)) {
+        setSelectedTopic("all");
+      }
+    }
+  }, [selectedRole, selectedTopic]);
 
   // Debounce search input
   useEffect(() => {
@@ -55,17 +72,18 @@ export default function Practice() {
 
   // Questions query with proper deduplication
   const { data: questionsData, isLoading, error } = useQuery({
-    queryKey: ["/api/questions/filtered", selectedTopic, selectedCompany, selectedDifficulty, debouncedSearchTerm],
+    queryKey: ["/api/questions/filtered", selectedTopic, selectedCompany, selectedDifficulty, selectedRole, debouncedSearchTerm],
     queryFn: async () => {
       const params = new URLSearchParams();
       
       if (selectedCompany !== "all") params.append('company', selectedCompany);
       if (selectedDifficulty !== "all") params.append('difficulty', selectedDifficulty);
+      if (selectedRole !== "all") params.append('role', selectedRole);
       if (selectedTopic !== "all") params.append('topic', selectedTopic);
       if (debouncedSearchTerm.trim()) params.append('search', debouncedSearchTerm);
       
       const hasFilters = params.toString().length > 0;
-      const url = hasFilters ? `/api/questions/filtered?${params.toString()}` : "/api/questions/popular";
+      const url = hasFilters ? `/api/questions/search?${params.toString()}` : "/api/questions/popular";
       
       const response = await fetch(url);
       if (!response.ok) {
@@ -110,17 +128,18 @@ export default function Practice() {
     setSelectedDifficulty("all");
     setSelectedTopic("all");
     setSelectedCompany("all");
+    setSelectedRole("all");
     setSearchTerm("");
     setDebouncedSearchTerm("");
     window.history.pushState({}, '', '/practice');
   };
 
-  const topics = [
-    { id: "all", name: "All Topics" },
-    { id: "pm", name: "Product Management" },
-    { id: "tpm", name: "Program Management" },
-    { id: "em", name: "Engineering Management" },
-    { id: "project-management", name: "Project Management" }
+  const roles = [
+    { id: "all", name: "All Roles" },
+    { id: "Product Management", name: "Product Management" },
+    { id: "Program Management", name: "Program Management" },
+    { id: "Engineering Management", name: "Engineering Management" },
+    { id: "General Management", name: "General Management" }
   ];
 
   const difficulties = [
@@ -224,7 +243,7 @@ export default function Practice() {
             </CardHeader>
             {filtersExpanded && (
               <CardContent className="pt-0">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                   {/* Difficulty Filter */}
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
@@ -254,26 +273,63 @@ export default function Practice() {
                     </div>
                   </div>
 
-                  {/* Topic Filter */}
+                  {/* Role Filter */}
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
                       <Users className="w-4 h-4 text-blue-600" />
-                      <h4 className="text-sm font-semibold text-gray-800">Management Area</h4>
+                      <h4 className="text-sm font-semibold text-gray-800">Role</h4>
                     </div>
                     <div className="space-y-2">
-                      {topics.map((topic) => (
+                      {roles.map((role) => (
                         <Button
-                          key={topic.id}
-                          variant={selectedTopic === topic.id ? "default" : "outline"}
+                          key={role.id}
+                          variant={selectedRole === role.id ? "default" : "outline"}
                           size="sm"
-                          onClick={() => setSelectedTopic(topic.id)}
+                          onClick={() => setSelectedRole(role.id)}
                           className={`w-full justify-start transition-all duration-200 ${
-                            selectedTopic === topic.id 
+                            selectedRole === role.id 
                               ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg" 
                               : "hover:bg-blue-50 hover:border-blue-300"
                           }`}
                         >
-                          {topic.name}
+                          {role.name}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Topic Filter */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Target className="w-4 h-4 text-green-600" />
+                      <h4 className="text-sm font-semibold text-gray-800">Topic</h4>
+                    </div>
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                      <Button
+                        variant={selectedTopic === "all" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedTopic("all")}
+                        className={`w-full justify-start transition-all duration-200 ${
+                          selectedTopic === "all" 
+                            ? "bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg" 
+                            : "hover:bg-green-50 hover:border-green-300"
+                        }`}
+                      >
+                        All Topics
+                      </Button>
+                      {availableTopics.map((topic) => (
+                        <Button
+                          key={topic}
+                          variant={selectedTopic === topic ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedTopic(topic)}
+                          className={`w-full justify-start transition-all duration-200 text-xs ${
+                            selectedTopic === topic 
+                              ? "bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-lg" 
+                              : "hover:bg-green-50 hover:border-green-300"
+                          }`}
+                        >
+                          {topic}
                         </Button>
                       ))}
                     </div>

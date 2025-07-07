@@ -13,7 +13,7 @@ import Footer from "@/components/footer";
 import VoiceInput from "@/components/voice-input";
 import { ArrowLeft, Save, Send, Clock, Lightbulb, Mic, Keyboard, Users, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { CommunityAnswers } from "@/components/CommunityAnswers";
+
 
 export default function Question() {
   const [, setLocation] = useLocation();
@@ -335,11 +335,8 @@ export default function Question() {
                       if (answer.trim()) {
                         localStorage.setItem(`draft_answer_${questionId}`, answer);
                       }
-                      // Scroll to community section
-                      const communitySection = document.getElementById('community');
-                      if (communitySection) {
-                        communitySection.scrollIntoView({ behavior: 'smooth' });
-                      }
+                      // Navigate to community page for this question
+                      window.open(`/community?question=${questionId}`, '_blank');
                     }}
                   >
                     <Users className="mr-2 h-4 w-4" />
@@ -368,15 +365,7 @@ export default function Question() {
           </CardContent>
         </Card>
 
-        {/* Community Answers Section */}
-        {question && (
-          <div className="mt-8" id="community">
-            <CommunityAnswers 
-              questionId={questionId} 
-              questionTitle={question.title} 
-            />
-          </div>
-        )}
+
       </div>
 
       <Footer />

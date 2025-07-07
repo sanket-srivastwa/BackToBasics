@@ -23,6 +23,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { formatDistanceToNow } from "date-fns";
 import { Link } from "wouter";
+import { getTopicsForRole, getAllTopics } from "@/lib/topicFilters";
 
 interface CommunityQuestion extends Question {
   communityAnswersCount: number;
@@ -102,7 +103,19 @@ export default function Community() {
   const companies = ["Google", "Microsoft", "Amazon", "Meta", "Apple", "Oracle", "Cisco", "Salesforce", "Adobe", "NVIDIA", "Netflix"];
   const difficulties = ["Easy", "Medium", "Hard"];
   const roles = ["Product Management", "Program Management", "Engineering Management", "General Management"];
-  const topics = ["Product Strategy", "Technical Program Management", "People Management", "Business Analytics", "System Design", "Leadership"];
+  
+  // Dynamic topics based on selected role
+  const availableTopics = selectedRole === "all" ? getAllTopics() : getTopicsForRole(selectedRole);
+  
+  // Reset topic if current selection is not available for the new role
+  useEffect(() => {
+    if (selectedRole !== "all" && selectedTopic !== "all") {
+      const roleTopics = getTopicsForRole(selectedRole);
+      if (!roleTopics.includes(selectedTopic)) {
+        setSelectedTopic("all");
+      }
+    }
+  }, [selectedRole, selectedTopic]);
 
   const getSortLabel = (sort: string) => {
     switch (sort) {
@@ -234,7 +247,7 @@ export default function Community() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Topics</SelectItem>
-                        {topics.map((topic) => (
+                        {availableTopics.map((topic) => (
                           <SelectItem key={topic} value={topic}>
                             {topic}
                           </SelectItem>
